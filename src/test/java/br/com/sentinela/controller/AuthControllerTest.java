@@ -33,7 +33,7 @@ class AuthControllerTest extends WebLayerTestSupport {
 
     @Test
     void cadastroRespondeAcceptedComMensagemGenerica() throws Exception {
-        when(authService.register(any())).thenReturn(new MessageResponseDto(GENERIC_REGISTER));
+        when(authService.register(any(), any())).thenReturn(new MessageResponseDto(GENERIC_REGISTER));
 
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -46,7 +46,7 @@ class AuthControllerTest extends WebLayerTestSupport {
 
     @Test
     void cadastroComEmailJaCadastradoRespondeConflict() throws Exception {
-        when(authService.register(any())).thenThrow(new EmailAlreadyRegisteredException());
+        when(authService.register(any(), any())).thenThrow(new EmailAlreadyRegisteredException());
 
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -69,7 +69,7 @@ class AuthControllerTest extends WebLayerTestSupport {
                 .andExpect(content().string(containsString("E-mail inválido")))
                 .andExpect(content().string(containsString("A senha deve ter entre 8 e 72 caracteres")));
 
-        verify(authService, never()).register(any());
+        verify(authService, never()).register(any(), any());
     }
 
     @Test
@@ -138,7 +138,7 @@ class AuthControllerTest extends WebLayerTestSupport {
 
     @Test
     void confirmarEmailComCodigoInvalidoRespondeBadRequest() throws Exception {
-        when(authService.confirmEmail(any())).thenThrow(new InvalidVerificationCodeException());
+        when(authService.confirmEmail(any(), any())).thenThrow(new InvalidVerificationCodeException());
 
         mockMvc.perform(post("/auth/email/confirm")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -173,9 +173,12 @@ class AuthControllerTest extends WebLayerTestSupport {
     }
 
     @Test
-    void logoutEhPublicoERespondeNoContent() throws Exception {
-        mockMvc.perform(post("/auth/logout"))
+    void logoutComTokenRevogaSessaoERespondeNoContent() throws Exception {
+        User user = user();
+        mockMvc.perform(post("/auth/logout").header("Authorization", bearer(user)))
                 .andExpect(status().isNoContent());
+
+        verify(authService).logout(user);
     }
 
     // Regressao: sem token, /auth/logout-all respondia 500 (NullPointerException no AuthService).
@@ -200,9 +203,10 @@ class AuthControllerTest extends WebLayerTestSupport {
 
     @Test
     void erroInesperadoRespondeInternalServerErrorSemDetalhesInternos() throws Exception {
-        doThrow(new IllegalStateException("detalhe interno")).when(authService).logout();
+        User user = user();
+        doThrow(new IllegalStateException("detalhe interno")).when(authService).logout(any());
 
-        mockMvc.perform(post("/auth/logout"))
+        mockMvc.perform(post("/auth/logout").header("Authorization", bearer(user)))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().string("Erro inesperado ao processar a requisição"));
     }

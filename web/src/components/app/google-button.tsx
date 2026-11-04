@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { SocialButton } from "@/components/base/buttons/social-button";
 import { notify } from "@/components/app/notifications";
 import { cx } from "@/utils/cx";
 
@@ -45,8 +44,7 @@ interface GoogleButtonProps {
 }
 
 /**
- * Botao "Continuar com o Google" no visual do Untitled UI.
- * O botao oficial do Google (que gera o ID token) fica por cima, transparente, e recebe o clique.
+ * Usa o botao oficial do Google para manter o mesmo controle acessível que recebe o clique.
  */
 export const GoogleButton = ({ onCredential, isDisabled, className }: GoogleButtonProps) => {
     const { t, i18n } = useTranslation();
@@ -106,18 +104,18 @@ export const GoogleButton = ({ onCredential, isDisabled, className }: GoogleButt
 
     return (
         <div ref={wrapperRef} className={cx("relative", className)} title={unavailable ? t("auth.googleNotConfigured") : undefined}>
-            <SocialButton social="google" theme="brand" size="md" className="w-full" isDisabled={unavailable || isDisabled || !ready} aria-hidden={ready}>
-                {t("auth.google")}
-            </SocialButton>
             {!unavailable && (
                 <div
                     ref={overlayRef}
                     className={cx(
-                        "absolute inset-0 flex items-center justify-center overflow-hidden opacity-[0.011]",
+                        "flex min-h-11 w-full items-center justify-center overflow-hidden",
                         (isDisabled || !ready) && "pointer-events-none",
                     )}
+                    aria-hidden={!ready}
+                    inert={isDisabled || !ready}
                 />
             )}
+            {unavailable && <div aria-disabled="true" className="flex min-h-11 w-full items-center justify-center rounded-lg border border-secondary text-sm font-semibold text-tertiary">{t("auth.google")}</div>}
         </div>
     );
 };

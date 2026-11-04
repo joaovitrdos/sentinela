@@ -35,7 +35,7 @@ export interface RiverLevel {
     projeto: string | null;
     situacaoEstacao: "ATIVA" | "MANUTENCAO" | null;
     cotaCm: number | null;
-    status: "ATENCAO" | "NORMAL" | "ESTIAGEM" | "SEM_DADOS" | "SEM_REFERENCIA" | "DESCONHECIDO";
+    status: "ATENCAO" | "ALERTA" | "INUNDACAO" | "NORMAL" | "ESTIAGEM" | "SEM_DADOS" | "SEM_REFERENCIA" | "DESCONHECIDO";
     statusDescricao: string | null;
     dataUltimoDado: string | null;
     idadeHoras: number | null;
@@ -104,6 +104,8 @@ export const THEME_CLASSES: Record<ThemeId, ClassDef[]> = {
         { key: "none", color: "#a3a3a3", label: "hydro.rain.none" },
     ],
     level: [
+        { key: "flood", color: "#991b1b", label: "hydro.level.flood" },
+        { key: "alert", color: "#dc2626", label: "hydro.level.alert" },
         { key: "attention", color: "#ef4444", label: "hydro.level.attention" },
         { key: "normal", color: "#22c55e", label: "hydro.level.normal" },
         { key: "drought", color: "#f59e0b", label: "hydro.level.drought" },
@@ -125,6 +127,8 @@ const RAIN_KEYS: Record<string, [string, number]> = {
 };
 
 const LEVEL_KEYS: Record<RiverLevel["status"], [string, number]> = {
+    INUNDACAO: ["flood", 7],
+    ALERTA: ["alert", 6],
     ATENCAO: ["attention", 5],
     ESTIAGEM: ["drought", 4],
     NORMAL: ["normal", 3],

@@ -205,7 +205,7 @@ class UserControllerTest extends WebLayerTestSupport {
         User user = user();
         UserResponseDto response = new UserResponseDto(user.getUserId(), user.getName(), "novo@example.com", null,
                 AuthProvider.LOCAL, true);
-        when(userService.confirmEmailChange(any(), any())).thenReturn(AuthResponseDto.bearer("token-novo", response));
+        when(userService.confirmEmailChange(any(), any(), any())).thenReturn(AuthResponseDto.bearer("token-novo", response));
 
         mockMvc.perform(post("/users/me/email/confirm")
                         .header("Authorization", bearer(user))
@@ -227,7 +227,7 @@ class UserControllerTest extends WebLayerTestSupport {
                                 """))
                 .andExpect(status().isUnauthorized());
 
-        verify(userService, never()).requestEmailChange(any(), any());
+        verify(userService, never()).requestEmailChange(any(), any(), any());
     }
 
     @Test
@@ -235,16 +235,17 @@ class UserControllerTest extends WebLayerTestSupport {
         mockMvc.perform(delete("/users/me"))
                 .andExpect(status().isUnauthorized());
 
-        verify(userService, never()).delete(any());
+        verify(userService, never()).delete(any(), any());
     }
 
     @Test
     void excluirContaComTokenRespondeNoContent() throws Exception {
         User user = user();
 
-        mockMvc.perform(delete("/users/me").header("Authorization", bearer(user)))
+        mockMvc.perform(delete("/users/me").header("Authorization", bearer(user))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"currentPassword\":\"senha\"}"))
                 .andExpect(status().isNoContent());
 
-        verify(userService).delete(user.getUserId());
+        verify(userService).delete(org.mockito.ArgumentMatchers.eq(user.getUserId()), any());
     }
 }

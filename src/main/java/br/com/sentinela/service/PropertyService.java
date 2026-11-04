@@ -13,6 +13,7 @@ import br.com.sentinela.repository.PropertyMemberRepository;
 import br.com.sentinela.repository.PropertyInvitationRepository;
 import br.com.sentinela.repository.UserRepository;
 import br.com.sentinela.util.PropertyGeometry;
+import br.com.sentinela.util.LogUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +70,7 @@ public class PropertyService {
 
     @Transactional
     public void delete(UUID ownerId, UUID propertyId) {
-        Property property = teamService.requireAdmin(propertyId, ownerId);
+        Property property = teamService.requireOwner(propertyId, ownerId);
         invitationRepository.deleteAllByProperty_PropertyId(propertyId);
         memberRepository.deleteAllByProperty_PropertyId(propertyId);
         fieldActionRepository.deleteAllByProperty_PropertyId(propertyId);
@@ -87,12 +88,20 @@ public class PropertyService {
     @Transactional(readOnly = true)
     public Property requireAdmin(UUID propertyId, UUID userId) { return teamService.requireAdmin(propertyId, userId); }
 
+    @Transactional(readOnly = true)
+    public Property requireOwner(UUID propertyId, UUID userId) { return teamService.requireOwner(propertyId, userId); }
+
     public PropertyGeometryResponseDto geometryOf(Property property) {
         if (property.getPolygonJson() == null || property.getPolygonJson().isBlank()) {
             return null;
         }
-        PropertyGeometryResponseDto geometry = objectMapper.readValue(property.getPolygonJson(), PropertyGeometryResponseDto.class);
-        return PropertyGeometry.validate(geometry).geometry();
+        try {
+            PropertyGeometryResponseDto geometry = objectMapper.readValue(property.getPolygonJson(), PropertyGeometryResponseDto.class);
+            return PropertyGeometry.validate(geometry).geometry();
+        } catch (RuntimeException exception) {
+            LogUtil.error("Falha ao ler o polígono salvo da propriedade " + property.getPropertyId(), exception);
+            return null;
+        }
     }
 
     private void apply(Property property, PropertyRequestDto request) {

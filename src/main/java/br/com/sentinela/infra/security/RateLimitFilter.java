@@ -71,11 +71,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
             return new Target("auth:" + ip, rateLimit.auth());
         }
 
-        String email = tokenService.emailFrom(request.getHeader(HttpHeaders.AUTHORIZATION));
-        if (email == null) {
+        String subject = tokenService.subjectFrom(request.getHeader(HttpHeaders.AUTHORIZATION));
+        if (subject == null) {
             return new Target("ip:" + ip, rateLimit.anonymous());
         }
-        return new Target("user:" + email, rateLimit.user());
+        return new Target("user:" + subject, rateLimit.user());
     }
 
     private Bucket newBucket(SentinelaSecurityProperties.Limit limit) {

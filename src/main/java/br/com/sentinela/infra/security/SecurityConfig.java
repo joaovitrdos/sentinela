@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Rotas protegidas que casariam com as regras publicas abaixo: precisam vir antes.
-                        .requestMatchers("/auth/logout-all", "/users/me", "/users/me/**").authenticated()
+                        .requestMatchers("/auth/logout", "/auth/logout-all", "/users/me", "/users/me/**").authenticated()
                         .requestMatchers("/auth/**", "/actuator/health/**", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/system/status").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/connection/probe").permitAll()

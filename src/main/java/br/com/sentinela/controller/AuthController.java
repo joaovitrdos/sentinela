@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/auth")
@@ -31,18 +32,18 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public MessageResponseDto register(@RequestBody @Valid RegisterRequestDto request) {
-        return authService.register(request);
+    public MessageResponseDto register(@RequestBody @Valid RegisterRequestDto request, HttpServletRequest servletRequest) {
+        return authService.register(request, servletRequest.getRemoteAddr());
     }
 
     @PostMapping("/email/confirm")
-    public AuthResponseDto confirmEmail(@RequestBody @Valid ValidateCodeRequestDto request) {
-        return authService.confirmEmail(request);
+    public AuthResponseDto confirmEmail(@RequestBody @Valid ValidateCodeRequestDto request, HttpServletRequest servletRequest) {
+        return authService.confirmEmail(request, servletRequest.getRemoteAddr());
     }
 
     @PostMapping("/email/resend")
-    public MessageResponseDto resendVerification(@RequestBody @Valid SendEmailRequestDto request) {
-        return authService.resendVerification(request);
+    public MessageResponseDto resendVerification(@RequestBody @Valid SendEmailRequestDto request, HttpServletRequest servletRequest) {
+        return authService.resendVerification(request, servletRequest.getRemoteAddr());
     }
 
     @PostMapping("/login")
@@ -57,8 +58,8 @@ public class AuthController {
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout() {
-        authService.logout();
+    public void logout(@AuthenticationPrincipal User principal) {
+        authService.logout(principal);
     }
 
     @PostMapping("/logout-all")
@@ -68,18 +69,18 @@ public class AuthController {
     }
 
     @PostMapping("/password/forgot")
-    public MessageResponseDto forgotPassword(@RequestBody @Valid SendEmailRequestDto request) {
-        return passwordRecoveryService.sendRecoveryCode(request);
+    public MessageResponseDto forgotPassword(@RequestBody @Valid SendEmailRequestDto request, HttpServletRequest servletRequest) {
+        return passwordRecoveryService.sendRecoveryCode(request, servletRequest.getRemoteAddr());
     }
 
     @PostMapping("/password/validate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void validateRecoveryCode(@RequestBody @Valid ValidateCodeRequestDto request) {
-        passwordRecoveryService.validateCode(request);
+    public void validateRecoveryCode(@RequestBody @Valid ValidateCodeRequestDto request, HttpServletRequest servletRequest) {
+        passwordRecoveryService.validateCode(request, servletRequest.getRemoteAddr());
     }
 
     @PostMapping("/password/reset")
-    public MessageResponseDto resetPassword(@RequestBody @Valid ResetPasswordRequestDto request) {
-        return passwordRecoveryService.resetPassword(request);
+    public MessageResponseDto resetPassword(@RequestBody @Valid ResetPasswordRequestDto request, HttpServletRequest servletRequest) {
+        return passwordRecoveryService.resetPassword(request, servletRequest.getRemoteAddr());
     }
 }

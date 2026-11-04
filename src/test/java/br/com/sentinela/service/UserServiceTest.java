@@ -2,6 +2,7 @@ package br.com.sentinela.service;
 
 import br.com.sentinela.dto.request.ChangeEmailRequestDto;
 import br.com.sentinela.dto.request.ConfirmEmailChangeRequestDto;
+import br.com.sentinela.dto.request.DeleteAccountRequestDto;
 import br.com.sentinela.dto.request.UpdateUserRequestDto;
 import br.com.sentinela.dto.response.AuthResponseDto;
 import br.com.sentinela.dto.response.MessageResponseDto;
@@ -232,8 +233,9 @@ class UserServiceTest {
     @Test
     void excluirContaApagaEmailsEUsuario() {
         when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("senha", "hash")).thenReturn(true);
 
-        userService.delete(user.getUserId());
+        userService.delete(user.getUserId(), new DeleteAccountRequestDto("senha", null));
 
         verify(emailRepository).deleteByUserId(user.getUserId());
         verify(propertyRepository).deleteAllOwnedBy(user.getUserId());
@@ -244,8 +246,10 @@ class UserServiceTest {
     @Test
     void falhaDoBancoAoExcluirViraUserDeleteException() {
         when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("senha", "hash")).thenReturn(true);
         doThrow(new DataAccessResourceFailureException("banco fora")).when(userRepository).flush();
 
-        assertThatThrownBy(() -> userService.delete(user.getUserId())).isInstanceOf(UserDeleteException.class);
+        assertThatThrownBy(() -> userService.delete(user.getUserId(), new DeleteAccountRequestDto("senha", null)))
+                .isInstanceOf(UserDeleteException.class);
     }
 }

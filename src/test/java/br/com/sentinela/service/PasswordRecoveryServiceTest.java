@@ -113,7 +113,7 @@ class PasswordRecoveryServiceTest {
         assertThat(user.getPassword()).isEqualTo("hash-novo");
         assertThat(user.getTokenVersion()).isEqualTo(version + 1);
         verify(userRepository).saveAndFlush(user);
-        verify(attemptGuard).clearCodeAttempts("qa@example.com");
+        verify(attemptGuard).clearCodeAttempts("qa@example.com", null);
         verify(attemptGuard).clearLogin("qa@example.com");
         assertThat(response.message()).isEqualTo("Senha atualizada com sucesso");
     }

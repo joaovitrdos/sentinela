@@ -33,8 +33,8 @@ public class SecurityFilter extends OncePerRequestFilter {
         TokenService.Credentials credentials =
                 tokenService.credentialsFrom(request.getHeader(HttpHeaders.AUTHORIZATION));
 
-        if (credentials != null && credentials.email() != null) {
-            userRepository.findByEmail(credentials.email())
+        if (credentials != null) {
+            userRepository.findById(credentials.userId())
                     .filter(credentials::matches)
                     .ifPresent(user -> authenticate(user, request));
         }

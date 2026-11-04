@@ -67,6 +67,13 @@ public class TeamService {
     }
 
     @Transactional(readOnly = true)
+    public Property requireOwner(UUID propertyId, UUID userId) {
+        Property property = requireView(propertyId, userId);
+        if (!property.getUser().getUserId().equals(userId)) throw forbidden();
+        return property;
+    }
+
+    @Transactional(readOnly = true)
     public TeamRole role(Property property, UUID userId) {
         if (userId == null || property == null) return null;
         if (property.getUser().getUserId().equals(userId)) return TeamRole.ADMIN;
@@ -82,7 +89,7 @@ public class TeamService {
         TeamRole current = role(property, userId);
         List<TeamOverviewDto.Member> memberRows = List.of();
         List<TeamOverviewDto.Invitation> invitationRows = List.of();
-        if (current == TeamRole.ADMIN) {
+        if (owner) {
             var ownerUser = property.getUser();
             memberRows = new java.util.ArrayList<>();
             memberRows.add(new TeamOverviewDto.Member(ownerUser.getUserId(), ownerUser.getName(), ownerUser.getEmail(),
@@ -106,7 +113,7 @@ public class TeamService {
 
     @Transactional
     public TeamOverviewDto changeTitle(UUID propertyId, UUID actorId, String title) {
-        Property property = requireAdmin(propertyId, actorId);
+        Property property = requireOwner(propertyId, actorId);
         property.setTeamTitle(title.trim());
         properties.saveAndFlush(property);
         return overview(propertyId, actorId);
@@ -114,7 +121,7 @@ public class TeamService {
 
     @Transactional
     public TeamOverviewDto setMode(UUID propertyId, UUID userId, boolean enabled) {
-        Property property = requireAdmin(propertyId, userId);
+        Property property = requireOwner(propertyId, userId);
         if (!property.getUser().getUserId().equals(userId)) throw forbidden();
         if (!enabled) {
             invitations.deleteAllByProperty_PropertyId(propertyId);
@@ -127,7 +134,7 @@ public class TeamService {
 
     @Transactional
     public TeamOverviewDto invite(UUID propertyId, UUID userId, TeamInviteRequestDto request) {
-        Property property = requireAdmin(propertyId, userId);
+        Property property = requireOwner(propertyId, userId);
         if (!Boolean.TRUE.equals(property.getTeamEnabled())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Ative a equipe nesta propriedade primeiro");
         }
@@ -153,7 +160,7 @@ public class TeamService {
 
     @Transactional
     public TeamOverviewDto changeRole(UUID propertyId, UUID actorId, UUID memberId, TeamRole newRole) {
-        Property property = requireAdmin(propertyId, actorId);
+        Property property = requireOwner(propertyId, actorId);
         if (property.getUser().getUserId().equals(memberId)) throw forbidden();
         PropertyMember member = members.findByProperty_PropertyIdAndUser_UserId(propertyId, memberId)
                 .orElseThrow(PropertyNotFoundException::new);
@@ -164,7 +171,7 @@ public class TeamService {
 
     @Transactional
     public TeamOverviewDto removeMember(UUID propertyId, UUID actorId, UUID memberId) {
-        Property property = requireAdmin(propertyId, actorId);
+        Property property = requireOwner(propertyId, actorId);
         if (property.getUser().getUserId().equals(memberId)) throw forbidden();
         members.delete(members.findByProperty_PropertyIdAndUser_UserId(propertyId, memberId)
                 .orElseThrow(PropertyNotFoundException::new));
@@ -183,7 +190,7 @@ public class TeamService {
 
     @Transactional
     public TeamOverviewDto cancelInvitation(UUID propertyId, UUID actorId, UUID invitationId) {
-        requireAdmin(propertyId, actorId);
+        requireOwner(propertyId, actorId);
         PropertyInvitation invitation = invitations.findById(invitationId)
                 .filter(item -> item.getProperty().getPropertyId().equals(propertyId))
                 .orElseThrow(PropertyNotFoundException::new);

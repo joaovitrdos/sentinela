@@ -6,6 +6,7 @@ import br.com.sentinela.infra.client.snirh.SnirhLayerClient;
 import br.com.sentinela.infra.client.snirh.SnirhText;
 import br.com.sentinela.dto.response.ArcGisLayerResponseDto.LayerFeatureDto;
 import br.com.sentinela.infra.config.SnirhHydroProperties;
+import br.com.sentinela.exception.SnirhUnavailableException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,10 +34,14 @@ public class StationService {
     }
 
     private List<HydroStationResponseDto> load() {
-        return client.fetchAll(properties.stationsUrl(), FIELDS, "Codigo", false).stream()
+        List<HydroStationResponseDto> stations = client.fetchAll(properties.stationsUrl(), FIELDS, "Codigo", false).stream()
                 .map(this::toStation)
                 .filter(Objects::nonNull)
                 .toList();
+        if (stations.isEmpty()) {
+            throw new SnirhUnavailableException("SNIRH returned no valid stations");
+        }
+        return stations;
     }
 
     HydroStationResponseDto toStation(LayerFeatureDto feature) {

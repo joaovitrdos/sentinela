@@ -248,13 +248,14 @@ class AuthServiceTest {
         verify(verificationCodeService).consumeCode("12345678", "qa@example.com", CodePurpose.EMAIL_VERIFICATION);
         assertThat(user.isEmailVerified()).isTrue();
         assertThat(response.accessToken()).isEqualTo("jwt");
-        verify(attemptGuard).clearCodeAttempts("qa@example.com");
+        verify(attemptGuard).clearCodeAttempts("qa@example.com", null);
     }
 
     @Test
     void logoutEmTodosOsDispositivosRevogaOsTokens() {
         User user = user(true);
         int version = user.getTokenVersion();
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
 
         authService.logoutEverywhere(user);
 

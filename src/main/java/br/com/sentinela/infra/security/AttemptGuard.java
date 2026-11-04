@@ -46,14 +46,26 @@ public class AttemptGuard {
         }
     }
 
+    public void checkRecovery(String email, String clientAddress) {
+        checkRecovery(clientKey(email, clientAddress));
+    }
+
     public void checkCodeAttempt(String email) {
         if (increment(codeAttempts, email) > attempts.maxCodeAttempts()) {
             throw new TooManyCodeAttemptsException();
         }
     }
 
+    public void checkCodeAttempt(String email, String clientAddress) {
+        checkCodeAttempt(clientKey(email, clientAddress));
+    }
+
     public void clearCodeAttempts(String email) {
         codeAttempts.invalidate(email);
+    }
+
+    public void clearCodeAttempts(String email, String clientAddress) {
+        codeAttempts.invalidate(clientKey(email, clientAddress));
     }
 
     private static Cache<String, AtomicInteger> counters(Duration window) {
@@ -70,5 +82,9 @@ public class AttemptGuard {
 
     private int increment(Cache<String, AtomicInteger> counters, String email) {
         return counters.get(email, key -> new AtomicInteger()).incrementAndGet();
+    }
+
+    private String clientKey(String email, String clientAddress) {
+        return email + "@" + (clientAddress == null || clientAddress.isBlank() ? "unknown" : clientAddress);
     }
 }

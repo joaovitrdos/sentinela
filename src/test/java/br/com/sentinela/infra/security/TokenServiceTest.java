@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -18,7 +20,7 @@ class TokenServiceTest {
     @BeforeEach
     void setUp() {
         tokenService = tokenServiceWith(SECRET);
-        user = User.builder().email("qa@example.com").build();
+        user = User.builder().userId(UUID.randomUUID()).email("qa@example.com").build();
     }
 
     private TokenService tokenServiceWith(String secret) {
@@ -28,12 +30,12 @@ class TokenServiceTest {
     }
 
     @Test
-    void tokenGeradoDevolveOEmailEAVersaoDoUsuario() {
+    void tokenGeradoDevolveOIdEAVersaoDoUsuario() {
         String token = tokenService.generateToken(user);
 
         TokenService.Credentials credentials = tokenService.credentialsFrom("Bearer " + token);
 
-        assertThat(credentials.email()).isEqualTo("qa@example.com");
+        assertThat(credentials.userId()).isEqualTo(user.getUserId());
         assertThat(credentials.tokenVersion()).isEqualTo(user.getTokenVersion());
         assertThat(credentials.matches(user)).isTrue();
     }
@@ -60,7 +62,7 @@ class TokenServiceTest {
     @Test
     void semCabecalhoNaoHaCredenciais() {
         assertThat(tokenService.credentialsFrom(null)).isNull();
-        assertThat(tokenService.emailFrom(null)).isNull();
+        assertThat(tokenService.subjectFrom(null)).isNull();
     }
 
     @Test

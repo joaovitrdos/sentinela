@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 
     const signOut = useCallback(async () => {
-        // O logout do backend e stateless; a sessao some de fato quando o token sai do navegador.
+        // O backend incrementa tokenVersion antes de limpar o token local.
         await authApi.logout().catch(() => undefined);
         update(null);
     }, [update]);

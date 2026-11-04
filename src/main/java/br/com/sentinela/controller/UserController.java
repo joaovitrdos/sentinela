@@ -3,6 +3,7 @@ package br.com.sentinela.controller;
 import br.com.sentinela.dto.request.ChangeEmailRequestDto;
 import br.com.sentinela.dto.request.ChangePasswordRequestDto;
 import br.com.sentinela.dto.request.ConfirmEmailChangeRequestDto;
+import br.com.sentinela.dto.request.DeleteAccountRequestDto;
 import br.com.sentinela.dto.request.UpdateUserRequestDto;
 import br.com.sentinela.dto.response.AuthResponseDto;
 import br.com.sentinela.dto.response.MessageResponseDto;
@@ -12,6 +13,7 @@ import br.com.sentinela.entity.User;
 import br.com.sentinela.service.PasswordRecoveryService;
 import br.com.sentinela.service.UserService;
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,22 +44,24 @@ public class UserController {
 
     @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@AuthenticationPrincipal User principal) {
-        userService.delete(principal.getUserId());
+    public void delete(@AuthenticationPrincipal User principal, @RequestBody @Valid DeleteAccountRequestDto request) {
+        userService.delete(principal.getUserId(), request);
     }
 
     @PostMapping("/me/email")
     public MessageResponseDto requestEmailChange(
             @AuthenticationPrincipal User principal,
-            @RequestBody @Valid ChangeEmailRequestDto request) {
-        return userService.requestEmailChange(principal, request);
+            @RequestBody @Valid ChangeEmailRequestDto request,
+            HttpServletRequest servletRequest) {
+        return userService.requestEmailChange(principal, request, servletRequest.getRemoteAddr());
     }
 
     @PostMapping("/me/email/confirm")
     public AuthResponseDto confirmEmailChange(
             @AuthenticationPrincipal User principal,
-            @RequestBody @Valid ConfirmEmailChangeRequestDto request) {
-        return userService.confirmEmailChange(principal, request);
+            @RequestBody @Valid ConfirmEmailChangeRequestDto request,
+            HttpServletRequest servletRequest) {
+        return userService.confirmEmailChange(principal, request, servletRequest.getRemoteAddr());
     }
 
     @PostMapping("/change-password")

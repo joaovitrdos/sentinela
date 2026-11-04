@@ -3,6 +3,7 @@ import { AnimatePresence, MotionConfig } from "motion/react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import { AppShell } from "@/components/app/app-shell";
+import { ErrorBoundary } from "@/components/app/error-boundary";
 import { Notifications } from "@/components/app/notifications";
 import { ConnectionMonitor } from "@/components/app/connection-monitor";
 import { AnimatedOutlet, PageFade, routeGroup } from "@/components/app/page-transition";
@@ -151,21 +152,23 @@ const AppRoutes = () => {
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-        {/* reducedMotion="user": quem pede "reduzir movimento" no sistema ve tudo sem animacao */}
-        <MotionConfig reducedMotion="user">
-            <ThemeProvider>
-                <Notifications />
-                <ConnectionMonitor />
-                <SystemProvider>
-                    <AuthProvider>
-                        <BrowserRouter>
-                            <RouteProvider>
-                                <AppRoutes />
-                            </RouteProvider>
-                        </BrowserRouter>
-                    </AuthProvider>
-                </SystemProvider>
-            </ThemeProvider>
-        </MotionConfig>
+        <ErrorBoundary>
+            {/* reducedMotion="user": quem pede "reduzir movimento" no sistema ve tudo sem animacao */}
+            <MotionConfig reducedMotion="user">
+                <ThemeProvider>
+                    <Notifications />
+                    <ConnectionMonitor />
+                    <SystemProvider>
+                        <AuthProvider>
+                            <BrowserRouter>
+                                <RouteProvider>
+                                    <AppRoutes />
+                                </RouteProvider>
+                            </BrowserRouter>
+                        </AuthProvider>
+                    </SystemProvider>
+                </ThemeProvider>
+            </MotionConfig>
+        </ErrorBoundary>
     </StrictMode>,
 );

@@ -66,10 +66,15 @@ public class AuthService {
 
     @Transactional
     public MessageResponseDto register(RegisterRequestDto request) {
+        return register(request, null);
+    }
+
+    @Transactional
+    public MessageResponseDto register(RegisterRequestDto request, String clientAddress) {
         validateRegister(request);
 
         String email = normalizeEmail(request.email());
-        attemptGuard.checkRecovery(email);
+        attemptGuard.checkRecovery(email, clientAddress);
 
         Optional<User> existing = userRepository.findByEmail(email);
 
@@ -98,8 +103,13 @@ public class AuthService {
 
     @Transactional
     public MessageResponseDto resendVerification(SendEmailRequestDto request) {
+        return resendVerification(request, null);
+    }
+
+    @Transactional
+    public MessageResponseDto resendVerification(SendEmailRequestDto request, String clientAddress) {
         String email = normalizeEmail(request.email());
-        attemptGuard.checkRecovery(email);
+        attemptGuard.checkRecovery(email, clientAddress);
 
         userRepository.findByEmail(email)
                 .filter(user -> !user.isEmailVerified())
@@ -111,8 +121,13 @@ public class AuthService {
 
     @Transactional
     public AuthResponseDto confirmEmail(ValidateCodeRequestDto request) {
+        return confirmEmail(request, null);
+    }
+
+    @Transactional
+    public AuthResponseDto confirmEmail(ValidateCodeRequestDto request, String clientAddress) {
         String email = normalizeEmail(request.email());
-        attemptGuard.checkCodeAttempt(email);
+        attemptGuard.checkCodeAttempt(email, clientAddress);
 
         User user = userRepository.findByEmail(email).orElseThrow(this::invalidCredentials);
 
@@ -121,7 +136,7 @@ public class AuthService {
         user.setEmailVerified(true);
         User confirmed = saveUser(user);
 
-        attemptGuard.clearCodeAttempts(email);
+        attemptGuard.clearCodeAttempts(email, clientAddress);
         sendWelcomeEmail(confirmed);
 
         return issueToken(confirmed);
@@ -154,15 +169,17 @@ public class AuthService {
         return issueToken(resolveGoogleUser(request));
     }
 
-    public void logout() {
+    @Transactional
+    public void logout(User principal) {
+        User user = userRepository.findById(principal.getUserId()).orElseThrow(this::invalidCredentials);
+        user.revokeIssuedTokens();
+        saveUser(user);
         SecurityContextHolder.clearContext();
     }
 
     @Transactional
     public void logoutEverywhere(User user) {
-        user.revokeIssuedTokens();
-        saveUser(user);
-        SecurityContextHolder.clearContext();
+        logout(user);
     }
 
     private User persistNewUser(User user) {

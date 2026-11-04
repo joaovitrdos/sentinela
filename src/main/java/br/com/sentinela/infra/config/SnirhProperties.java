@@ -12,7 +12,7 @@ public record SnirhProperties(
         @DefaultValue("1000") int pageSize,
         @DefaultValue("4") int maxRetries,
         @DefaultValue("2000") long retryDelayMs,
-        @DefaultValue("300") double maxRainfallMm24h,
+        @DefaultValue("2000") double maxRainfallMm24h,
         @DefaultValue("10m") Duration cache
 ) {
 }

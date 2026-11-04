@@ -9,6 +9,7 @@ import br.com.sentinela.util.LogUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -70,6 +71,8 @@ public class SnirhRainClient {
                 }
                 return response.features() != null ? response.features() : List.of();
 
+            } catch (HttpClientErrorException exception) {
+                throw new SnirhApiException("SNIRH rejected offset " + offset + " with HTTP " + exception.getStatusCode());
             } catch (SnirhApiException exception) {
                 throw exception;
             } catch (RuntimeException exception) {

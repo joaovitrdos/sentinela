@@ -74,9 +74,9 @@ class RateLimitFilterTest {
     }
 
     @Test
-    void usuarioLogadoUsaOLimiteDeUsuarioPorEmail() throws Exception {
+    void usuarioLogadoUsaOLimiteDeUsuarioPorId() throws Exception {
         RateLimitFilter filter = filter(true, 1, 3);
-        when(tokenService.emailFrom("Bearer token")).thenReturn("qa@example.com");
+        when(tokenService.subjectFrom("Bearer token")).thenReturn("user-123");
 
         int passed = 0;
         for (int i = 0; i < 4; i++) {

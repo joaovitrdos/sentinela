@@ -536,6 +536,8 @@
             "none": "No rain"
         },
         "level": {
+            "flood": "Flood stage",
+            "alert": "Flood alert",
             "attention": "Attention (high level)",
             "normal": "Normal",
             "drought": "Drought (low level)",

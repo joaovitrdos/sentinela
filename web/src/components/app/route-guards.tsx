@@ -46,7 +46,14 @@ export const RequireAuth = ({ children }: { children: ReactNode }) => {
 /** Telas de login/cadastro: quem ja esta logado vai direto para o inicio. */
 export const GuestOnly = ({ children }: { children: ReactNode }) => {
     const { isAuthenticated, isRestoring } = useAuth();
+    const location = useLocation();
     if (isRestoring) return <PageLoader />;
-    if (isAuthenticated) return <Redirect to="/home" />;
+    if (isAuthenticated) {
+        const from = (location.state as { from?: unknown } | null)?.from;
+        const returnTo = typeof from === "string" && from.startsWith("/") && !from.startsWith("//")
+            ? from
+            : "/home";
+        return <Redirect to={returnTo} />;
+    }
     return children;
 };

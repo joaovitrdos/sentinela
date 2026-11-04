@@ -9,6 +9,7 @@ import br.com.sentinela.util.LogUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -20,6 +21,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
 
 @Component
 @RequiredArgsConstructor
@@ -43,11 +46,13 @@ public class SnirhLayerClient {
         Semaphore permits = new Semaphore(Math.max(1, properties.parallelPages()));
         List<LayerFeatureDto> all = new ArrayList<>(total);
 
-        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            List<Future<List<LayerFeatureDto>>> pages = new ArrayList<>();
+        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+        List<Future<List<LayerFeatureDto>>> pages = new ArrayList<>();
+        CompletionService<List<LayerFeatureDto>> completed = new ExecutorCompletionService<>(executor);
+        try {
             for (int offset = 0; offset < total; offset += pageSize) {
                 int pageOffset = offset;
-                pages.add(executor.submit(() -> {
+                pages.add(completed.submit(() -> {
                     permits.acquire();
                     try {
                         return fetchPage(queryUrl, fields, orderBy, withGeometry, extraParams, pageOffset);
@@ -56,9 +61,21 @@ public class SnirhLayerClient {
                     }
                 }));
             }
-            for (Future<List<LayerFeatureDto>> page : pages) {
-                all.addAll(await(page));
+            for (int i = 0; i < pages.size(); i++) {
+                all.addAll(completed.take().get());
             }
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new SnirhUnavailableException("SNIRH request was interrupted", exception);
+        } catch (ExecutionException exception) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof RuntimeException runtime) {
+                throw runtime;
+            }
+            throw new SnirhUnavailableException("Failed to query SNIRH", cause);
+        } finally {
+            pages.forEach(page -> page.cancel(true));
+            executor.shutdownNow();
         }
 
         LogUtil.info("SNIRH {0}: loaded {1} records", queryUrl, all.size());
@@ -73,7 +90,10 @@ public class SnirhLayerClient {
                 .build(true)
                 .toUri();
         ArcGisLayerResponseDto response = call(uri, "count");
-        return response.total() != null ? response.total() : 0;
+        if (response.total() == null || response.total() < 0) {
+            throw new SnirhApiException("SNIRH returned an invalid record count");
+        }
+        return response.total();
     }
 
     private List<LayerFeatureDto> fetchPage(String queryUrl, String fields, String orderBy, boolean withGeometry,
@@ -104,6 +124,8 @@ public class SnirhLayerClient {
                     throw new SnirhApiException("ArcGIS error " + response.error().code() + ": " + response.error().message());
                 }
                 return response;
+            } catch (HttpClientErrorException exception) {
+                throw new SnirhApiException("SNIRH rejected " + context + " with HTTP " + exception.getStatusCode());
             } catch (SnirhApiException exception) {
                 throw exception;
             } catch (RuntimeException exception) {
@@ -116,20 +138,6 @@ public class SnirhLayerClient {
             }
         }
         throw new SnirhUnavailableException("Could not query SNIRH");
-    }
-
-    private static List<LayerFeatureDto> await(Future<List<LayerFeatureDto>> page) {
-        try {
-            return page.get();
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt();
-            throw new SnirhUnavailableException("SNIRH request was interrupted", exception);
-        } catch (ExecutionException exception) {
-            if (exception.getCause() instanceof RuntimeException runtime) {
-                throw runtime;
-            }
-            throw new SnirhUnavailableException("Failed to query SNIRH", exception.getCause());
-        }
     }
 
     private static void sleep(long milliseconds) {

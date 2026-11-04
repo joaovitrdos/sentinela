@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 
 @Service
 public class TokenService {
@@ -20,7 +21,7 @@ public class TokenService {
     private static final String ISSUER = "sentinela";
     private static final String VERSION_CLAIM = "ver";
     private static final String BEARER_PREFIX = "Bearer ";
-    private static final Duration TOKEN_TTL = Duration.ofDays(7);
+    private static final Duration TOKEN_TTL = Duration.ofDays(1);
     private static final int MIN_SECRET_LENGTH = 32;
 
     @Value("${api.security.token.secret}")
@@ -39,7 +40,7 @@ public class TokenService {
         try {
             return JWT.create()
                     .withIssuer(ISSUER)
-                    .withSubject(user.getEmail())
+                    .withSubject(user.getUserId().toString())
                     .withClaim(VERSION_CLAIM, user.getTokenVersion())
                     .withExpiresAt(genExpirationDate())
                     .sign(Algorithm.HMAC256(secret));
@@ -56,14 +57,31 @@ public class TokenService {
         }
 
         Claim version = decoded.getClaim(VERSION_CLAIM);
-        return new Credentials(decoded.getSubject(), version.isMissing() || version.isNull()
+        UUID userId = parseUserId(decoded.getSubject());
+        if (userId == null) {
+            return null;
+        }
+        return new Credentials(userId, version.isMissing() || version.isNull()
                 ? null
                 : version.asInt());
     }
 
-    public String emailFrom(String authorizationHeader) {
+    /** Chave estavel do usuario (o userId), usada para o rate limit por usuario. */
+    public String subjectFrom(String authorizationHeader) {
         Credentials credentials = credentialsFrom(authorizationHeader);
-        return credentials == null ? null : credentials.email();
+        return credentials == null ? null : credentials.userId().toString();
+    }
+
+    // O subject e o userId (imutavel). Tokens antigos, emitidos com o e-mail no subject, deixam de valer.
+    private static UUID parseUserId(String subject) {
+        if (subject == null) {
+            return null;
+        }
+        try {
+            return UUID.fromString(subject);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
     }
 
     private DecodedJWT decode(String authorizationHeader) {
@@ -84,9 +102,10 @@ public class TokenService {
         return Instant.now().plus(TOKEN_TTL);
     }
 
-    public record Credentials(String email, Integer tokenVersion) {
+    public record Credentials(UUID userId, Integer tokenVersion) {
         public boolean matches(User user) {
-            return tokenVersion != null && tokenVersion == user.getTokenVersion();
+            return tokenVersion != null && tokenVersion == user.getTokenVersion()
+                    && userId.equals(user.getUserId());
         }
     }
 }

@@ -46,8 +46,13 @@ public class PasswordRecoveryService {
 
     @Transactional
     public MessageResponseDto sendRecoveryCode(SendEmailRequestDto request) {
+        return sendRecoveryCode(request, null);
+    }
+
+    @Transactional
+    public MessageResponseDto sendRecoveryCode(SendEmailRequestDto request, String clientAddress) {
         String email = EmailNormalizer.normalize(request.email());
-        attemptGuard.checkRecovery(email);
+        attemptGuard.checkRecovery(email, clientAddress);
 
         userRepository.findByEmail(email)
                 .filter(User::hasLocalPassword)
@@ -58,16 +63,26 @@ public class PasswordRecoveryService {
 
     @Transactional
     public void validateCode(ValidateCodeRequestDto request) {
+        validateCode(request, null);
+    }
+
+    @Transactional
+    public void validateCode(ValidateCodeRequestDto request, String clientAddress) {
         String email = EmailNormalizer.normalize(request.email());
-        attemptGuard.checkCodeAttempt(email);
+        attemptGuard.checkCodeAttempt(email, clientAddress);
 
         verificationCodeService.validateCode(request.code(), email, CodePurpose.PASSWORD_RECOVERY);
     }
 
     @Transactional
     public MessageResponseDto resetPassword(ResetPasswordRequestDto request) {
+        return resetPassword(request, null);
+    }
+
+    @Transactional
+    public MessageResponseDto resetPassword(ResetPasswordRequestDto request, String clientAddress) {
         String email = EmailNormalizer.normalize(request.email());
-        attemptGuard.checkCodeAttempt(email);
+        attemptGuard.checkCodeAttempt(email, clientAddress);
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(InvalidVerificationCodeException::new);
@@ -79,7 +94,7 @@ public class PasswordRecoveryService {
         verificationCodeService.consumeCode(request.code(), email, CodePurpose.PASSWORD_RECOVERY);
 
         applyNewPassword(user, request.newPassword());
-        attemptGuard.clearCodeAttempts(email);
+        attemptGuard.clearCodeAttempts(email, clientAddress);
         attemptGuard.clearLogin(email);
 
         return new MessageResponseDto("Senha atualizada com sucesso");
@@ -90,13 +105,19 @@ public class PasswordRecoveryService {
      * mas devolve um token novo para a sessao atual continuar logada.
      */
     @Transactional
-    public AuthResponseDto changePassword(User user, ChangePasswordRequestDto request) {
+    public AuthResponseDto changePassword(User principal, ChangePasswordRequestDto request) {
+        User user = userRepository.findById(principal.getUserId())
+                .orElseThrow(InvalidVerificationCodeException::new);
+        String email = EmailNormalizer.normalize(user.getEmail());
+        attemptGuard.checkLogin(email);
         if (user.getAuthProvider() != AuthProvider.LOCAL) {
             throw new GoogleAccountWithoutPasswordException();
         }
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+            attemptGuard.recordLoginFailure(email);
             throw new IncorrectPasswordException();
         }
+        attemptGuard.clearLogin(email);
 
         applyNewPassword(user, request.newPassword());
 

@@ -7,6 +7,7 @@ import { initialsOf } from "@/components/app/app-shell";
 import { CodeInput } from "@/components/app/code-input";
 import { ConfirmationModal } from "@/components/app/confirmation-modal";
 import { FormAlert } from "@/components/app/form-alert";
+import { GoogleButton } from "@/components/app/google-button";
 import { notify } from "@/components/app/notifications";
 import { fieldProps } from "@/components/app/form-styles";
 import { Dialog, Modal, ModalOverlay } from "@/components/application/modals/modal";
@@ -261,7 +262,7 @@ const TeamCard = ({ reloadKey }: { reloadKey: number }) => {
 
     const submitInvite = (event: FormEvent) => {
         event.preventDefault();
-        if (!team?.enabled || team.myRole !== "ADMIN" || !email.trim()) return;
+        if (!team?.enabled || !team.owner || !email.trim()) return;
         void act(() => inviteTeamMember(selectedId, email.trim(), role), t("settings.team.invited"))
             .then((saved) => { if (saved) setEmail(""); });
     };
@@ -295,9 +296,9 @@ const TeamCard = ({ reloadKey }: { reloadKey: number }) => {
         {properties.length === 0 ? <p className="text-sm text-tertiary">{t("settings.team.empty")}</p> : <>
             <div className="grid gap-3">
                 <TeamGroup label={t("settings.team.organizer")} empty={t("settings.team.noOrganized")} properties={organized} selectedId={selectedId}
-                    open={organizerOpen} onToggle={() => setOrganizerOpen((open) => !open)} onSelect={setSelectedId} />
+                    open={organizerOpen} onToggle={() => setOrganizerOpen((open) => !open)} onSelect={(id) => { if (!busy) setSelectedId(id); }} />
                 <TeamGroup label={t("settings.team.participating")} empty={t("settings.team.noParticipating")} properties={participating} selectedId={selectedId}
-                    open={participatingOpen} onToggle={() => setParticipatingOpen((open) => !open)} onSelect={setSelectedId} />
+                    open={participatingOpen} onToggle={() => setParticipatingOpen((open) => !open)} onSelect={(id) => { if (!busy) setSelectedId(id); }} />
             </div>
             {selectedGroupOpen && (!team ? <p className="mt-4 text-sm text-tertiary">{t("settings.team.loading")}</p> : <>
                 <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
@@ -305,7 +306,7 @@ const TeamCard = ({ reloadKey }: { reloadKey: number }) => {
                         <p className="text-sm text-tertiary">{t("settings.team.property")}: {team.propertyName} · {t("settings.team.access", { role: roleLabel(team.myRole) })}</p></div>
                     {!team.owner && <Button size="sm" color="secondary" isDisabled={busy} onClick={() => { setError(""); setPending({ kind: "leave" }); }}>{t("settings.team.leave")}</Button>}
                 </div>
-                {team.myRole === "ADMIN" && <form className="mt-4 flex flex-wrap items-end gap-3" onSubmit={(event) => {
+                {team.owner && <form className="mt-4 flex flex-wrap items-end gap-3" onSubmit={(event) => {
                     event.preventDefault();
                     if (title.trim() && title.trim() !== team.title) void act(() => setTeamTitle(selectedId, title.trim()), t("settings.team.titleSaved"))
                         .then((saved) => { if (saved) setProperties((rows) => rows.map((row) => row.propertyId === selectedId ? { ...row, teamTitle: title.trim() } : row)); });
@@ -324,7 +325,7 @@ const TeamCard = ({ reloadKey }: { reloadKey: number }) => {
                         }}>{t(team.enabled ? "settings.team.useSolo" : "settings.team.activate")}</Button>}
                     </div>
                 </div>
-                {team.enabled && team.myRole === "ADMIN" && <>
+                {team.enabled && team.owner && <>
                     <form onSubmit={submitInvite} className="mt-5 grid gap-3 rounded-xl border border-secondary p-4 sm:grid-cols-[minmax(0,1fr)_10rem_auto] sm:items-end">
                         <label className="text-sm font-medium text-secondary">{t("settings.team.inviteEmail")}<input className={`${teamInputClass} mt-1`} type="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="pessoa@exemplo.com" /></label>
                         <label className="text-sm font-medium text-secondary">{t("settings.team.role")}<select className={`${teamInputClass} mt-1`} value={role} onChange={(event) => setRole(event.target.value as TeamRole)}><option value="VIEWER">{roleLabel("VIEWER")}</option><option value="EDITOR">{roleLabel("EDITOR")}</option><option value="ADMIN">{roleLabel("ADMIN")}</option></select></label>
@@ -462,7 +463,7 @@ const PropertiesCard = () => {
         setLoadError(undefined);
         listProperties(controller.signal)
             .then((result) => {
-                if (!controller.signal.aborted) setProperties(result.filter((property) => property.accessRole === "ADMIN"));
+                if (!controller.signal.aborted) setProperties(result.filter((property) => property.teamOwner));
             })
             .catch((error: unknown) => {
                 if (!controller.signal.aborted) setLoadError(propertyErrorMessage(error, t("settings.properties.loadError")));
@@ -482,7 +483,7 @@ const PropertiesCard = () => {
     };
 
     const remove = async () => {
-        if (!selected || busy || selected.accessRole !== "ADMIN") return;
+        if (!selected || busy || !selected.teamOwner) return;
         const property = selected;
         setBusy(true);
         setDeleteError(undefined);
@@ -899,18 +900,19 @@ const SessionsCard = () => {
 const DeleteCard = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { clearSession } = useAuth();
+    const { clearSession, user } = useAuth();
     const [open, setOpen] = useState(false);
     const [typed, setTyped] = useState("");
+    const [password, setPassword] = useState("");
     const [error, setError] = useState<string>();
     const [busy, setBusy] = useState(false);
     const keyword = t("settings.delete.keyword");
 
-    const remove = async () => {
+    const finishRemoval = async (body: { currentPassword?: string; googleIdToken?: string }) => {
         setBusy(true);
         setError(undefined);
         try {
-            await userApi.delete();
+            await userApi.delete(body);
             clearSession();
             navigate("/login", { replace: true, state: { notice: "accountDeleted" } });
         } catch (err) {
@@ -918,6 +920,8 @@ const DeleteCard = () => {
             setBusy(false);
         }
     };
+
+    const remove = () => finishRemoval({ currentPassword: password });
 
     return (
         <ActionCard
@@ -937,6 +941,7 @@ const DeleteCard = () => {
                     setOpen(value);
                     if (!value) {
                         setTyped("");
+                        setPassword("");
                         setError(undefined);
                     }
                 }}
@@ -951,6 +956,16 @@ const DeleteCard = () => {
                                 <p className="mt-1 text-sm text-tertiary">{t("settings.delete.modalText", { word: keyword })}</p>
                             </div>
                             <Input {...fieldProps} aria-label={keyword} placeholder={keyword} value={typed} onChange={setTyped} autoFocus />
+                            {user?.authProvider === "LOCAL" ? (
+                                <Input
+                                    label={t("settings.email.password")}
+                                    type="password"
+                                    autoComplete="current-password"
+                                    {...fieldProps}
+                                    value={password}
+                                    onChange={setPassword}
+                                />
+                            ) : null}
                             <FormAlert>{error}</FormAlert>
                             <div className="mt-1 grid grid-cols-2 gap-3">
                                 <Button size="sm" color="secondary" onClick={() => setOpen(false)} isDisabled={busy}>
@@ -960,13 +975,19 @@ const DeleteCard = () => {
                                     size="sm"
                                     color="primary-destructive"
                                     onClick={remove}
-                                    isDisabled={typed.trim() !== keyword}
+                                    isDisabled={typed.trim() !== keyword || user?.authProvider !== "LOCAL" || !password}
                                     isLoading={busy}
                                     showTextWhileLoading
                                 >
                                     {t("settings.delete.confirm")}
                                 </Button>
                             </div>
+                            {user?.authProvider === "GOOGLE" && typed.trim() === keyword ? (
+                                <GoogleButton
+                                    isDisabled={busy}
+                                    onCredential={(googleIdToken) => void finishRemoval({ googleIdToken })}
+                                />
+                            ) : null}
                         </div>
                     </Dialog>
                 </Modal>

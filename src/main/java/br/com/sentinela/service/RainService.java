@@ -8,6 +8,7 @@ import br.com.sentinela.dto.response.ArcGisQueryResponseDto.AttributesDto;
 import br.com.sentinela.dto.response.ArcGisQueryResponseDto.FeatureDto;
 import br.com.sentinela.dto.response.ArcGisQueryResponseDto.GeometryDto;
 import br.com.sentinela.infra.config.SnirhProperties;
+import br.com.sentinela.exception.SnirhUnavailableException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -33,15 +34,28 @@ public class RainService {
     }
 
     public List<RainReadingResponseDto> getRain24h() {
-        return cache.get();
+        Instant now = Instant.now();
+        return cache.get().stream().map(reading -> new RainReadingResponseDto(
+                reading.stationCode(), reading.stationName(), reading.city(), reading.state(), reading.watershed(),
+                reading.responsible(), reading.rainfallMm24h(), reading.readingClass(), reading.lastReadingAt(),
+                ReferenceLevelService.ageHours(reading.lastReadingAt().toInstant(), now), reading.latitude(),
+                reading.longitude(), reading.requiresAttention())).toList();
     }
 
     private List<RainReadingResponseDto> load() {
         Instant now = Instant.now();
-        return client.fetchAllFeatures().stream()
+        List<FeatureDto> features = client.fetchAllFeatures();
+        if (features.isEmpty()) {
+            throw new SnirhUnavailableException("SNIRH returned no rainfall stations");
+        }
+        List<RainReadingResponseDto> readings = features.stream()
                 .map(feature -> toReading(feature, now))
                 .filter(Objects::nonNull)
                 .toList();
+        if (readings.isEmpty()) {
+            throw new SnirhUnavailableException("SNIRH returned no valid rainfall readings");
+        }
+        return readings;
     }
 
     RainReadingResponseDto toReading(FeatureDto feature, Instant now) {

@@ -7,6 +7,7 @@ import br.com.sentinela.infra.client.snirh.SnirhText;
 import br.com.sentinela.dto.response.ArcGisLayerResponseDto.LayerFeatureDto;
 import br.com.sentinela.dto.response.ArcGisLayerResponseDto.LayerGeometryDto;
 import br.com.sentinela.infra.config.SnirhHydroProperties;
+import br.com.sentinela.exception.SnirhUnavailableException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +41,13 @@ public class ReferenceLevelService {
     }
 
     public List<RiverLevelResponseDto> getRiverLevels() {
-        return cache.get();
+        Instant now = Instant.now();
+        return cache.get().stream().map(level -> new RiverLevelResponseDto(
+                level.stationCode(), level.stationName(), level.city(), level.state(), level.watershed(), level.subWatershed(),
+                level.responsible(), level.operator(), level.project(), level.stationSituation(), level.levelCm(),
+                level.status(), level.statusDescription(), level.lastReadingAt(),
+                level.lastReadingAt() == null ? null : ageHours(level.lastReadingAt().toInstant(), now),
+                level.latitude(), level.longitude(), level.requiresAttention())).toList();
     }
 
     private List<RiverLevelResponseDto> load() {
@@ -49,7 +56,11 @@ public class ReferenceLevelService {
                 .map(feature -> toRiverLevel(feature, now))
                 .filter(Objects::nonNull)
                 .toList();
-        return latestPerStation(levels, now);
+        List<RiverLevelResponseDto> latest = latestPerStation(levels, now);
+        if (latest.isEmpty()) {
+            throw new SnirhUnavailableException("SNIRH returned no valid reference levels");
+        }
+        return latest;
     }
 
     RiverLevelResponseDto toRiverLevel(LayerFeatureDto feature, Instant now) {
@@ -82,7 +93,7 @@ public class ReferenceLevelService {
                 lastReadingAt != null ? ageHours(lastReadingAt, now) : null,
                 geometry.latitude(),
                 geometry.longitude(),
-                "ATENCAO".equals(status));
+                "ATENCAO".equals(status) || "ALERTA".equals(status) || "INUNDACAO".equals(status));
     }
 
     static List<RiverLevelResponseDto> latestPerStation(List<RiverLevelResponseDto> levels, Instant now) {
@@ -114,6 +125,12 @@ public class ReferenceLevelService {
         }
         if (normalizedDescription.contains("atencao") || normalizedDescription.startsWith("acima")) {
             return "ATENCAO";
+        }
+        if (normalizedDescription.contains("inundacao") || normalizedDescription.contains("transbord")) {
+            return "INUNDACAO";
+        }
+        if (normalizedDescription.contains("alerta")) {
+            return "ALERTA";
         }
         if (normalizedDescription.contains("estiagem") || normalizedDescription.startsWith("abaixo")) {
             return "ESTIAGEM";

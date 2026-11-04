@@ -554,6 +554,8 @@
             "none": "Sem chuva"
         },
         "level": {
+            "flood": "Inundação",
+            "alert": "Alerta de cheia",
             "attention": "Atenção (nível alto)",
             "normal": "Normal",
             "drought": "Estiagem (nível baixo)",

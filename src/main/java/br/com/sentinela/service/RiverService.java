@@ -7,6 +7,7 @@ import br.com.sentinela.infra.client.snirh.SnirhLayerClient;
 import br.com.sentinela.dto.response.ArcGisLayerResponseDto.LayerFeatureDto;
 import br.com.sentinela.dto.response.ArcGisLayerResponseDto.LayerGeometryDto;
 import br.com.sentinela.infra.config.SnirhHydroProperties;
+import br.com.sentinela.exception.SnirhUnavailableException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -44,6 +45,9 @@ public class RiverService {
                 .map(RiverService::toRiver)
                 .filter(Objects::nonNull)
                 .toList();
+        if (rivers.isEmpty()) {
+            throw new SnirhUnavailableException("SNIRH returned no valid rivers");
+        }
         return RiverNetworkResponseDto.of(rivers);
     }
 

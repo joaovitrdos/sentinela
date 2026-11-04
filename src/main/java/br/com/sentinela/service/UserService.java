@@ -2,6 +2,7 @@ package br.com.sentinela.service;
 
 import br.com.sentinela.dto.request.ChangeEmailRequestDto;
 import br.com.sentinela.dto.request.ConfirmEmailChangeRequestDto;
+import br.com.sentinela.dto.request.DeleteAccountRequestDto;
 import br.com.sentinela.dto.request.UpdateUserRequestDto;
 import br.com.sentinela.dto.response.AuthResponseDto;
 import br.com.sentinela.dto.response.MessageResponseDto;
@@ -62,6 +63,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AttemptGuard attemptGuard;
     private final TokenService tokenService;
+    private final GoogleTokenVerifier googleTokenVerifier;
 
     @Transactional(readOnly = true)
     public UserResponseDto findById(UUID userId) {
@@ -88,17 +90,25 @@ public class UserService {
 
     @Transactional
     public MessageResponseDto requestEmailChange(User loggedUser, ChangeEmailRequestDto request) {
+        return requestEmailChange(loggedUser, request, null);
+    }
+
+    @Transactional
+    public MessageResponseDto requestEmailChange(User loggedUser, ChangeEmailRequestDto request, String clientAddress) {
         User user = findEntityById(loggedUser.getUserId());
 
         if (user.getAuthProvider() != AuthProvider.LOCAL) {
             throw new GoogleAccountEmailChangeException();
         }
+        attemptGuard.checkLogin(user.getEmail());
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+            attemptGuard.recordLoginFailure(user.getEmail());
             throw new IncorrectPasswordException();
         }
+        attemptGuard.clearLogin(user.getEmail());
 
         String newEmail = EmailNormalizer.normalize(request.newEmail());
-        attemptGuard.checkRecovery(newEmail);
+        attemptGuard.checkRecovery(newEmail, clientAddress);
 
         if (userRepository.existsByEmail(newEmail)) {
             return new MessageResponseDto("Enviamos um código de confirmação para o novo endereço");
@@ -111,13 +121,18 @@ public class UserService {
     }
 
     /**
-     * Confirma o novo e-mail e revoga os tokens emitidos (o token carrega o e-mail antigo),
+     * Confirma o novo e-mail e revoga os tokens emitidos,
      * devolvendo um token novo para a sessao atual continuar logada.
      */
     @Transactional
     public AuthResponseDto confirmEmailChange(User loggedUser, ConfirmEmailChangeRequestDto request) {
+        return confirmEmailChange(loggedUser, request, null);
+    }
+
+    @Transactional
+    public AuthResponseDto confirmEmailChange(User loggedUser, ConfirmEmailChangeRequestDto request, String clientAddress) {
         User user = findEntityById(loggedUser.getUserId());
-        attemptGuard.checkCodeAttempt(user.getEmail());
+        attemptGuard.checkCodeAttempt(user.getEmail(), clientAddress);
 
         VerificationCode verification =
                 verificationCodeService.consumeCode(request.code(), user.getEmail(), CodePurpose.EMAIL_CHANGE);
@@ -133,12 +148,14 @@ public class UserService {
         user.revokeIssuedTokens();
 
         User saved = saveUser(user);
+        attemptGuard.clearCodeAttempts(user.getEmail(), clientAddress);
         return AuthResponseDto.bearer(tokenService.generateToken(saved), userMapper.toResponse(saved));
     }
 
     @Transactional
-    public void delete(UUID userId) {
+    public void delete(UUID userId, DeleteAccountRequestDto request) {
         User user = findEntityById(userId);
+        verifyDeleteReauthentication(user, request);
 
         try {
             emailRepository.deleteByUserId(userId);
@@ -152,6 +169,31 @@ public class UserService {
         } catch (DataAccessException ex) {
             LogUtil.error("Falha ao excluir o usuário " + userId, ex);
             throw new UserDeleteException(ex);
+        }
+    }
+
+    private void verifyDeleteReauthentication(User user, DeleteAccountRequestDto request) {
+        if (request == null) {
+            throw new IncorrectPasswordException();
+        }
+        if (user.getAuthProvider() == AuthProvider.LOCAL) {
+            String email = EmailNormalizer.normalize(user.getEmail());
+            attemptGuard.checkLogin(email);
+            if (request.currentPassword() == null
+                    || !passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+                attemptGuard.recordLoginFailure(email);
+                throw new IncorrectPasswordException();
+            }
+            attemptGuard.clearLogin(email);
+            return;
+        }
+
+        if (request.googleIdToken() == null || user.getGoogleId() == null) {
+            throw new IncorrectPasswordException();
+        }
+        var payload = googleTokenVerifier.verify(request.googleIdToken());
+        if (!user.getGoogleId().equals(payload.getSubject()) || !Boolean.TRUE.equals(payload.getEmailVerified())) {
+            throw new IncorrectPasswordException();
         }
     }
 

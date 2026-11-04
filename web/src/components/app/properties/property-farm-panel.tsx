@@ -1,5 +1,5 @@
 import { FormAlert } from "@/components/app/form-alert";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/base/buttons/button";
 import { api } from "@/lib/api";
 import { createPropertyActivity, deletePropertyActivity, listPropertyActivities, propertyErrorMessage } from "@/lib/property-data";
@@ -47,6 +47,8 @@ export const PropertyFarmPanel = ({ property, inspectionSuggestion }: { property
     const [amountMm, setAmountMm] = useState("");
     const [savingActivity, setSavingActivity] = useState(false);
     const propertyId = property?.propertyId;
+    const currentPropertyId = useRef(propertyId);
+    currentPropertyId.current = propertyId;
 
     useEffect(() => {
         setForecast([]);
@@ -81,12 +83,13 @@ export const PropertyFarmPanel = ({ property, inspectionSuggestion }: { property
 
     const loadActivities = useCallback((signal?: AbortSignal) => {
         if (!propertyId) return Promise.resolve();
+        const requestedPropertyId = propertyId;
         setActivityLoading(true);
         setActivityError("");
         return listPropertyActivities(propertyId, signal)
-            .then((result) => { if (!signal?.aborted) setActivities(result); })
-            .catch((reason: unknown) => { if (!signal?.aborted) setActivityError(propertyErrorMessage(reason, "Não foi possível carregar o caderno de campo.")); })
-            .finally(() => { if (!signal?.aborted) setActivityLoading(false); });
+            .then((result) => { if (!signal?.aborted && currentPropertyId.current === requestedPropertyId) setActivities(result); })
+            .catch((reason: unknown) => { if (!signal?.aborted && currentPropertyId.current === requestedPropertyId) setActivityError(propertyErrorMessage(reason, "Não foi possível carregar o caderno de campo.")); })
+            .finally(() => { if (!signal?.aborted && currentPropertyId.current === requestedPropertyId) setActivityLoading(false); });
     }, [propertyId]);
 
     useEffect(() => {
@@ -104,6 +107,7 @@ export const PropertyFarmPanel = ({ property, inspectionSuggestion }: { property
     const submitActivity = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (!propertyId || !activityNotes.trim()) return;
+        const submittedPropertyId = propertyId;
         setSavingActivity(true);
         setActivityError("");
         try {
@@ -115,24 +119,27 @@ export const PropertyFarmPanel = ({ property, inspectionSuggestion }: { property
                 amountMm: activityType === "IRRIGATION" && amountMm !== "" ? Number(amountMm) : null,
                 plotId: null,
             });
-            setActivityNotes("");
-            setActivityTime("");
-            setAmountMm("");
-            await loadActivities();
+            if (currentPropertyId.current === submittedPropertyId) {
+                setActivityNotes("");
+                setActivityTime("");
+                setAmountMm("");
+                await loadActivities();
+            }
         } catch (reason) {
-            setActivityError(propertyErrorMessage(reason, "Não foi possível salvar o registro."));
+            if (currentPropertyId.current === submittedPropertyId) setActivityError(propertyErrorMessage(reason, "Não foi possível salvar o registro."));
         } finally {
-            setSavingActivity(false);
+            if (currentPropertyId.current === submittedPropertyId) setSavingActivity(false);
         }
     };
 
     const removeActivity = async (activityId: string) => {
         if (!propertyId) return;
+        const submittedPropertyId = propertyId;
         try {
             await deletePropertyActivity(propertyId, activityId);
-            setActivities((rows) => rows.filter((row) => row.activityId !== activityId));
+            if (currentPropertyId.current === submittedPropertyId) setActivities((rows) => rows.filter((row) => row.activityId !== activityId));
         } catch (reason) {
-            setActivityError(propertyErrorMessage(reason, "Não foi possível excluir o registro."));
+            if (currentPropertyId.current === submittedPropertyId) setActivityError(propertyErrorMessage(reason, "Não foi possível excluir o registro."));
         }
     };
 

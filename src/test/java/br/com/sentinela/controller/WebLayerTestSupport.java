@@ -8,6 +8,9 @@ import br.com.sentinela.infra.security.TokenService;
 import br.com.sentinela.repository.UserRepository;
 import br.com.sentinela.service.AuthService;
 import br.com.sentinela.service.CopernicusService;
+import br.com.sentinela.service.FieldActionService;
+import br.com.sentinela.service.PlotService;
+import br.com.sentinela.service.TeamService;
 import br.com.sentinela.service.PasswordRecoveryService;
 import br.com.sentinela.service.PropertyService;
 import br.com.sentinela.service.PropertyActivityService;
@@ -91,6 +94,15 @@ abstract class WebLayerTestSupport {
 
     @MockitoBean
     protected MaintenanceService maintenanceService;
+
+    @MockitoBean
+    protected FieldActionService fieldActionService;
+
+    @MockitoBean
+    protected PlotService plotService;
+
+    @MockitoBean
+    protected TeamService teamService;
 
     @BeforeEach
     void systemIsAvailable() {

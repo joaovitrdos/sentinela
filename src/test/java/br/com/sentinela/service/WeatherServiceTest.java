@@ -1,6 +1,5 @@
 package br.com.sentinela.service;
 
-import br.com.sentinela.infra.config.WeatherApiConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -36,7 +35,7 @@ class WeatherServiceTest {
     void readsCurrentWeatherWithTheDefaultJsonConverter() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        RestClient client = new WeatherApiConfig().weatherCurrentRestClient(builder, "https://weather.test/v1/current.json");
+        RestClient client = builder.baseUrl("https://weather.test/v1/current.json").build();
         server.expect(requestTo("https://weather.test/v1/current.json?key=test-key&q=-19.54,-40.63&lang=pt&aqi=no"))
                 .andRespond(withSuccess(RESPONSE, MediaType.APPLICATION_JSON));
 
@@ -53,7 +52,7 @@ class WeatherServiceTest {
     void readsAndSerializesTheForecastAsNestedJson() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        RestClient client = new WeatherApiConfig().weatherForecastRestClient(builder, "https://weather.test/v1/forecast.json");
+        RestClient client = builder.baseUrl("https://weather.test/v1/forecast.json").build();
         server.expect(requestTo("https://weather.test/v1/forecast.json?key=test-key&q=-19.54,-40.63&days=3&lang=pt&aqi=no"))
                 .andRespond(withSuccess(RESPONSE, MediaType.APPLICATION_JSON));
 
@@ -72,7 +71,7 @@ class WeatherServiceTest {
     void readsTimeZoneWithTheDefaultJsonConverter() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        RestClient client = new WeatherApiConfig().weatherTimeZoneRestClient(builder, "https://weather.test/v1/timezone.json");
+        RestClient client = builder.baseUrl("https://weather.test/v1/timezone.json").build();
         server.expect(requestTo("https://weather.test/v1/timezone.json?key=test-key&q=-19.54,-40.63"))
                 .andRespond(withSuccess(RESPONSE, MediaType.APPLICATION_JSON));
 

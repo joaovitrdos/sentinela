@@ -121,6 +121,7 @@ class PasswordRecoveryServiceTest {
     @Test
     void contaGoogleNaoTemSenhaParaAlterar() {
         user.setAuthProvider(AuthProvider.GOOGLE);
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
 
         assertThatThrownBy(() -> passwordRecoveryService.changePassword(user,
                 new ChangePasswordRequestDto("qualquer", "senha-nova-123")))
@@ -129,6 +130,7 @@ class PasswordRecoveryServiceTest {
 
     @Test
     void alterarSenhaComSenhaAtualErradaLancaIncorrectPassword() {
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("senha-errada", "hash-antigo")).thenReturn(false);
 
         assertThatThrownBy(() -> passwordRecoveryService.changePassword(user,
@@ -141,6 +143,7 @@ class PasswordRecoveryServiceTest {
     @Test
     void alterarSenhaGravaNovaSenhaRevogaTokensEDevolveTokenNovo() {
         int version = user.getTokenVersion();
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
         UserResponseDto mapped = new UserResponseDto(user.getUserId(), "QA", "qa@example.com", null, AuthProvider.LOCAL, true);
         when(passwordEncoder.matches("senha-atual", "hash-antigo")).thenReturn(true);
         when(passwordEncoder.encode("senha-nova-123")).thenReturn("hash-novo");

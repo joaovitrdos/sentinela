@@ -120,9 +120,9 @@ abstract class WebLayerTestSupport {
                 .build();
     }
 
-    /** Token valido para o usuario; o filtro de seguranca o encontra pelo e-mail. */
+    /** Token valido para o usuario; o filtro de seguranca o encontra pelo ID imutavel. */
     protected String bearer(User user) {
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
         return "Bearer " + tokenService.generateToken(user);
     }
 }

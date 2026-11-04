@@ -1,0 +1,533 @@
+{
+  "info": {
+    "name": "Sentinela API",
+    "_postman_id": "ef712eb2-ff30-4296-a0c2-37430ba7313a",
+    "description": "Sentinela backend endpoints. Select the Sentinela Local environment and update values in one place. Log in or confirm an email to set accessToken automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/register",
+            "description": "Creates an account and sends an email confirmation code.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"{{name}}\",\"email\":\"{{email}}\",\"password\":\"{{password}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Confirm email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/email/confirm",
+            "description": "Use the eight-digit code sent to the email address.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"code\":\"{{verificationCode}}\",\"email\":\"{{email}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const token = pm.response.json().accessToken;",
+                  "  if (token) pm.environment.set(\"accessToken\", token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resend confirmation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/email/resend",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "description": "Salva accessToken no ambiente após login bem-sucedido.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email}}\",\"password\":\"{{password}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const token = pm.response.json().accessToken;",
+                  "  if (token) pm.environment.set(\"accessToken\", token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Google login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/google",
+            "description": "Use the ID token issued by Google.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"idToken\":\"{{googleIdToken}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const token = pm.response.json().accessToken;",
+                  "  if (token) pm.environment.set(\"accessToken\", token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/logout",
+            "description": "Ends the current token session."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.environment.unset(\"accessToken\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout all devices",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/logout-all",
+            "description": "Ends all sessions for the authenticated user."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) pm.environment.unset(\"accessToken\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Request password recovery",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/password/forgot",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{email}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Validate recovery code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/password/validate",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"code\":\"{{recoveryCode}}\",\"email\":\"{{email}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Reset password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/password/reset",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"code\":\"{{recoveryCode}}\",\"email\":\"{{email}}\",\"newPassword\":\"{{newPassword}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ],
+      "name": "Authentication"
+    },
+    {
+      "item": [
+        {
+          "name": "My profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users/me",
+            "description": "Requires accessToken."
+          }
+        },
+        {
+          "name": "Update profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\":\"{{name}}\",\"picture\":\"{{picture}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete my account",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/users/me",
+            "description": "Irreversible: deletes the authenticated account."
+          }
+        },
+        {
+          "name": "Request email change",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me/email",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"newEmail\":\"{{newEmail}}\",\"currentPassword\":\"{{currentPassword}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Confirm email change",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/users/me/email/confirm",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"code\":\"{{verificationCode}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Change password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/users/change-password",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"currentPassword\":\"{{currentPassword}}\",\"newPassword\":\"{{newPassword}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "My profile by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users/{{userId}}",
+            "description": "Requires accessToken. Set userId to the authenticated user UUID; other IDs return 404."
+          }
+        },
+        {
+          "name": "Count users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users/count",
+            "description": "Requires accessToken."
+          }
+        }
+      ],
+      "name": "Users"
+    },
+    {
+      "item": [
+        {
+          "name": "Rainfall in the last 24 hours",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/hydro/rain/24h",
+            "description": ""
+          }
+        },
+        {
+          "name": "River levels",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/hydro/levels",
+            "description": ""
+          }
+        },
+        {
+          "name": "Hydrological stations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/hydro/stations",
+            "description": ""
+          }
+        },
+        {
+          "name": "River network",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/hydro/rivers",
+            "description": ""
+          }
+        }
+      ],
+      "name": "Hydrology"
+    },
+    {
+      "item": [
+        {
+          "name": "Current weather by coordinates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/weather/current?latitude={{latitude}}&longitude={{longitude}}",
+            "description": ""
+          }
+        },
+        {
+          "name": "Forecast by coordinates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/weather/forecast?latitude={{latitude}}&longitude={{longitude}}&days={{forecastDays}}",
+            "description": ""
+          }
+        },
+        {
+          "name": "Time zone by coordinates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/weather/time-zone?latitude={{latitude}}&longitude={{longitude}}",
+            "description": ""
+          }
+        }
+      ],
+      "name": "Weather"
+    }
+  ]
+}

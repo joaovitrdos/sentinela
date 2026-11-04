@@ -1,0 +1,109 @@
+spring:
+  application:
+    name: sentinela
+
+  config:
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO}
+
+  cache:
+    type: caffeine
+    cache-names: user-count
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=5m
+
+  jackson:
+    time-zone: ${APP_TIME_ZONE:America/Sao_Paulo}
+
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: ${MAIL_SMTP_AUTH}
+      mail.smtp.starttls.enable: ${MAIL_SMTP_STARTTLS}
+
+server:
+  port: ${SERVER_PORT:8080}
+  forward-headers-strategy: native
+
+  compression:
+    enabled: true
+    mime-types: application/json,text/plain
+    min-response-size: 2KB
+
+api:
+  security:
+    token:
+      secret: ${SENTINELA_JWT_SECRET}
+
+sentinela:
+  web-base-url: ${FRONTEND_URL:http://localhost:5173}
+  time-zone: ${APP_TIME_ZONE:America/Sao_Paulo}
+  google:
+    client-id: ${GOOGLE_CLIENT_ID}
+  mail:
+    enabled: ${MAIL_ENABLED}
+    from: ${MAIL_FROM:}
+  security:
+    rate-limit:
+      enabled: true
+      auth:
+        capacity: 10
+        window: 1m
+      anonymous:
+        capacity: 60
+        window: 1m
+      user:
+        capacity: 120
+        window: 1m
+snirh:
+  rain:
+    base-url: https://portal1.snirh.gov.br/server/rest/services/Chuva_Telem%C3%A9trica/MapServer/1/query
+    page-size: 1000
+    max-retries: 4
+    retry-delay-ms: 2000
+    max-rainfall-mm-24h: 300
+    cache: 10m
+  hydro:
+    levels-url: https://portal1.snirh.gov.br/server/rest/services/SGH/CotasReferencia2/MapServer/2/query
+    stations-url: https://portal1.snirh.gov.br/server/rest/services/Esta%C3%A7%C3%B5es_Hidrometeorol%C3%B3gicas_SNIRH/MapServer/0/query
+    rivers-url: https://portal1.snirh.gov.br/server/rest/services/RiosPrincipais/MapServer/0/query
+    page-size: 1000
+    parallel-pages: 6
+    max-retries: 4
+    retry-delay-ms: 2000
+    river-simplification-degrees: 0.01
+    levels-cache: 10m
+    stations-cache: 12h
+    rivers-cache: 7d
+    preload: true
+
+weather:
+  api:
+    current-url: https://api.weatherapi.com/v1/current.json
+    forecast-url: https://api.weatherapi.com/v1/forecast.json
+    time-zone-url: https://api.weatherapi.com/v1/timezone.json
+    key: ${WEATHER_API_KEY}
+
+copernicus:
+  client-id: ${COPERNICUS_CLIENT_ID:}
+  client-secret: ${COPERNICUS_CLIENT_SECRET:}
+  token-url: https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token
+  process-url: https://sh.dataspace.copernicus.eu/process/v1
+  statistics-url: https://sh.dataspace.copernicus.eu/statistics/v1
+  connect-timeout: 10s
+  request-timeout: 60s
+  cache: 6h
+  image-max-size: 512
+

@@ -1,0 +1,10 @@
+# Fica fora do contexto do build: o npm ci instala tudo de novo e as VITE_* vem como build args.
+node_modules/
+.git/
+dist/
+.env
+.env.*
+!.env.example
+bun.lock
+Dockerfile
+.dockerignore

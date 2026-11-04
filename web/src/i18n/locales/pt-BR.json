@@ -1,0 +1,625 @@
+{
+    "app": {
+        "name": "Sentinela",
+        "tagline": "Chuvas e rios do Brasil, do estado ao município."
+    },
+    "common": {
+        "back": "Voltar",
+        "cancel": "Cancelar",
+        "close": "Fechar",
+        "save": "Salvar",
+        "saving": "Salvando...",
+        "continue": "Continuar",
+        "loading": "Carregando...",
+        "or": "ou",
+        "email": "E-mail",
+        "emailPlaceholder": "voce@exemplo.com",
+        "password": "Senha",
+        "passwordPlaceholder": "Sua senha",
+        "name": "Nome",
+        "namePlaceholder": "Seu nome completo",
+        "copy": "Copiar",
+        "copied": "Copiado"
+    },
+    "connection": {
+        "disconnected": "Não foi possível conectar ao servidor. Verifique sua conexão com a internet.",
+        "unstable": "A conexão com o servidor está lenta. Isso pode afetar o funcionamento do sistema.",
+        "restored": "A conexão com o servidor foi restabelecida."
+    },
+    "language": {
+        "label": "Idioma",
+        "pt-BR": "Português",
+        "en": "English",
+        "es": "Español"
+    },
+    "theme": {
+        "toggle": "Alternar tema",
+        "toLight": "Usar tema claro",
+        "toDark": "Usar tema escuro"
+    },
+    "auth": {
+        "hero": {
+            "title": "SENTINELA",
+            "subtitle": "Chuva acumulada, nível dos rios e alertas em todo o Brasil, do estado até o seu município.",
+            "hint": "Toque em um estado para explorar seus municípios"
+        },
+        "card": {
+            "title": "Entre ou cadastre-se",
+            "subtitle": "Acompanhe a chuva e os rios do seu estado e da sua cidade."
+        },
+        "tabs": {
+            "login": "Entrar",
+            "register": "Criar conta"
+        },
+        "google": "Continuar com o Google",
+        "googleNotConfigured": "Login com Google não configurado",
+        "login": {
+            "submit": "Entrar",
+            "forgot": "Esqueci minha senha"
+        },
+        "register": {
+            "submit": "Criar conta",
+            "passwordHint": "Entre 8 e 72 caracteres.",
+            "success": "Conta criada! Enviamos um código para o seu e-mail."
+        },
+        "legalNotice": "Ao continuar, você aceita os <terms>Termos de uso</terms> e a <privacy>Política de privacidade</privacy>.",
+        "verify": {
+            "title": "Confirme seu e-mail",
+            "subtitle": "Enviamos um código de 8 dígitos para <strong>{{email}}</strong>. Ele vale por 15 minutos.",
+            "codeLabel": "Código de verificação",
+            "submit": "Confirmar e entrar",
+            "noCode": "Não recebeu?",
+            "resend": "Reenviar código",
+            "resendIn": "Reenviar em {{seconds}}s",
+            "resent": "Enviamos um novo código.",
+            "changeEmail": "Usar outro e-mail",
+            "emailLabel": "Qual e-mail você cadastrou?"
+        },
+        "forgot": {
+            "title": "Esqueceu a senha?",
+            "subtitle": "Informe seu e-mail e enviaremos um código para criar uma nova senha.",
+            "submit": "Enviar código",
+            "backToLogin": "Voltar para o login"
+        },
+        "reset": {
+            "title": "Crie uma nova senha",
+            "subtitleCode": "Digite o código de 8 dígitos enviado para <strong>{{email}}</strong>.",
+            "subtitlePassword": "Código validado. Agora escolha sua nova senha.",
+            "validate": "Validar código",
+            "newPassword": "Nova senha",
+            "confirmPassword": "Confirmar nova senha",
+            "submit": "Redefinir senha",
+            "success": "Senha redefinida! Entre com a nova senha."
+        },
+        "notices": {
+            "passwordReset": "Senha redefinida! Entre com a nova senha.",
+            "loggedOutAll": "Você saiu de todos os dispositivos.",
+            "accountDeleted": "Sua conta foi excluída. Sentiremos sua falta."
+        }
+    },
+    "validation": {
+        "required": "Campo obrigatório.",
+        "email": "Informe um e-mail válido.",
+        "passwordLength": "A senha deve ter entre 8 e 72 caracteres.",
+        "nameMax": "O nome deve ter no máximo 120 caracteres.",
+        "code": "O código deve ter 8 dígitos.",
+        "passwordMismatch": "As senhas não conferem.",
+        "url": "Use um endereço http:// ou https://.",
+        "urlMax": "O endereço deve ter no máximo 512 caracteres."
+    },
+    "errors": {
+        "network": "Não foi possível falar com o servidor. Verifique sua conexão.",
+        "generic": "Algo deu errado. Tente novamente.",
+        "invalidData": "Confira os dados informados.",
+        "sessionExpired": "Sua sessão expirou. Entre novamente.",
+        "rateLimited": "Muitas tentativas. Aguarde um pouco e tente de novo.",
+        "invalidCredentials": "E-mail ou senha inválidos.",
+        "emailNotVerified": "Confirme seu e-mail antes de entrar.",
+        "emailTaken": "Este e-mail já está em uso. Tente outro.",
+        "googleNoPassword": "Contas do Google não possuem senha para alterar.",
+        "googleEmailChange": "Contas do Google usam o e-mail da conta Google e não podem trocá-lo aqui.",
+        "invalidCode": "Código de verificação inválido.",
+        "expiredCode": "Código expirado. Solicite um novo.",
+        "tooManyCodeAttempts": "Muitas tentativas com o código. Solicite um novo mais tarde.",
+        "tooManyCodes": "Muitos códigos solicitados. Tente novamente mais tarde.",
+        "tooManyLogins": "Muitas tentativas de login. Tente novamente mais tarde.",
+        "incorrectPassword": "A senha informada está incorreta.",
+        "googleInvalid": "Login com Google inválido ou expirado. Tente de novo.",
+        "googleEmailNotVerified": "O e-mail da conta Google não foi verificado pelo Google.",
+        "googleUnavailable": "Não foi possível validar o login com Google agora. Tente em instantes.",
+        "userNotFound": "Usuário não encontrado.",
+        "emailSend": "Não conseguimos enviar o e-mail agora. Tente novamente.",
+        "saveFailed": "Não foi possível salvar. Tente novamente.",
+        "deleteFailed": "Não foi possível excluir a conta. Tente novamente."
+    },
+    "nav": {
+        "home": "Início",
+        "properties": "Propriedades",
+        "dashboard": "Dashboard",
+        "reports": "Relatórios",
+        "settings": "Configurações",
+        "logout": "Sair",
+        "account": "Conta"
+    },
+    "reports": {
+        "title": "Relatórios",
+        "subtitle": "Gere arquivos com os dados das suas propriedades e atividades.",
+        "generatorTitle": "Gerar relatório",
+        "generatorSubtitle": "Escolha os dados, o período e o formato do arquivo.",
+        "dataLabel": "Dados do relatório",
+        "options": {
+            "sentinela_properties_activities": "Propriedades e atividades de campo",
+            "sentinela_activity_summary_by_property": "Resumo de atividades por propriedade e tipo",
+            "sentinela_irrigation_monthly_summary": "Resumo mensal de irrigação",
+            "snirh_rainfall_24h_by_station": "SNIRH · Chuva acumulada nas últimas 24 horas",
+            "snirh_hydro_levels_station_status": "SNIRH · níveis hidrológicos por estação"
+        },
+        "loadingReports": "Carregando opções de relatórios…",
+        "reportsError": "Não foi possível carregar a lista de relatórios.",
+        "propertyActivities": "Propriedades e atividades de campo",
+        "propertyLabel": "Propriedade",
+        "allProperties": "Todas as propriedades",
+        "selectPropertiesHint": "Use Ctrl (Windows) ou Command (Mac) para selecionar várias propriedades.",
+        "selectAtLeastOneProperty": "Selecione ao menos uma propriedade ou escolha todas.",
+        "loadingProperties": "Carregando propriedades…",
+        "propertiesError": "Não foi possível carregar as propriedades.",
+        "periodLabel": "Período das atividades",
+        "range": "Intervalo de datas",
+        "singleDate": "Uma data específica",
+        "date": "Data",
+        "fromDate": "Data inicial",
+        "toDate": "Data final",
+        "invalidDates": "A data inicial deve ser anterior ou igual à data final.",
+        "filterByTime": "Filtrar também por horário",
+        "fromTime": "Horário inicial de cada dia",
+        "toTime": "Horário final de cada dia",
+        "timeNote": "O filtro de horário considera atividades com horário cadastrado. Registros antigos sem horário não serão incluídos.",
+        "invalidTimes": "O horário inicial deve ser anterior ou igual ao final.",
+        "stateFilter": "Estado (UF)",
+        "allStates": "Todos os estados",
+        "onlyAttention": "Exibir apenas estações que exigem atenção",
+        "formatLabel": "Formato do arquivo",
+        "text": "Texto (.txt)",
+        "generating": "Gerando…",
+        "generate": "Gerar relatório",
+        "infoTitle": "Sobre este relatório",
+        "infoText": "O período filtra as atividades. Os dados cadastrais das propriedades selecionadas também aparecem para contextualizar o relatório.",
+        "activitySummaryInfoText": "Compara a quantidade de atividades, dias ativos e última atividade por propriedade e tipo. Para irrigação, também mostra as lâminas registradas.",
+        "irrigationSummaryInfoText": "Agrupa os registros de irrigação por propriedade e mês, com total e média da lâmina informada em milímetros.",
+        "securityNote": "O arquivo inclui somente propriedades e atividades da sua conta.",
+        "snirhInfoText": "Mostra os níveis mais recentes disponíveis por estação hidrológica. Use os filtros de estado e atenção para restringir a lista.",
+        "rainfallInfoText": "Mostra a chuva acumulada em 24 horas por estação, com classificação, horário da última leitura e idade do dado. Os dados refletem a consulta atual ao SNIRH.",
+        "snirhSecurityNote": "Os níveis são dados públicos consultados no SNIRH."
+    },
+    "dashboard": {
+        "title": "Dashboard ambiental",
+        "subtitle": "Resumo de chuva, clima e níveis dos rios com dados recentes das estações monitoradas.",
+        "refresh": "Atualizar dados",
+        "updatedAt": "Atualizado às {{time}}",
+        "metricsTitle": "Indicadores do monitoramento",
+        "partialData": "Algumas fontes estão indisponíveis. Os demais indicadores continuam mostrando os dados recebidos.",
+        "loadingHydro": "Carregando estações...",
+        "loadingWeather": "Consultando WeatherAPI...",
+        "noWeatherLocation": "Selecione uma cidade com estação para consultar o clima.",
+        "liveNote": "Dados atualizados automaticamente a cada 10 minutos",
+        "sources": "Fontes: ANA/SNIRH e WeatherAPI",
+        "filters": {
+            "title": "Filtros do dashboard",
+            "region": "Região",
+            "city": "Cidade monitorada",
+            "period": "Período do gráfico",
+            "allRegions": "Todas as regiões",
+            "allCities": "Todas as cidades",
+            "citySearchHint": "Digite para buscar. Até {{count}} cidades por vez.",
+            "lastHours": "Próximas {{count}} horas"
+        },
+        "cards": {
+            "rain": "Chuva média em 24 h",
+            "rainDetail": "média de {{count}} estações no filtro",
+            "temperature": "Temperatura atual",
+            "levels": "Leituras de nível",
+            "levelDetail": "de {{count}} estações fluviais",
+            "alerts": "Estações em alerta",
+            "alertDetail": "chuva forte ou nível em atenção",
+            "stations": "Estações operando",
+            "stationDetail": "de {{total}} estações monitoradas"
+        },
+        "charts": {
+            "weatherTitle": "Previsão meteorológica por hora",
+            "weatherSubtitle": "{{city}} · próximas {{count}} horas",
+            "forecastBadge": "Previsão para 3 dias",
+            "forecastSourceNote": "Temperatura e precipitação horárias fornecidas pela WeatherAPI.",
+            "noForecast": "Não há horários de previsão disponíveis para este período.",
+            "temperatureLine": "Temperatura (°C)",
+            "rainLine": "Precipitação (mm)",
+            "levelTitle": "Leituras recentes dos rios",
+            "levelSubtitle": "Até {{count}} leituras recentes no filtro",
+            "noLevels": "Não há leituras de nível para este filtro.",
+            "levelValue": "Cota do rio (cm)",
+            "levelSourceNote": "Cotas em centímetros. As cores seguem a classificação da ANA/SNIRH. Passe sobre uma leitura para ver os detalhes."
+        },
+        "summary": {
+            "title": "Resumo hidrológico",
+            "subtitle": "Área: {{location}}",
+            "rain": "Chuva acumulada em 24 h",
+            "rainValue": "{{value}} mm em média por estação",
+            "rainReadings": "{{count}} estações pluviométricas com dados",
+            "river": "Níveis dos rios",
+            "levelsValue": "{{count}} leituras com cota",
+            "riverRisk": "{{count}} leituras em atenção"
+        },
+        "weather": {
+            "title": "Condições meteorológicas",
+            "forecastTitle": "Previsão para 3 dias",
+            "forecastUnavailable": "A previsão não está disponível no momento.",
+            "localTime": "Horário local: {{time}} ({{zone}})",
+            "observedAt": "Atualizado pela fonte às {{time}}"
+        }
+    },
+    "home": {
+        "greeting": "Olá, {{name}}",
+        "subtitle": "Explore o mapa: escolha um estado para ver seus municípios e toque em uma cidade para ver os detalhes.",
+        "stats": {
+            "users": "Usuários cadastrados",
+            "states": "Estados",
+            "cities": "Municípios",
+            "population": "População estimada"
+        },
+        "mapTitle": "Brasil em detalhe",
+        "mapSubtitle": "Limites oficiais do IBGE para os 26 estados, o Distrito Federal e os 5.570 municípios.",
+        "verifyBanner": "Seu e-mail ainda não foi confirmado."
+    },
+    "map": {
+        "brazil": "Brasil",
+        "back": "Voltar",
+        "searchPlaceholder": "Buscar cidade...",
+        "searchEmpty": "Nenhuma cidade encontrada",
+        "hintCountry": "Clique em um estado",
+        "hintState": "Clique em um município",
+        "loading": "Carregando mapa...",
+        "error": "Não foi possível carregar o mapa.",
+        "retry": "Tentar de novo",
+        "capital": "Capital",
+        "capitalOf": "Capital: {{name}}",
+        "municipalities_one": "{{count}} município",
+        "municipalities_other": "{{count}} municípios",
+        "population": "População",
+        "meso": "Mesorregião",
+        "micro": "Microrregião",
+        "ibgeCode": "Código IBGE",
+        "region": "Região",
+        "inhabitants": "{{value}} hab.",
+        "source": "Fonte: IBGE · população estimada {{year}}",
+        "zoomOut": "Afastar",
+        "openState": "Ver municípios",
+        "regions": {
+            "N": "Norte",
+            "NE": "Nordeste",
+            "CO": "Centro-Oeste",
+            "SE": "Sudeste",
+            "S": "Sul"
+        },
+        "statsStates": "Estados",
+        "statsCities": "Municípios",
+        "statsPopulation": "Habitantes",
+        "zoomIn": "Aproximar",
+        "gestures": {
+            "windows": "Use Ctrl + rolagem para dar zoom no mapa",
+            "mac": "Use ⌘ + rolagem para dar zoom no mapa",
+            "mobile": "Use dois dedos para mover o mapa"
+        },
+        "resetView": "Voltar ao Brasil inteiro"
+    },
+    "weather": {
+        "title": "Clima no local selecionado",
+        "current": "Clima atual",
+        "timeZone": "Fuso horário",
+        "currentLocation": "Localização atual",
+        "selectHint": "Clique no mapa ou use sua localização atual.",
+        "empty": "Escolha um ponto no mapa para consultar o clima atual e a previsão de 3 dias.",
+        "loading": "Consultando o clima...",
+        "loadError": "Não foi possível carregar os dados do clima.",
+        "retry": "Tentar novamente",
+        "selectedMarker": "Local selecionado para consultar o clima",
+        "source": {
+            "map": "selecionado no mapa",
+            "device": "localização do dispositivo"
+        },
+        "feelsLike": "Sensação",
+        "humidity": "Umidade",
+        "precipitation": "Precipitação",
+        "wind": "Vento",
+        "forecast": "Previsão de 3 dias",
+        "forecastError": "A previsão não está disponível no momento.",
+        "geolocationUnsupported": "Este navegador não oferece localização.",
+        "locationDenied": "Permita o acesso à localização no navegador e tente novamente.",
+        "locationUnavailable": "Não foi possível determinar sua localização.",
+        "locationTimeout": "A localização demorou para responder. Tente novamente."
+    },
+    "settings": {
+        "title": "Configurações",
+        "subtitle": "Gerencie seus dados, sua senha e a segurança da conta.",
+        "tabs": {
+            "profile": "Perfil",
+            "properties": "Propriedades",
+            "team": "Equipe",
+            "security": "Segurança",
+            "appearance": "Aparência"
+        },
+        "appearance": {
+            "title": "Aparência e idioma",
+            "description": "Escolha como o Sentinela aparece neste navegador.",
+            "theme": "Tema",
+            "system": "Usar configuração do dispositivo",
+            "light": "Claro",
+            "dark": "Escuro",
+            "saved": "As preferências são salvas automaticamente neste navegador."
+        },
+        "team": {
+            "description": "Trabalhe sozinho ou compartilhe cada propriedade com sua equipe.",
+            "organizer": "Organizador",
+            "participating": "Participando",
+            "noOrganized": "Você ainda não organiza nenhuma propriedade.",
+            "noParticipating": "Você ainda não participa de outras equipes.",
+            "titleLabel": "Título da equipe",
+            "saveTitle": "Salvar título",
+            "titleSaved": "Título da equipe atualizado.",
+            "leave": "Sair da equipe",
+            "confirmLeave": "Sair da equipe {{title}}? Você perderá o acesso a esta propriedade.",
+            "left": "Você saiu da equipe.",
+            "property": "Propriedade",
+            "empty": "Cadastre uma propriedade para configurar a equipe.",
+            "loading": "Carregando equipe…",
+            "mode": "Modo desta propriedade",
+            "active": "Equipe ativa",
+            "solo": "Uso individual",
+            "access": "Seu acesso: {{role}}",
+            "useSolo": "Usar sozinho",
+            "activate": "Ativar equipe",
+            "confirmSolo": "Voltar ao uso individual removerá todos os membros e convites desta propriedade. Continuar?",
+            "inviteEmail": "Convidar por e-mail",
+            "role": "Função",
+            "sendInvite": "Enviar convite",
+            "permissions": "Visualizador consulta dados; editor cria e altera, sem excluir; administrador também pode excluir e gerenciar a equipe.",
+            "members": "Membros",
+            "owner": "Proprietário",
+            "remove": "Remover",
+            "confirmRemove": "Remover {{name}} da propriedade?",
+            "pending": "Convites pendentes",
+            "noPending": "Nenhum convite pendente.",
+            "expires": "expira em {{date}}",
+            "cancel": "Cancelar",
+            "adminOnly": "Somente administradores podem gerenciar convites e funções.",
+            "viewer": "Visualizador",
+            "editor": "Editor",
+            "admin": "Administrador",
+            "invited": "Convite criado. O envio do e-mail será processado.",
+            "accepted": "Convite aceito. A propriedade já está disponível para sua conta.",
+            "acceptError": "Não foi possível aceitar o convite.",
+            "loadError": "Não foi possível carregar a equipe.",
+            "saveError": "Não foi possível salvar a equipe."
+        },
+        "properties": {
+            "title": "Minhas propriedades",
+            "subtitle": "Selecione uma propriedade para excluir seu cadastro e contorno.",
+            "loading": "Carregando suas propriedades…",
+            "empty": "Você ainda não tem propriedades cadastradas.",
+            "loadError": "Não foi possível carregar suas propriedades.",
+            "retry": "Tentar novamente",
+            "deleteError": "Não foi possível excluir esta propriedade.",
+            "select": "Selecionar {{name}} para excluir",
+            "areaUnknown": "Área não delimitada",
+            "confirmTitle": "Excluir propriedade?",
+            "confirmText": "O cadastro e o contorno da propriedade “{{name}}” serão excluídos. Essa ação não pode ser desfeita.",
+            "confirm": "Excluir propriedade",
+            "deleted": "Propriedade “{{name}}” excluída."
+        },
+        "profile": {
+            "title": "Informações pessoais",
+            "subtitle": "Seu nome e sua foto no Sentinela.",
+            "picture": "Foto (URL)",
+            "pictureHint": "Endereço de uma imagem pública. Deixe vazio para usar as iniciais.",
+            "saved": "Perfil atualizado.",
+            "emailVerified": "Verificado",
+            "emailNotVerified": "Não verificado",
+            "provider": "Forma de acesso",
+            "providers": {
+                "LOCAL": "E-mail e senha",
+                "GOOGLE": "Google"
+            }
+        },
+        "password": {
+            "title": "Senha",
+            "subtitle": "Ao trocar a senha, você sai dos outros dispositivos.",
+            "current": "Senha atual",
+            "new": "Nova senha",
+            "confirm": "Confirmar nova senha",
+            "submit": "Alterar senha",
+            "saved": "Senha alterada. Você continua conectado aqui; os outros dispositivos foram desconectados.",
+            "googleOnly": "Você entra com o Google, então não há senha para alterar."
+        },
+        "email": {
+            "title": "E-mail",
+            "subtitle": "Enviaremos um código de 8 dígitos para o novo endereço.",
+            "current": "E-mail atual",
+            "new": "Novo e-mail",
+            "password": "Senha atual",
+            "submit": "Enviar código",
+            "codeTitle": "Digite o código enviado para {{email}}",
+            "confirm": "Confirmar troca",
+            "saved": "E-mail alterado para {{email}}. Você continua conectado aqui; os outros dispositivos foram desconectados.",
+            "googleOnly": "Contas do Google usam o e-mail da conta Google."
+        },
+        "sessions": {
+            "title": "Sessões",
+            "subtitle": "Encerra o acesso em todos os computadores e celulares, inclusive neste.",
+            "submit": "Sair de todos os dispositivos"
+        },
+        "delete": {
+            "title": "Excluir conta",
+            "subtitle": "Apaga sua conta e seus dados de forma permanente. Essa ação não pode ser desfeita.",
+            "submit": "Excluir minha conta",
+            "modalTitle": "Excluir conta definitivamente?",
+            "modalText": "Seu perfil, seus dados de acesso e o histórico de e-mails enviados a você serão apagados. Para confirmar, digite {{word}} abaixo.",
+            "keyword": "EXCLUIR",
+            "confirm": "Excluir para sempre"
+        },
+        "dangerZone": "Zona de perigo"
+    },
+    "legal": {
+        "privacy": "Política de privacidade",
+        "terms": "Termos de uso",
+        "updatedAt": "Última atualização: {{date}}",
+        "contents": "Nesta página",
+        "otherDoc": "Leia também",
+        "backHome": "Voltar ao início"
+    },
+    "maintenance": {
+        "code": "Manutenção do sistema",
+        "title": "Estamos cuidando do Sentinela",
+        "subtitle": "O sistema está temporariamente indisponível para manutenção. Assim que o serviço voltar, esta tela será atualizada automaticamente.",
+        "startedAt": "Início da manutenção",
+        "expectedEnd": "Previsão de retorno",
+        "noEstimate": "Ainda sem horário previsto",
+        "version": "Versão do sistema",
+        "retry": "Verificar disponibilidade",
+        "autoRefresh": "Verificamos a disponibilidade a cada 30 segundos. Sua sessão será preservada.",
+        "checkFailed": "Não foi possível consultar o status agora. Vamos tentar novamente automaticamente."
+    },
+    "notFound": {
+        "code": "Erro 404",
+        "title": "Não encontramos esta página",
+        "subtitle": "O endereço pode estar errado ou a página foi removida.",
+        "back": "Voltar",
+        "home": "Ir para o início"
+    },
+    "footer": {
+        "rights": "© {{year}} {{company}}. Dados geográficos: IBGE."
+    },
+    "hydro": {
+        "theme": "Dados",
+        "apiFilters": "Filtros",
+        "apiResults": "Dados meteorológicos",
+        "filters": {
+            "selectAll": "Selecionar todas",
+            "selectedCount": "{{count}} fontes selecionadas",
+            "noneSelected": "Nenhuma fonte selecionada",
+            "activeTables": "Tabelas das {{count}} fontes hidrológicas selecionadas",
+            "noHydroSelected": "Selecione chuva, nível ou estações para exibir as tabelas."
+        },
+        "mapControls": {
+            "title": "Mapa base e camadas"
+        },
+        "themes": {
+            "rain": "Chuva (24h)",
+            "level": "Nível dos rios",
+            "stations": "Estações (HidroWeb)"
+        },
+        "themeHints": {
+            "rain": "Chuva acumulada nas últimas 24 horas nas estações telemétricas.",
+            "level": "Situação do nível em relação às cotas de referência.",
+            "stations": "Inventário da Rede Hidrometeorológica Nacional."
+        },
+        "basemaps": {
+            "title": "Mapa base",
+            "monitoring": "Sentinela · Detalhado",
+            "satellite": "Satélite",
+            "hybrid": "Satélite com nomes",
+            "streets": "Ruas (OpenStreetMap)",
+            "topo": "Relevo",
+            "ocean": "Oceano",
+            "light": "Claro",
+            "dark": "Escuro",
+            "minimal": "Mínimo"
+        },
+        "layers": {
+            "title": "Camadas",
+            "rivers": "Rios",
+            "riversHint": "Rios principais da ANA e rios e lagos do OpenStreetMap",
+            "points": "Estações do tema",
+            "inactive": "Estações desativadas"
+        },
+        "legend": {
+            "title": "Legenda",
+            "empty": "Abra os filtros e selecione as fontes que deseja visualizar.",
+            "show": "Mostrar legenda",
+            "hide": "Ocultar legenda",
+            "toggleHint": "Clique para mostrar ou esconder"
+        },
+        "rain": {
+            "veryStrong": "Muito forte (acima de 70 mm)",
+            "strong": "Forte (30 a 70 mm)",
+            "moderate": "Moderada (10 a 30 mm)",
+            "weak": "Fraca (até 10 mm)",
+            "none": "Sem chuva"
+        },
+        "level": {
+            "attention": "Atenção (nível alto)",
+            "normal": "Normal",
+            "drought": "Estiagem (nível baixo)",
+            "stale": "Sem dados atualizados",
+            "noRef": "Sem cota de referência"
+        },
+        "stations": {
+            "fluvio": "Fluviométrica",
+            "pluvio": "Pluviométrica",
+            "operating": "Em operação",
+            "inactive": "Desativada",
+            "maintenance": "Em manutenção",
+            "telemetry": "Telemétrica",
+            "conventional": "Convencional"
+        },
+        "table": {
+            "title": "Dados hidrológicos",
+            "show": "Ver tabela",
+            "hide": "Ocultar tabela",
+            "tabStates": "Estados",
+            "search": "Buscar estação, município ou código...",
+            "allStates": "Todos os estados",
+            "onlyState": "Só {{uf}}",
+            "empty": "Nenhum registro encontrado.",
+            "noData": "O SNIRH não retornou dados agora. Tente novamente em alguns minutos.",
+            "error": "Não foi possível carregar os dados.",
+            "retry": "Tentar de novo",
+            "loading": "Carregando dados do SNIRH...",
+            "range": "{{from}}–{{to}} de {{total}}",
+            "prev": "Anterior",
+            "next": "Próxima",
+            "sort": "Ordenar por {{column}}",
+            "restartBackend": "Se a tabela não carregar, reinicie o backend para ele ter os endpoints novos.",
+            "cols": {
+                "station": "Estação",
+                "code": "Código",
+                "city": "Município",
+                "uf": "UF",
+                "rain": "Chuva 24h",
+                "class": "Classe",
+                "updated": "Atualizado",
+                "level": "Cota",
+                "status": "Situação",
+                "type": "Tipo",
+                "river": "Rio",
+                "responsible": "Responsável",
+                "operator": "Operadora",
+                "project": "Projeto",
+                "telemetry": "Telemetria",
+                "basin": "Bacia",
+                "region": "Região",
+                "capital": "Capital",
+                "cities": "Municípios",
+                "population": "População",
+                "state": "Estado"
+            }
+        },
+        "popup": {
+            "title": "Informações",
+            "close": "Fechar",
+            "selectedPoint": "Detalhes do ponto selecionado",
+            "selectHint": "Selecione uma estação no mapa ou na tabela para ver os detalhes.",
+            "lastData": "Último dado",
+            "source": "Fonte: ANA/SNIRH",
+            "altitude": "Altitude",
+            "drainage": "Área de drenagem"
+        }
+    }
+}

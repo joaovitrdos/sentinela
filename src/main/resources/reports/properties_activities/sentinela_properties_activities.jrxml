@@ -1,0 +1,115 @@
+<!-- Created for JasperReports Library 7.x. Edit with Jaspersoft Studio 7 or newer. -->
+<jasperReport whenNoDataType="NoDataSection" name="sentinela_properties_activities" language="java" orientation="Landscape"
+              pageWidth="842" pageHeight="595" columnWidth="794"
+              leftMargin="24" rightMargin="24" topMargin="24" bottomMargin="24"
+              uuid="01a2cbda-a7e1-4f41-9372-019af115b1dc">
+    <parameter name="REPORT_TITLE" class="java.lang.String"/>
+    <parameter name="PERIOD_LABEL" class="java.lang.String"/>
+    <parameter name="TIME_LABEL" class="java.lang.String"/>
+    <parameter name="OWNER_ID" class="java.lang.String"/>
+    <parameter name="ALL_PROPERTIES" class="java.lang.Boolean"/>
+    <parameter name="PROPERTY_IDS" class="java.util.Collection"/>
+    <parameter name="FROM_DATE" class="java.sql.Date"/>
+    <parameter name="TO_DATE" class="java.sql.Date"/>
+    <parameter name="FROM_TIME" class="java.sql.Time"/>
+    <parameter name="TO_TIME" class="java.sql.Time"/>
+
+    <query language="sql"><![CDATA[
+        SELECT report_rows.*
+        FROM (
+            SELECT
+                'Propriedade'::text AS tipo,
+                p.property_id::text AS id,
+                p.name::text AS propriedade,
+                concat_ws('/', p.city, p.state)::text AS localidade,
+                concat('Área: ', coalesce(round(p.area_hectares::numeric, 2)::text, ''), ' ha; lat: ',
+                    coalesce(round(p.latitude::numeric, 5)::text, ''), '; lon: ', coalesce(round(p.longitude::numeric, 5)::text, ''))::text AS medidas,
+                concat_ws(' / ', nullif(p.crop_name, ''), nullif(p.plot_name, ''), nullif(p.crop_stage, ''))::text AS cultura,
+                coalesce(to_char(p.planting_date, 'DD/MM/YYYY'), '')::text AS data,
+                concat('Cadastro: ', coalesce(to_char(p.created_at, 'DD/MM/YYYY HH24:MI'), ''),
+                    '; atualização: ', coalesce(to_char(p.update_at, 'DD/MM/YYYY HH24:MI'), ''))::text AS detalhes,
+                p.planting_date AS sort_date
+            FROM tb_property p
+            WHERE (p.user_id = CAST($P{OWNER_ID} AS uuid) OR
+                (p.team_enabled = true AND EXISTS (SELECT 1 FROM tb_property_member m
+                    WHERE m.property_id = p.property_id AND m.user_id = CAST($P{OWNER_ID} AS uuid))))
+                AND ($P{ALL_PROPERTIES} = true OR $X{IN, p.property_id, PROPERTY_IDS})
+
+            UNION ALL
+
+            SELECT
+                (CASE a.activity_type WHEN 'IRRIGATION' THEN 'Irrigação'
+                    WHEN 'RAINFALL' THEN 'Chuva Medida'
+                    WHEN 'INSPECTION' THEN 'Inspeção' WHEN 'INCIDENT' THEN 'Incidente'
+                    ELSE a.activity_type END)::text AS tipo,
+                a.activity_id::text AS id,
+                p.name::text AS propriedade,
+                concat_ws('/', p.city, p.state)::text AS localidade,
+                CASE WHEN a.amount_mm IS NULL THEN '' ELSE concat(a.amount_mm::text, ' mm') END::text AS medidas,
+                concat_ws(' / ', nullif(coalesce(plot.crop_name, p.crop_name), ''),
+                    nullif(coalesce(plot.name, p.plot_name), ''), nullif(coalesce(plot.crop_stage, p.crop_stage), ''))::text AS cultura,
+                concat(to_char(a.activity_date, 'DD/MM/YYYY'),
+                    CASE WHEN a.activity_time IS NULL THEN '' ELSE concat(' ', to_char(a.activity_time, 'HH24:MI')) END)::text AS data,
+                concat(a.notes, '; registro: ', coalesce(to_char(a.created_at, 'DD/MM/YYYY HH24:MI'), ''))::text AS detalhes,
+                a.activity_date AS sort_date
+            FROM tb_property_activity a
+            JOIN tb_property p ON p.property_id = a.property_id
+            LEFT JOIN tb_plot plot ON plot.plot_id = a.plot_id
+            WHERE (p.user_id = CAST($P{OWNER_ID} AS uuid) OR
+                (p.team_enabled = true AND EXISTS (SELECT 1 FROM tb_property_member m
+                    WHERE m.property_id = p.property_id AND m.user_id = CAST($P{OWNER_ID} AS uuid))))
+                AND ($P{ALL_PROPERTIES} = true OR $X{IN, p.property_id, PROPERTY_IDS})
+                AND a.activity_date BETWEEN $P{FROM_DATE} AND $P{TO_DATE}
+                AND (CAST($P{FROM_TIME} AS time) IS NULL OR a.activity_time BETWEEN $P{FROM_TIME} AND $P{TO_TIME})
+        ) AS report_rows
+        ORDER BY report_rows.propriedade, report_rows.sort_date, report_rows.tipo
+    ]]></query>
+
+    <field name="tipo" class="java.lang.String"/>
+    <field name="id" class="java.lang.String"/>
+    <field name="propriedade" class="java.lang.String"/>
+    <field name="localidade" class="java.lang.String"/>
+    <field name="medidas" class="java.lang.String"/>
+    <field name="cultura" class="java.lang.String"/>
+    <field name="data" class="java.lang.String"/>
+    <field name="detalhes" class="java.lang.String"/>
+
+    <title height="68">
+        <element kind="textField" uuid="6386db39-baa4-4612-96a1-a717a3b7e0d3" x="0" y="0" width="794" height="30" forecolor="#000000" fontSize="17.0" bold="true" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$P{REPORT_TITLE}]]></expression></element>
+        <element kind="textField" uuid="f0c896e5-8148-45b3-9871-c0b91f4ddb74" x="0" y="39" width="794" height="20" forecolor="#252525" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA["Período: " + $P{PERIOD_LABEL} + "   |   Horário: " + $P{TIME_LABEL}]]></expression></element>
+    </title>
+    <columnHeader height="24">
+            <element kind="staticText" uuid="71ea4ebc-54a1-4715-abf8-75e386b56348" x="0" y="0" width="70" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Tipo]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="staticText" uuid="e79ba548-40da-4311-81a2-f6ec42689947" x="70" y="0" width="75" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Identificador]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="staticText" uuid="d7763b62-8cc2-46ef-8229-461d76f9438c" x="145" y="0" width="100" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Propriedade]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="staticText" uuid="1a0884d8-6dd5-43cf-9f31-0f8720799d4d" x="245" y="0" width="85" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Localidade]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="staticText" uuid="4451c3ea-165e-4a28-9dae-3a66dc75e99d" x="330" y="0" width="105" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Medidas]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="staticText" uuid="022f20cf-149a-4762-9e04-1a9a776715ca" x="435" y="0" width="100" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Cultura / Talhão]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="staticText" uuid="29203dde-22d0-4d90-ad48-d4e156534e02" x="535" y="0" width="75" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Data]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="staticText" uuid="699e8b77-ac20-44dd-a71f-a47e70ca0561" x="610" y="0" width="184" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Detalhe]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+    </columnHeader>
+    <detail>
+        <band height="36" splitType="Stretch">
+            <element kind="textField" uuid="8c72537c-4bb9-4737-8138-39e5f70ed289" x="0" y="0" width="70" height="36" fontSize="7.0" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{tipo})]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="eaa288df-07bc-432a-8756-a79e8d195e4e" x="70" y="0" width="75" height="36" fontSize="7.0" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$F{id}]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="7b34e269-796c-4b7a-a3f9-3a419c8755f0" x="145" y="0" width="100" height="36" fontSize="7.0" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{propriedade})]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="ac36d8b0-31ca-49dd-a451-fbc169690d41" x="245" y="0" width="85" height="36" fontSize="7.0" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{localidade})]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="fbd9fed6-df3a-41a2-b114-b2b850b8f830" x="330" y="0" width="105" height="36" fontSize="7.0" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$F{medidas}]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="c863a6d5-51d9-4f8a-a315-4edf0cf8357a" x="435" y="0" width="100" height="36" fontSize="7.0" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{cultura})]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="63c2a625-5cca-4c43-bdaf-d3c5f4082358" x="535" y="0" width="75" height="36" fontSize="7.0" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$F{data}]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="337eb1ec-9bf7-449a-89c3-9f40031a3c99" x="610" y="0" width="184" height="36" fontSize="7.0" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{detalhes})]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        
+        </band>
+    </detail>
+
+    <pageFooter height="24">
+        <element kind="line" uuid="0a0af422-c000-4aaa-99d8-559e5f291343" x="0" y="0" width="794" height="1" forecolor="#D8E3EA"/>
+        <element kind="staticText" uuid="7a7ea29a-3714-4bc4-9e6d-2fbbf828504a" x="0" y="6" width="674" height="15" forecolor="#718597" fontSize="8.0"><text><![CDATA[SENTINELA  •  Monitoramento e informações]]></text></element>
+        <element kind="textField" uuid="76f8cbcf-a82d-400b-884e-cec77efd06b9" x="674" y="6" width="120" height="15" forecolor="#718597" fontSize="8.0" hTextAlign="Right"><expression><![CDATA["Página " + $V{PAGE_NUMBER}]]></expression></element>
+    </pageFooter>
+    <noData height="120">
+        <element kind="textField" uuid="6386db39-baa4-4612-96a1-a717a3b7e0d3" x="0" y="0" width="794" height="30" forecolor="#000000" fontSize="17.0" bold="true" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$P{REPORT_TITLE}]]></expression></element>
+        <element kind="textField" uuid="f0c896e5-8148-45b3-9871-c0b91f4ddb74" x="0" y="39" width="794" height="20" forecolor="#252525" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA["Período: " + $P{PERIOD_LABEL} + "   |   Horário: " + $P{TIME_LABEL}]]></expression></element>
+        <element kind="staticText" uuid="e6b8a7ae-880c-4664-baa5-a50f6c79f95a" x="0" y="82" width="794" height="25" forecolor="#333333" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Nenhum Registro Encontrado Para Os Filtros Selecionados.]]></text></element>
+    </noData>
+</jasperReport>

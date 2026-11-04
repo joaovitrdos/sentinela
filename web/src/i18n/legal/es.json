@@ -1,0 +1,208 @@
+{
+    "privacy": {
+        "title": "Política de Privacidad",
+        "updated": "2026-10-21",
+        "intro": "Esta política explica qué datos personales trata {{company}} cuando usas el sitio y la aplicación, para qué sirven, con quién se comparten y cómo puedes ejercer tus derechos, según la Ley General de Protección de Datos de Brasil (Ley nº 13.709/2018 - LGPD).",
+        "sections": [
+            {
+                "id": "controlador",
+                "title": "1. Quién es responsable de tus datos",
+                "paragraphs": [
+                    "El responsable de los datos personales tratados en Sentinela es {{company}}. Para cualquier asunto de privacidad, incluido el contacto con el encargado de protección de datos (DPO), escribe a {{email}}."
+                ]
+            },
+            {
+                "id": "dados",
+                "title": "2. Qué datos recopilamos",
+                "items": [
+                    "Registro: nombre, correo y contraseña. La contraseña nunca se guarda como texto: solo almacenamos un resumen criptográfico (hash bcrypt) que no permite recuperarla.",
+                    "Iniciar sesión con Google: si eliges esta opción, Google nos envía el identificador de tu cuenta, nombre, correo y foto de perfil. Nunca vemos tu contraseña de Google.",
+                    "Perfil: la dirección (URL) de la foto que indiques.",
+                    "Códigos de verificación: códigos de 8 dígitos para confirmar el correo, cambiar el correo y recuperar la contraseña. Vencen en 15 minutos.",
+                    "Historial de correos enviados: remitente, destinatario, asunto, tipo de mensaje y si el envío tuvo éxito.",
+                    "Datos técnicos de seguridad: dirección IP e identificación de la cuenta, usados por pocos minutos y solo en memoria para limitar intentos repetidos (protección contra abusos), además de registros de errores del servidor.",
+                    "En tu navegador: el token de sesión y tus preferencias de idioma y tema, guardados en el almacenamiento local (localStorage)."
+                ]
+            },
+            {
+                "id": "finalidades",
+                "title": "3. Para qué usamos los datos",
+                "items": [
+                    "Crear y mantener tu cuenta y confirmar que eres tú quien inicia sesión (ejecución de contrato, art. 7, V, LGPD).",
+                    "Enviar los correos necesarios para el servicio, como códigos de confirmación y de recuperación de contraseña (ejecución de contrato).",
+                    "Proteger la plataforma contra fraudes, intrusiones y abusos (interés legítimo, art. 7, IX).",
+                    "Cumplir obligaciones legales y órdenes de autoridades (art. 7, II)."
+                ],
+                "paragraphs": ["No vendemos tus datos ni los usamos para publicidad o para crear perfiles de comportamiento."]
+            },
+            {
+                "id": "compartilhamento",
+                "title": "4. Con quién los compartimos",
+                "items": [
+                    "Google: solo si usas el inicio de sesión con Google, para validar tu identidad.",
+                    "Proveedor de correo: para entregar los códigos y avisos que te enviamos.",
+                    "Proveedores de infraestructura y alojamiento que operan los servidores y la base de datos en nuestro nombre.",
+                    "Autoridades públicas, cuando exista obligación legal u orden judicial."
+                ],
+                "paragraphs": ["Tu perfil público muestra solo tu nombre y tu foto, a cualquier persona que tenga el enlace. Tu correo nunca se muestra públicamente."]
+            },
+            {
+                "id": "fontes-publicas",
+                "title": "5. Datos públicos que muestran los mapas",
+                "paragraphs": [
+                    "Los límites de estados y municipios y las estimaciones de población provienen del IBGE. La información de lluvias y ríos proviene de fuentes públicas como la Agencia Nacional de Aguas y Saneamiento Básico de Brasil (ANA/SNIRH). Estos datos no son personales."
+                ]
+            },
+            {
+                "id": "seguranca",
+                "title": "6. Cómo protegemos los datos",
+                "items": [
+                    "Contraseñas guardadas solo como hash bcrypt.",
+                    "Sesión con token firmado, válido hasta por 7 días, que se revoca cuando cambias la contraseña, cambias el correo o eliges cerrar sesión en todos los dispositivos.",
+                    "Límite de intentos de inicio de sesión y de envío de códigos.",
+                    "Acceso a los datos restringido a quien lo necesita para operar el servicio."
+                ],
+                "paragraphs": ["Ningún sistema es totalmente inmune a fallas. Si ocurre un incidente que pueda ponerte en riesgo, te avisaremos a ti y a la ANPD, como exige la ley."]
+            },
+            {
+                "id": "retencao",
+                "title": "7. Por cuánto tiempo los guardamos",
+                "items": [
+                    "Datos de la cuenta: mientras la cuenta exista.",
+                    "Códigos de verificación: vencen en 15 minutos.",
+                    "Al eliminar la cuenta: perfil, credenciales e historial de correos se borran de inmediato y de forma definitiva.",
+                    "Registros técnicos: por el plazo que exige la ley, como los registros de acceso a aplicaciones previstos en el Marco Civil de Internet de Brasil (Ley nº 12.965/2014)."
+                ]
+            },
+            {
+                "id": "direitos",
+                "title": "8. Tus derechos",
+                "paragraphs": [
+                    "Según la LGPD (art. 18), puedes solicitar: confirmación de que tratamos tus datos, acceso, corrección, anonimización, bloqueo o eliminación de datos innecesarios, portabilidad, información sobre con quién los compartimos y revocación del consentimiento cuando sea la base del tratamiento. También puedes oponerte a un tratamiento.",
+                    "En la propia aplicación puedes editar tu nombre y foto, cambiar el correo, cambiar la contraseña y eliminar la cuenta en Configuración. Para otras solicitudes, escribe a {{email}}. Responderemos en hasta 15 días. También puedes presentar una reclamación ante la Autoridad Nacional de Protección de Datos de Brasil (ANPD)."
+                ]
+            },
+            {
+                "id": "cookies",
+                "title": "9. Cookies y almacenamiento local",
+                "paragraphs": [
+                    "No usamos cookies de publicidad ni de rastreo. Solo guardamos en tu navegador lo necesario para que la aplicación funcione: el token de sesión, el idioma y el tema. Al usar el inicio de sesión con Google, el propio Google puede guardar cookies según su política de privacidad."
+                ]
+            },
+            {
+                "id": "internacional",
+                "title": "10. Transferencia internacional",
+                "paragraphs": [
+                    "Algunos proveedores, como Google y los servicios de alojamiento o de correo, pueden procesar datos fuera de Brasil. En esos casos exigimos garantías de protección compatibles con la LGPD (art. 33)."
+                ]
+            },
+            {
+                "id": "menores",
+                "title": "11. Niños y adolescentes",
+                "paragraphs": ["Sentinela no está dirigido a niños. Los menores de 18 años deben usar el servicio con autorización y supervisión de sus padres o tutores."]
+            },
+            {
+                "id": "alteracoes",
+                "title": "12. Cambios en esta política",
+                "paragraphs": [
+                    "Podemos actualizar esta política. La fecha de la última actualización aparece al inicio de la página y, si el cambio es relevante, te avisaremos por correo o en la aplicación."
+                ]
+            }
+        ]
+    },
+    "terms": {
+        "title": "Términos de Uso",
+        "updated": "2026-10-21",
+        "intro": "Estos términos regulan el uso de Sentinela, ofrecido por {{company}}. Al crear una cuenta o usar el servicio, aceptas estos términos y la Política de Privacidad.",
+        "sections": [
+            {
+                "id": "servico",
+                "title": "1. Qué es Sentinela",
+                "paragraphs": [
+                    "Sentinela reúne en mapas información sobre lluvias, ríos y territorios de Brasil, como la lluvia acumulada, el nivel de los ríos y los límites de estados y municipios, a partir de fuentes públicas como ANA/SNIRH e IBGE."
+                ]
+            },
+            {
+                "id": "aviso",
+                "title": "2. Aviso importante: no sustituye las alertas oficiales",
+                "paragraphs": [
+                    "La información es solo de carácter informativo. Los datos de estaciones telemétricas pueden llegar con retraso, tener errores o estar fuera de línea. Sentinela no sustituye las alertas de Defensa Civil, Cemaden, INMET u otros organismos oficiales.",
+                    "En una situación de riesgo, sigue las orientaciones de Defensa Civil (teléfono 199) y del Cuerpo de Bomberos (teléfono 193)."
+                ]
+            },
+            {
+                "id": "conta",
+                "title": "3. Tu cuenta",
+                "items": [
+                    "Proporciona datos verdaderos y mantén tu correo actualizado.",
+                    "Mantén tu contraseña en secreto. Eres responsable de lo que se haga con tu cuenta.",
+                    "Si sospechas un uso indebido, cambia la contraseña y usa la opción \"Cerrar sesión en todos los dispositivos\".",
+                    "Los menores de 18 años solo pueden usar el servicio con autorización de sus tutores."
+                ]
+            },
+            {
+                "id": "uso",
+                "title": "4. Uso permitido",
+                "paragraphs": ["Al usar Sentinela, te comprometes a no:"],
+                "items": [
+                    "intentar eludir la seguridad, acceder a cuentas ajenas o explotar fallas;",
+                    "hacer solicitudes automatizadas en exceso ni sobrecargar el servicio;",
+                    "hacerte pasar por otra persona ni usar el servicio para actividades ilegales;",
+                    "usar en el perfil público un nombre o foto ofensivos, o imágenes de terceros sin autorización."
+                ]
+            },
+            {
+                "id": "conteudo",
+                "title": "5. Tu perfil público",
+                "paragraphs": [
+                    "Tu nombre y tu foto aparecen en tu perfil público. Al indicar una foto, declaras tener derecho a usarla. Podemos eliminar contenido que infrinja estos términos."
+                ]
+            },
+            {
+                "id": "propriedade",
+                "title": "6. Propiedad intelectual y fuentes de datos",
+                "paragraphs": [
+                    "El software, la marca y el diseño de Sentinela pertenecen a {{company}}. Los datos públicos mostrados siguen sujetos a las reglas y licencias de las fuentes originales (como IBGE y ANA), que siempre se citan."
+                ]
+            },
+            {
+                "id": "disponibilidade",
+                "title": "7. Disponibilidad",
+                "paragraphs": [
+                    "El servicio se ofrece tal como está. Trabajamos para mantenerlo en línea, pero pueden ocurrir interrupciones por mantenimiento, fallas técnicas o indisponibilidad de las fuentes de datos."
+                ]
+            },
+            {
+                "id": "responsabilidade",
+                "title": "8. Limitación de responsabilidad",
+                "paragraphs": [
+                    "En la medida que lo permita la ley, incluido el Código de Defensa del Consumidor de Brasil, no respondemos por decisiones tomadas únicamente con base en la información de Sentinela, ni por retrasos o errores provenientes de las fuentes públicas de datos."
+                ]
+            },
+            {
+                "id": "encerramento",
+                "title": "9. Cierre de la cuenta",
+                "paragraphs": [
+                    "Puedes eliminar tu cuenta en cualquier momento en Configuración > Seguridad. La eliminación es definitiva. Podemos suspender o cerrar cuentas que infrinjan estos términos, avisándote siempre que sea posible."
+                ]
+            },
+            {
+                "id": "alteracoes",
+                "title": "10. Cambios en los términos",
+                "paragraphs": [
+                    "Podemos actualizar estos términos. Si el cambio es relevante, avisaremos con antelación. Seguir usando el servicio después significa que aceptas la nueva versión."
+                ]
+            },
+            {
+                "id": "lei",
+                "title": "11. Ley aplicable",
+                "paragraphs": ["Estos términos se rigen por las leyes de Brasil. Los conflictos se resolverán en los tribunales del domicilio del usuario."]
+            },
+            {
+                "id": "contato",
+                "title": "12. Contacto",
+                "paragraphs": ["Dudas sobre estos términos: {{email}}."]
+            }
+        ]
+    }
+}

@@ -1,0 +1,214 @@
+{
+    "privacy": {
+        "title": "Política de Privacidade",
+        "updated": "2026-10-21",
+        "intro": "Esta política explica quais dados pessoais o {{company}} trata quando você usa o site e o aplicativo, para que eles servem, com quem são compartilhados e como você pode exercer seus direitos, de acordo com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 - LGPD).",
+        "sections": [
+            {
+                "id": "controlador",
+                "title": "1. Quem é o responsável pelos seus dados",
+                "paragraphs": [
+                    "O controlador dos dados pessoais tratados no Sentinela é {{company}}. Para qualquer assunto relacionado a privacidade, inclusive para falar com o encarregado pelo tratamento de dados (DPO), escreva para {{email}}."
+                ]
+            },
+            {
+                "id": "dados",
+                "title": "2. Quais dados coletamos",
+                "items": [
+                    "Cadastro: nome, e-mail e senha. A senha nunca é guardada em texto: armazenamos apenas um resumo criptográfico (hash bcrypt), que não permite recuperá-la.",
+                    "Entrar com o Google: se você escolher essa opção, recebemos do Google o identificador da sua conta, nome, e-mail e foto de perfil. Não temos acesso à sua senha do Google.",
+                    "Perfil: o endereço (URL) da foto que você informar.",
+                    "Códigos de verificação: códigos de 8 dígitos usados para confirmar o e-mail, trocar o e-mail e recuperar a senha. Eles expiram em 15 minutos.",
+                    "Histórico de e-mails enviados: remetente, destinatário, assunto, tipo de mensagem e se o envio deu certo.",
+                    "Dados técnicos de segurança: endereço IP e identificação da conta, usados por poucos minutos e somente em memória para limitar tentativas repetidas (proteção contra abuso), além de registros de erro do servidor.",
+                    "No seu navegador: o token da sessão e suas preferências de idioma e de tema, guardados no armazenamento local (localStorage)."
+                ]
+            },
+            {
+                "id": "finalidades",
+                "title": "3. Para que usamos os dados",
+                "items": [
+                    "Criar e manter sua conta e confirmar que é você quem está entrando (execução de contrato, art. 7º, V, da LGPD).",
+                    "Enviar e-mails necessários ao serviço, como códigos de confirmação e de recuperação de senha (execução de contrato).",
+                    "Proteger a plataforma contra fraudes, invasões e uso abusivo (legítimo interesse, art. 7º, IX).",
+                    "Cumprir obrigações legais e atender a ordens de autoridades (art. 7º, II)."
+                ],
+                "paragraphs": ["Não vendemos seus dados e não os usamos para publicidade ou para criar perfis de comportamento."]
+            },
+            {
+                "id": "compartilhamento",
+                "title": "4. Com quem compartilhamos",
+                "items": [
+                    "Google: apenas se você usar o login com Google, para validar a sua identidade.",
+                    "Provedor de e-mail: para entregar os códigos e avisos que enviamos a você.",
+                    "Provedores de infraestrutura e hospedagem, que operam os servidores e o banco de dados em nosso nome.",
+                    "Autoridades públicas, quando houver obrigação legal ou ordem judicial."
+                ],
+                "paragraphs": [
+                    "Seu perfil público mostra apenas o seu nome e a sua foto, para qualquer pessoa que tenha o link. O e-mail nunca é exibido publicamente."
+                ]
+            },
+            {
+                "id": "fontes-publicas",
+                "title": "5. Dados públicos exibidos nos mapas",
+                "paragraphs": [
+                    "Os limites de estados e municípios e as estimativas de população vêm do IBGE. As informações de chuva e de rios vêm de fontes públicas como a Agência Nacional de Águas e Saneamento Básico (ANA/SNIRH). Esses dados não são pessoais."
+                ]
+            },
+            {
+                "id": "seguranca",
+                "title": "6. Como protegemos os dados",
+                "items": [
+                    "Senhas guardadas apenas como hash bcrypt.",
+                    "Sessão por token assinado, válido por até 7 dias, que é revogado quando você troca a senha, troca o e-mail ou escolhe sair de todos os dispositivos.",
+                    "Limite de tentativas de login e de envio de códigos.",
+                    "Acesso restrito aos dados por quem precisa deles para operar o serviço."
+                ],
+                "paragraphs": ["Nenhum sistema é totalmente imune a falhas. Se ocorrer um incidente que possa trazer risco a você, avisaremos você e a ANPD, como manda a lei."]
+            },
+            {
+                "id": "retencao",
+                "title": "7. Por quanto tempo guardamos",
+                "items": [
+                    "Dados da conta: enquanto a conta existir.",
+                    "Códigos de verificação: expiram em 15 minutos.",
+                    "Ao excluir a conta: perfil, credenciais e histórico de e-mails são apagados na hora, de forma definitiva.",
+                    "Registros técnicos: pelo prazo exigido em lei, como os registros de acesso a aplicações previstos no Marco Civil da Internet (Lei nº 12.965/2014)."
+                ]
+            },
+            {
+                "id": "direitos",
+                "title": "8. Seus direitos",
+                "paragraphs": [
+                    "Pela LGPD (art. 18), você pode pedir: confirmação de que tratamos seus dados, acesso, correção, anonimização, bloqueio ou eliminação de dados desnecessários, portabilidade, informação sobre com quem compartilhamos, e revogação do consentimento quando ele for a base do tratamento. Você também pode se opor a um tratamento.",
+                    "No próprio app você pode editar nome e foto, trocar o e-mail, trocar a senha e excluir a conta em Configurações. Para os demais pedidos, escreva para {{email}}. Responderemos em até 15 dias. Você também pode reclamar à Autoridade Nacional de Proteção de Dados (ANPD)."
+                ]
+            },
+            {
+                "id": "cookies",
+                "title": "9. Cookies e armazenamento local",
+                "paragraphs": [
+                    "Não usamos cookies de publicidade nem de rastreamento. Guardamos no seu navegador apenas o necessário para o funcionamento: o token da sessão, o idioma e o tema. Ao usar o login com Google, o próprio Google pode gravar cookies, conforme a política de privacidade dele."
+                ]
+            },
+            {
+                "id": "internacional",
+                "title": "10. Transferência internacional",
+                "paragraphs": [
+                    "Alguns provedores, como o Google e serviços de hospedagem ou de e-mail, podem processar dados fora do Brasil. Nesses casos, exigimos garantias de proteção compatíveis com a LGPD (art. 33)."
+                ]
+            },
+            {
+                "id": "menores",
+                "title": "11. Crianças e adolescentes",
+                "paragraphs": [
+                    "O Sentinela não é direcionado a crianças. Menores de 18 anos devem usar o serviço com autorização e acompanhamento dos pais ou responsáveis."
+                ]
+            },
+            {
+                "id": "alteracoes",
+                "title": "12. Mudanças nesta política",
+                "paragraphs": [
+                    "Podemos atualizar esta política. A data da última atualização fica no topo da página e, se a mudança for relevante, avisaremos por e-mail ou no próprio app."
+                ]
+            }
+        ]
+    },
+    "terms": {
+        "title": "Termos de Uso",
+        "updated": "2026-10-21",
+        "intro": "Estes termos regulam o uso do Sentinela, oferecido por {{company}}. Ao criar uma conta ou usar o serviço, você concorda com eles e com a Política de Privacidade.",
+        "sections": [
+            {
+                "id": "servico",
+                "title": "1. O que é o Sentinela",
+                "paragraphs": [
+                    "O Sentinela reúne em mapas informações sobre chuvas, rios e territórios do Brasil, como chuva acumulada, nível de rios e limites de estados e municípios, a partir de fontes públicas como a ANA/SNIRH e o IBGE."
+                ]
+            },
+            {
+                "id": "aviso",
+                "title": "2. Aviso importante: não substitui alertas oficiais",
+                "paragraphs": [
+                    "As informações têm caráter apenas informativo. Os dados de estações telemétricas podem chegar com atraso, ter falhas ou estar fora do ar. O Sentinela não substitui os alertas da Defesa Civil, do Cemaden, do INMET ou de outros órgãos oficiais.",
+                    "Em situação de risco, siga as orientações da Defesa Civil (telefone 199) e do Corpo de Bombeiros (telefone 193)."
+                ]
+            },
+            {
+                "id": "conta",
+                "title": "3. Sua conta",
+                "items": [
+                    "Informe dados verdadeiros e mantenha seu e-mail atualizado.",
+                    "Guarde sua senha em segredo. Você é responsável pelo que for feito com a sua conta.",
+                    "Se suspeitar de uso indevido, troque a senha e use a opção \"Sair de todos os dispositivos\".",
+                    "Menores de 18 anos só podem usar o serviço com autorização dos responsáveis."
+                ]
+            },
+            {
+                "id": "uso",
+                "title": "4. Uso permitido",
+                "paragraphs": ["Ao usar o Sentinela, você se compromete a não:"],
+                "items": [
+                    "tentar burlar a segurança, acessar contas de outras pessoas ou explorar falhas;",
+                    "fazer requisições automatizadas em excesso ou sobrecarregar o serviço;",
+                    "se passar por outra pessoa ou usar o serviço para atividades ilegais;",
+                    "usar no perfil público nome ou foto ofensivos, ou imagens de terceiros sem autorização."
+                ]
+            },
+            {
+                "id": "conteudo",
+                "title": "5. Seu perfil público",
+                "paragraphs": [
+                    "Seu nome e sua foto aparecem no seu perfil público. Ao informar uma foto, você declara ter o direito de usá-la. Podemos remover conteúdo que viole estes termos."
+                ]
+            },
+            {
+                "id": "propriedade",
+                "title": "6. Propriedade intelectual e fontes de dados",
+                "paragraphs": [
+                    "O software, a marca e o visual do Sentinela pertencem a {{company}}. Os dados públicos exibidos continuam sujeitos às regras e licenças das fontes originais (como IBGE e ANA), que são sempre citadas."
+                ]
+            },
+            {
+                "id": "disponibilidade",
+                "title": "7. Disponibilidade",
+                "paragraphs": [
+                    "O serviço é oferecido no estado em que se encontra. Trabalhamos para mantê-lo no ar, mas podem ocorrer interrupções para manutenção, por falhas técnicas ou por indisponibilidade das fontes de dados."
+                ]
+            },
+            {
+                "id": "responsabilidade",
+                "title": "8. Limitação de responsabilidade",
+                "paragraphs": [
+                    "Nos limites permitidos pela lei, inclusive pelo Código de Defesa do Consumidor, não respondemos por decisões tomadas apenas com base nas informações do Sentinela, nem por atrasos ou erros vindos das fontes públicas de dados."
+                ]
+            },
+            {
+                "id": "encerramento",
+                "title": "9. Encerramento da conta",
+                "paragraphs": [
+                    "Você pode excluir sua conta a qualquer momento em Configurações > Segurança. A exclusão é definitiva. Podemos suspender ou encerrar contas que violem estes termos, avisando você sempre que possível."
+                ]
+            },
+            {
+                "id": "alteracoes",
+                "title": "10. Mudanças nos termos",
+                "paragraphs": [
+                    "Podemos atualizar estes termos. Se a mudança for relevante, avisaremos com antecedência. Continuar usando o serviço depois disso significa que você concorda com a nova versão."
+                ]
+            },
+            {
+                "id": "lei",
+                "title": "11. Lei aplicável",
+                "paragraphs": [
+                    "Estes termos seguem as leis do Brasil. Fica eleito o foro do domicílio do usuário para resolver eventuais conflitos."
+                ]
+            },
+            {
+                "id": "contato",
+                "title": "12. Contato",
+                "paragraphs": ["Dúvidas sobre estes termos: {{email}}."]
+            }
+        ]
+    }
+}

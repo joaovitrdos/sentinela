@@ -1,0 +1,13 @@
+# Fica fora do contexto do build: acelera o build e nao vaza segredo para a imagem.
+.env
+.env.*
+!.env.example
+target/
+.idea/
+.vscode/
+.claude/
+*.iml
+.git/
+HELP.md
+docker-compose.yaml
+Dockerfile

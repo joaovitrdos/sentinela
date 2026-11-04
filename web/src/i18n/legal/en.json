@@ -1,0 +1,208 @@
+{
+    "privacy": {
+        "title": "Privacy Policy",
+        "updated": "2026-10-21",
+        "intro": "This policy explains which personal data {{company}} processes when you use the website and app, why, who it is shared with and how you can exercise your rights, under Brazil's General Data Protection Law (Law No. 13,709/2018 - LGPD).",
+        "sections": [
+            {
+                "id": "controlador",
+                "title": "1. Who is responsible for your data",
+                "paragraphs": [
+                    "The controller of the personal data processed in Sentinela is {{company}}. For any privacy matter, including contacting our data protection officer (DPO), write to {{email}}."
+                ]
+            },
+            {
+                "id": "dados",
+                "title": "2. What data we collect",
+                "items": [
+                    "Sign-up: name, email and password. The password is never stored as text: we only keep a cryptographic digest (bcrypt hash) that cannot be reversed.",
+                    "Sign in with Google: if you choose this option, Google sends us your account identifier, name, email and profile picture. We never see your Google password.",
+                    "Profile: the address (URL) of the photo you provide.",
+                    "Verification codes: 8-digit codes used to confirm your email, change your email and recover your password. They expire after 15 minutes.",
+                    "History of emails sent: sender, recipient, subject, message type and whether delivery succeeded.",
+                    "Technical security data: IP address and account identification, kept for a few minutes and only in memory to limit repeated attempts (abuse protection), plus server error logs.",
+                    "In your browser: the session token and your language and theme preferences, stored in local storage (localStorage)."
+                ]
+            },
+            {
+                "id": "finalidades",
+                "title": "3. How we use the data",
+                "items": [
+                    "To create and maintain your account and confirm it is really you signing in (performance of contract, art. 7, V, LGPD).",
+                    "To send emails required by the service, such as confirmation and password recovery codes (performance of contract).",
+                    "To protect the platform against fraud, intrusion and abuse (legitimate interest, art. 7, IX).",
+                    "To comply with legal obligations and orders from authorities (art. 7, II)."
+                ],
+                "paragraphs": ["We do not sell your data and we do not use it for advertising or behavioral profiling."]
+            },
+            {
+                "id": "compartilhamento",
+                "title": "4. Who we share it with",
+                "items": [
+                    "Google: only if you use Google sign-in, to validate your identity.",
+                    "Email provider: to deliver the codes and notices we send you.",
+                    "Infrastructure and hosting providers that run the servers and database on our behalf.",
+                    "Public authorities, when required by law or court order."
+                ],
+                "paragraphs": ["Your public profile shows only your name and photo, to anyone with the link. Your email is never shown publicly."]
+            },
+            {
+                "id": "fontes-publicas",
+                "title": "5. Public data shown on the maps",
+                "paragraphs": [
+                    "State and municipality boundaries and population estimates come from IBGE. Rainfall and river information comes from public sources such as Brazil's National Water and Sanitation Agency (ANA/SNIRH). This data is not personal."
+                ]
+            },
+            {
+                "id": "seguranca",
+                "title": "6. How we protect the data",
+                "items": [
+                    "Passwords stored only as bcrypt hashes.",
+                    "Sessions use a signed token valid for up to 7 days, revoked when you change your password, change your email or choose to sign out of all devices.",
+                    "Limits on sign-in attempts and on code requests.",
+                    "Access to data restricted to those who need it to run the service."
+                ],
+                "paragraphs": ["No system is completely immune to failures. If an incident may put you at risk, we will notify you and the ANPD, as required by law."]
+            },
+            {
+                "id": "retencao",
+                "title": "7. How long we keep it",
+                "items": [
+                    "Account data: while the account exists.",
+                    "Verification codes: they expire after 15 minutes.",
+                    "When you delete your account: profile, credentials and email history are erased immediately and permanently.",
+                    "Technical records: for the period required by law, such as the application access logs set by Brazil's Internet Civil Framework (Law No. 12,965/2014)."
+                ]
+            },
+            {
+                "id": "direitos",
+                "title": "8. Your rights",
+                "paragraphs": [
+                    "Under the LGPD (art. 18), you may request: confirmation that we process your data, access, correction, anonymization, blocking or deletion of unnecessary data, portability, information about who we share it with, and withdrawal of consent when consent is the legal basis. You may also object to processing.",
+                    "In the app itself you can edit your name and photo, change your email, change your password and delete your account under Settings. For other requests, write to {{email}}. We will reply within 15 days. You may also file a complaint with Brazil's National Data Protection Authority (ANPD)."
+                ]
+            },
+            {
+                "id": "cookies",
+                "title": "9. Cookies and local storage",
+                "paragraphs": [
+                    "We do not use advertising or tracking cookies. We only store in your browser what is needed for the app to work: the session token, language and theme. When you use Google sign-in, Google itself may set cookies under its own privacy policy."
+                ]
+            },
+            {
+                "id": "internacional",
+                "title": "10. International transfers",
+                "paragraphs": [
+                    "Some providers, such as Google and hosting or email services, may process data outside Brazil. In those cases we require protection safeguards compatible with the LGPD (art. 33)."
+                ]
+            },
+            {
+                "id": "menores",
+                "title": "11. Children and teenagers",
+                "paragraphs": ["Sentinela is not directed at children. People under 18 must use the service with the permission and supervision of a parent or guardian."]
+            },
+            {
+                "id": "alteracoes",
+                "title": "12. Changes to this policy",
+                "paragraphs": [
+                    "We may update this policy. The date of the last update is shown at the top of the page and, for relevant changes, we will notify you by email or in the app."
+                ]
+            }
+        ]
+    },
+    "terms": {
+        "title": "Terms of Use",
+        "updated": "2026-10-21",
+        "intro": "These terms govern the use of Sentinela, provided by {{company}}. By creating an account or using the service, you agree to them and to the Privacy Policy.",
+        "sections": [
+            {
+                "id": "servico",
+                "title": "1. What Sentinela is",
+                "paragraphs": [
+                    "Sentinela brings together, on maps, information about rainfall, rivers and territories in Brazil, such as accumulated rainfall, river levels and state and municipality boundaries, using public sources such as ANA/SNIRH and IBGE."
+                ]
+            },
+            {
+                "id": "aviso",
+                "title": "2. Important notice: not a substitute for official alerts",
+                "paragraphs": [
+                    "The information is for reference only. Data from telemetric stations may be delayed, contain errors or be offline. Sentinela does not replace alerts from Civil Defense, Cemaden, INMET or other official agencies.",
+                    "In a risk situation, follow the guidance of Civil Defense (phone 199) and the Fire Department (phone 193)."
+                ]
+            },
+            {
+                "id": "conta",
+                "title": "3. Your account",
+                "items": [
+                    "Provide accurate information and keep your email up to date.",
+                    "Keep your password secret. You are responsible for what is done with your account.",
+                    "If you suspect misuse, change your password and use \"Sign out of all devices\".",
+                    "People under 18 may only use the service with a guardian's permission."
+                ]
+            },
+            {
+                "id": "uso",
+                "title": "4. Acceptable use",
+                "paragraphs": ["When using Sentinela, you agree not to:"],
+                "items": [
+                    "try to bypass security, access other people's accounts or exploit flaws;",
+                    "make excessive automated requests or overload the service;",
+                    "impersonate someone else or use the service for illegal activities;",
+                    "use an offensive name or photo on your public profile, or third-party images without permission."
+                ]
+            },
+            {
+                "id": "conteudo",
+                "title": "5. Your public profile",
+                "paragraphs": [
+                    "Your name and photo appear on your public profile. By providing a photo, you state that you have the right to use it. We may remove content that violates these terms."
+                ]
+            },
+            {
+                "id": "propriedade",
+                "title": "6. Intellectual property and data sources",
+                "paragraphs": [
+                    "Sentinela's software, brand and design belong to {{company}}. Public data shown remains subject to the rules and licenses of the original sources (such as IBGE and ANA), which are always credited."
+                ]
+            },
+            {
+                "id": "disponibilidade",
+                "title": "7. Availability",
+                "paragraphs": [
+                    "The service is provided as is. We work to keep it online, but interruptions may happen for maintenance, technical failures or unavailability of the data sources."
+                ]
+            },
+            {
+                "id": "responsabilidade",
+                "title": "8. Limitation of liability",
+                "paragraphs": [
+                    "To the extent permitted by law, including Brazil's Consumer Protection Code, we are not liable for decisions made solely based on Sentinela's information, nor for delays or errors coming from public data sources."
+                ]
+            },
+            {
+                "id": "encerramento",
+                "title": "9. Closing your account",
+                "paragraphs": [
+                    "You can delete your account at any time under Settings > Security. Deletion is permanent. We may suspend or close accounts that violate these terms, notifying you whenever possible."
+                ]
+            },
+            {
+                "id": "alteracoes",
+                "title": "10. Changes to the terms",
+                "paragraphs": [
+                    "We may update these terms. For relevant changes we will give advance notice. Continuing to use the service afterwards means you accept the new version."
+                ]
+            },
+            {
+                "id": "lei",
+                "title": "11. Governing law",
+                "paragraphs": ["These terms are governed by the laws of Brazil. Disputes will be settled in the courts of the user's place of residence."]
+            },
+            {
+                "id": "contato",
+                "title": "12. Contact",
+                "paragraphs": ["Questions about these terms: {{email}}."]
+            }
+        ]
+    }
+}

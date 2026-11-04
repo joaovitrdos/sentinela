@@ -1,0 +1,62 @@
+<!-- Created for JasperReports Library 7.x. Edit with Jaspersoft Studio 7 or newer. -->
+<jasperReport whenNoDataType="NoDataSection" name="snirh_rainfall_24h_by_station" language="java" orientation="Landscape"
+              pageWidth="842" pageHeight="595" columnWidth="802"
+              leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              uuid="81c5cb26-b9a3-4afc-8476-8b1c85a842a0">
+    <parameter name="REPORT_TITLE" class="java.lang.String"/>
+    <parameter name="FILTER_LABEL" class="java.lang.String"/>
+    <parameter name="GENERATED_AT" class="java.lang.String"/>
+    <parameter name="TOTAL_STATIONS" class="java.lang.Integer"/>
+
+    <field name="stationCode" class="java.lang.String"/>
+    <field name="stationName" class="java.lang.String"/>
+    <field name="city" class="java.lang.String"/>
+    <field name="state" class="java.lang.String"/>
+    <field name="watershed" class="java.lang.String"/>
+    <field name="rainfallMm24h" class="java.lang.String"/>
+    <field name="readingClass" class="java.lang.String"/>
+    <field name="lastReadingAt" class="java.lang.String"/>
+    <field name="ageHours" class="java.lang.String"/>
+
+    <title height="68">
+        <element kind="textField" uuid="d81fb6cd-1276-40f1-882e-9a2f71697ec6" x="0" y="0" width="802" height="30" forecolor="#000000" fontSize="17.0" bold="true" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$P{REPORT_TITLE}]]></expression></element>
+        <element kind="textField" uuid="f93493c4-1842-4657-8b0f-853b2564e469" x="0" y="39" width="802" height="20" forecolor="#252525" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$P{FILTER_LABEL} + "   |   Consulta: " + $P{GENERATED_AT} + "   |   " + $P{TOTAL_STATIONS} + " Estações"]]></expression></element>
+    </title>
+
+    <columnHeader height="24">
+        <element kind="staticText" uuid="28bb67ae-bcef-4ed4-bf85-378376b9876a" x="0" y="0" width="60" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Código]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="8a9d9b90-8cc1-4e91-80d5-f70a4f02ba62" x="60" y="0" width="130" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Estação]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="532a911f-58d5-4bde-a26c-026bf706be3a" x="190" y="0" width="100" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Município]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="65b240ad-acb9-4d7e-a5f6-920726759f4f" x="290" y="0" width="30" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[UF]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="34686113-6a69-4b26-986e-84dbf0842933" x="320" y="0" width="100" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Bacia]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="ac8cdfe9-195e-4f9e-afcc-85f08ee6ec46" x="420" y="0" width="75" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Chuva 24 H]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="fcb3790d-a27f-4e4d-975d-6fbcc83f1387" x="495" y="0" width="115" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Classificação]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="ae2e6fc8-f35e-4440-8d34-cd0ccab0499f" x="610" y="0" width="135" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Última Leitura]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="29735951-8e51-43fd-9f7d-da789cab8b60" x="745" y="0" width="57" height="24" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Idade]]></text><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+    </columnHeader>
+    <detail>
+        <band height="24" splitType="Stretch">
+            <element kind="textField" uuid="873c46f1-13c5-4da3-af13-eb11cf63e399" x="0" y="0" width="60" height="24" fontSize="7.5" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$F{stationCode}]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="9617802f-807a-4cd0-bf9f-bd09717922aa" x="60" y="0" width="130" height="24" fontSize="7.5" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{stationName})]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="2376e614-260a-4eaa-8d05-399d585c8661" x="190" y="0" width="100" height="24" fontSize="7.5" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{city})]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="f697e7e6-a440-4729-9867-391c5b6a6c94" x="290" y="0" width="30" height="24" fontSize="7.5" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$F{state}]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="5ba12428-a9e7-48f2-af7b-74caf32a5715" x="320" y="0" width="100" height="24" fontSize="7.5" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{watershed})]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="ad3d6142-a86c-4ce9-9a61-2cd7d20fed63" x="420" y="0" width="75" height="24" fontSize="7.5" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$F{rainfallMm24h}]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="ee427961-27d0-40d8-b8a0-a471c0fcdf0f" x="495" y="0" width="115" height="24" fontSize="7.5" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{readingClass})]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="3bf2070f-18e4-4895-bd2e-280a2fcb86c1" x="610" y="0" width="135" height="24" fontSize="7.5" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$F{lastReadingAt}]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="85021a75-a76e-495d-b0df-6a512051db2b" x="745" y="0" width="57" height="24" fontSize="7.5" textAdjust="StretchHeight" blankWhenNull="true" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$F{ageHours}]]></expression><box topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        
+        </band>
+    </detail>
+
+    <pageFooter height="24">
+        <element kind="line" uuid="593c0928-37d3-468f-a9b7-516c34a2f4e6" x="0" y="0" width="802" height="1" forecolor="#D8E3EA"/>
+        <element kind="staticText" uuid="65737763-74f5-4330-b410-0c96a67afab5" x="0" y="6" width="682" height="15" forecolor="#718597" fontSize="8.0"><text><![CDATA[SENTINELA  •  Monitoramento e informações]]></text></element>
+        <element kind="textField" uuid="ae76e37a-de47-43ef-ae18-ee48f027649d" x="682" y="6" width="120" height="15" forecolor="#718597" fontSize="8.0" hTextAlign="Right"><expression><![CDATA["Página " + $V{PAGE_NUMBER}]]></expression></element>
+    </pageFooter>
+    <noData height="120">
+        <element kind="textField" uuid="d81fb6cd-1276-40f1-882e-9a2f71697ec6" x="0" y="0" width="802" height="30" forecolor="#000000" fontSize="17.0" bold="true" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$P{REPORT_TITLE}]]></expression></element>
+        <element kind="textField" uuid="f93493c4-1842-4657-8b0f-853b2564e469" x="0" y="39" width="802" height="20" forecolor="#252525" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$P{FILTER_LABEL} + "   |   Consulta: " + $P{GENERATED_AT} + "   |   " + $P{TOTAL_STATIONS} + " Estações"]]></expression></element>
+        <element kind="staticText" uuid="26f8a4e2-9578-42d3-9d09-a46b486f64a4" x="0" y="82" width="802" height="25" forecolor="#333333" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Nenhum Registro Encontrado Para Os Filtros Selecionados.]]></text></element>
+    </noData>
+</jasperReport>

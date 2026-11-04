@@ -1,0 +1,458 @@
+@import "tailwindcss";
+@import "./theme.css";
+@import "./typography.css";
+
+@plugin "@tailwindcss/typography";
+
+@media print {
+    @page { margin: 14mm; }
+    body { background: #fff !important; color: #111 !important; }
+    header, footer, button, form, section[aria-label="Mapa das suas propriedades"] { display: none !important; }
+    main { padding: 0 !important; }
+    .bg-primary, .bg-secondary { background: #fff !important; }
+    .text-primary, .text-secondary, .text-tertiary { color: #111 !important; }
+    .ring-1 { box-shadow: none !important; }
+}
+@plugin "tailwindcss-react-aria-components";
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:where(.dark-mode, .dark-mode *));
+@custom-variant label (& [data-label]);
+@custom-variant focus-input-within (&:has(input:focus));
+
+/* Shared scrollbars for pages, tables, dialogs and map panels. */
+@layer base {
+    :root {
+        color-scheme: light;
+        --scrollbar-track: var(--color-bg-primary);
+        --scrollbar-thumb: var(--color-neutral-500);
+        --scrollbar-thumb-hover: var(--color-neutral-600);
+    }
+
+    .dark-mode {
+        color-scheme: dark;
+        --scrollbar-thumb-hover: var(--color-neutral-400);
+    }
+
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    }
+
+    *:hover {
+        scrollbar-color: var(--scrollbar-thumb-hover) var(--scrollbar-track);
+    }
+
+    /* Chromium and WebKit allow rounded thumbs and matching horizontal tracks. */
+    @supports selector(::-webkit-scrollbar) {
+        * {
+            scrollbar-width: auto;
+            scrollbar-color: auto;
+        }
+
+        *:hover {
+            scrollbar-color: auto;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track,
+        ::-webkit-scrollbar-corner {
+            background-color: var(--scrollbar-track);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            min-height: 32px;
+            border: 3px solid var(--scrollbar-track);
+            border-radius: 999px;
+            background-color: var(--scrollbar-thumb);
+        }
+
+        ::-webkit-scrollbar-thumb:hover,
+        ::-webkit-scrollbar-thumb:active {
+            background-color: var(--scrollbar-thumb-hover);
+        }
+
+        ::-webkit-scrollbar-button {
+            display: none;
+        }
+    }
+
+    @media (forced-colors: active) {
+        * {
+            scrollbar-color: auto;
+        }
+
+        ::-webkit-scrollbar-track,
+        ::-webkit-scrollbar-corner {
+            background-color: Canvas;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-color: Canvas;
+            background-color: CanvasText;
+        }
+    }
+}
+
+@utility scrollbar-hide {
+    /* For Webkit-based browsers (Chrome, Safari and Opera) */
+    &::-webkit-scrollbar {
+        display: none;
+        -webkit-appearance: none;
+    }
+
+    /* For IE, Edge and Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+@utility transition-inherit-all {
+    transition-property: inherit;
+    transition-duration: inherit;
+    transition-timing-function: inherit;
+}
+
+html,
+body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-variant-ligatures: contextual;
+    font-variant-ligatures: contextual;
+    -webkit-font-kerning: normal;
+    font-kerning: normal;
+}
+
+body {
+    font-size: 17px;
+    line-height: 1.47;
+}
+
+h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+}
+
+/* Hide the default expand arrow on Safari.  */
+details summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Hide default arrows from number inputs. */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Hide the default clear button (X) from search inputs. */
+input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+}
+
+/* Hide the default outline on chart elements. */
+.recharts-surface,
+.recharts-surface g,
+.recharts-surface path {
+    outline: none;
+}
+
+/* ---------- Sentinela: mapa do Brasil (MapLibre) ---------- */
+
+:root {
+    --map-dot: rgb(10 13 18 / 0.09);
+    --map-glow: rgb(21 112 239 / 0.18);
+    --map-label: rgb(10 13 18 / 0.62);
+    --map-label-strong: rgb(10 13 18 / 0.9);
+    --map-halo: rgb(255 255 255 / 0.95);
+}
+
+.dark-mode {
+    --map-dot: rgb(255 255 255 / 0.07);
+    --map-glow: rgb(83 177 253 / 0.14);
+    --map-label: rgb(255 255 255 / 0.55);
+    --map-label-strong: rgb(255 255 255 / 0.95);
+    --map-halo: rgb(10 10 10 / 0.9);
+}
+
+@utility bg-dots {
+    background-image: radial-gradient(var(--map-dot) 1px, transparent 1.2px);
+    background-size: 18px 18px;
+}
+
+/* Rotulos do mapa (marcadores HTML posicionados pelo MapLibre) */
+.map-label-state,
+.map-label-city {
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    font-family: var(--font-body);
+    color: var(--map-label);
+    text-shadow:
+        0 0 2px var(--map-halo),
+        0 0 4px var(--map-halo);
+    transition: opacity 200ms ease;
+}
+.map-label-state {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+.map-label-city {
+    font-size: 11px;
+    font-weight: 500;
+}
+.map-label-city.is-active {
+    color: var(--map-label-strong);
+    font-weight: 600;
+}
+.map-label-state.is-hidden {
+    opacity: 0;
+}
+
+/* Botao de ajuda do "Ctrl + rolar" do MapLibre no visual do app */
+.maplibregl-cooperative-gesture-screen {
+    font-family: var(--font-body);
+    font-size: 13px;
+}
+
+/* Map credits and metric scale follow the application theme. */
+.sentinela-map .maplibregl-ctrl-attrib.maplibregl-compact,
+.sentinela-map .maplibregl-ctrl-scale {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-secondary);
+    font-family: var(--font-body);
+    font-size: 10px;
+    box-shadow: 0 0 0 1px var(--color-border-secondary);
+}
+
+.sentinela-map .maplibregl-ctrl-attrib.maplibregl-compact {
+    max-width: min(32rem, calc(100vw - 3rem));
+}
+
+.sentinela-map .maplibregl-ctrl-attrib-inner {
+    max-height: 8rem;
+    overflow-y: auto;
+    white-space: normal;
+}
+
+.sentinela-map .maplibregl-ctrl-attrib a {
+    color: var(--color-text-secondary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.sentinela-map .maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-button {
+    background-color: transparent;
+}
+
+.dark-mode .sentinela-map .maplibregl-ctrl-attrib-button {
+    filter: invert(1);
+}
+
+.sentinela-map .maplibregl-ctrl-scale {
+    border-color: var(--color-text-tertiary);
+    border-radius: 0 0 4px 4px;
+    line-height: 18px;
+}
+
+/* Paleta compartilhada para navegação, superfícies e ações. */
+:root {
+    --color-brand-500: #0071e3;
+    --color-brand-600: #0066cc;
+    --color-brand-700: #0055aa;
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f5f5f7;
+    --color-bg-tertiary: #eaeaec;
+    --color-bg-primary_hover: #f5f5f7;
+    --color-bg-secondary_hover: #eaeaec;
+    --color-text-primary: #1d1d1f;
+    --color-text-secondary: #333336;
+    --color-text-tertiary: #626268;
+    --color-text-quaternary: #73737a;
+    --color-text-brand-primary: #0066cc;
+    --color-text-brand-secondary: #0066cc;
+    --color-text-brand-tertiary: #0066cc;
+    --color-border-primary: #d2d2d7;
+    --color-border-secondary: #e0e0e4;
+    --color-focus-ring: #0071e3;
+    --cta: #0066cc;
+    --cta-hover: #005bb5;
+    --cta-fg: #ffffff;
+}
+.dark-mode {
+    --color-bg-primary: #242426;
+    --color-bg-primary_alt: #242426;
+    --color-bg-secondary: #161617;
+    --color-bg-secondary_alt: #202022;
+    --color-bg-tertiary: #303032;
+    --color-bg-quaternary: #39393b;
+    --color-bg-primary_hover: #303032;
+    --color-bg-secondary_hover: #303032;
+    --color-bg-brand-primary: #183554;
+    --color-bg-brand-primary_alt: #183554;
+    --color-bg-brand-secondary: #183554;
+    --color-text-primary: #f5f5f7;
+    --color-text-secondary: #dedee2;
+    --color-text-tertiary: #b5b5bd;
+    --color-text-tertiary_hover: #dedee2;
+    --color-text-quaternary: #a1a1aa;
+    --color-text-placeholder: #a1a1aa;
+    --color-text-brand-primary: #a7d3ff;
+    --color-text-brand-secondary: #5eb0ff;
+    --color-text-brand-secondary_hover: #8ec9ff;
+    --color-text-brand-tertiary: #5eb0ff;
+    --color-fg-brand-primary: #5eb0ff;
+    --color-fg-brand-secondary: #5eb0ff;
+    --color-fg-brand-primary_alt: #5eb0ff;
+    --color-fg-brand-secondary_alt: #5eb0ff;
+    --color-fg-brand-secondary_hover: #8ec9ff;
+    --color-fg-quaternary: #a1a1aa;
+    --color-fg-quaternary_hover: #dedee2;
+    --color-border-primary: #505054;
+    --color-border-secondary: #3c3c40;
+    --color-border-tertiary: #323235;
+    --color-focus-ring: #5eb0ff;
+    --cta: #0066cc;
+    --cta-hover: #0071e3;
+    --cta-fg: #ffffff;
+}
+
+.site-nav {
+    --color-text-primary: #f5f5f7;
+    --color-text-secondary: #f5f5f7;
+    --color-text-secondary_hover: #ffffff;
+    --color-text-tertiary: #d1d1d6;
+    --color-text-quaternary: #b8b8be;
+    --color-fg-quaternary: #b8b8be;
+    --color-bg-primary_hover: #303032;
+    --color-border-secondary: #38383b;
+}
+.site-nav .text-primary { color: #f5f5f7; }
+.site-nav button { color: #d1d1d6; }
+.site-nav button svg { color: #c5c5cc; }
+
+/* ---------- Layout do site ----------
+   Grade de 8pt. Gutters laterais iguais em todas as telas: 16px (celular), 24px (tablet), 32px (desktop).
+   Largura máxima compartilhada para as telas de conteúdo. */
+html:has([data-settings-page]) {
+    scrollbar-gutter: stable;
+}
+
+@supports not (scrollbar-gutter: stable) {
+    html:has([data-settings-page]) {
+        overflow-y: scroll;
+    }
+}
+
+@utility container-page {
+    width: 100%;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: 1rem;
+
+    @media (width >= 40rem) {
+        padding-inline: 1.5rem;
+    }
+    @media (width >= 64rem) {
+        padding-inline: 2rem;
+    }
+}
+
+/* ---------- Animacoes ----------
+   Tudo em CSS (transition/keyframes) ou Motion: funciona em todos os navegadores modernos. */
+
+/* Rolagem suave para os indices (ex.: "Nesta pagina" nos documentos legais) */
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+/* Link de texto com sublinhado que cresce da esquerda ao passar o mouse */
+@utility link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition:
+        background-size 200ms ease-out,
+        color 150ms ease-out;
+
+    &:hover,
+    &:focus-visible {
+        background-size: 100% 1px;
+    }
+}
+
+/* Quem pede "reduzir movimento" no sistema ve tudo instantaneo */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Balao de detalhes da estacao (MapLibre Popup) com as cores do app */
+.sentinela-popup .maplibregl-popup-content {
+    padding: 0;
+    border-radius: 0.75rem;
+    background: var(--color-bg-primary);
+    /* Sem isso o texto sem cor propria herda o preto do MapLibre (ilegivel no tema escuro) */
+    color: var(--color-text-secondary);
+    box-shadow:
+        0 12px 16px -4px rgb(10 13 18 / 0.08),
+        0 4px 6px -2px rgb(10 13 18 / 0.03),
+        0 0 0 1px var(--color-border-secondary);
+    font-family: var(--font-body);
+}
+.sentinela-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip,
+.sentinela-popup.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.sentinela-popup.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+    border-bottom-color: var(--color-bg-primary);
+}
+.sentinela-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+.sentinela-popup.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.sentinela-popup.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+    border-top-color: var(--color-bg-primary);
+}
+.sentinela-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+    border-right-color: var(--color-bg-primary);
+}
+.sentinela-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+    border-left-color: var(--color-bg-primary);
+}
+
+/* Rotulos sobre mapa de fundo real: seguem o tom do mapa (nao o tema do app) para nao virarem "borroes" */
+.map-tone-light :is(.map-label-state, .map-label-city) {
+    color: rgb(10 13 18 / 0.78);
+    text-shadow:
+        0 0 2px #fff,
+        0 0 4px #fff,
+        0 0 6px #fff;
+}
+.map-tone-dark :is(.map-label-state, .map-label-city) {
+    color: rgb(255 255 255 / 0.92);
+    text-shadow:
+        0 0 2px #000,
+        0 0 4px #000;
+}
+.map-tone-light .map-label-city.is-active {
+    color: #0a0d12;
+}
+.map-tone-dark .map-label-city.is-active {
+    color: #fff;
+}

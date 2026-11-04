@@ -1,0 +1,607 @@
+{
+    "app": {
+        "name": "Sentinela",
+        "tagline": "Lluvias y ríos de Brasil, del estado al municipio."
+    },
+    "common": {
+        "back": "Volver",
+        "cancel": "Cancelar",
+        "close": "Cerrar",
+        "save": "Guardar",
+        "saving": "Guardando...",
+        "continue": "Continuar",
+        "loading": "Cargando...",
+        "or": "o",
+        "email": "Correo electrónico",
+        "emailPlaceholder": "tu@ejemplo.com",
+        "password": "Contraseña",
+        "passwordPlaceholder": "Tu contraseña",
+        "name": "Nombre",
+        "namePlaceholder": "Tu nombre completo",
+        "copy": "Copiar",
+        "copied": "Copiado"
+    },
+    "connection": {
+        "disconnected": "No se pudo conectar con el servidor. Comprueba tu conexión a internet.",
+        "unstable": "La conexión con el servidor es lenta. Esto puede afectar al funcionamiento del sistema.",
+        "restored": "Se restableció la conexión con el servidor."
+    },
+    "language": {
+        "label": "Idioma",
+        "pt-BR": "Português",
+        "en": "English",
+        "es": "Español"
+    },
+    "theme": {
+        "toggle": "Cambiar tema",
+        "toLight": "Usar tema claro",
+        "toDark": "Usar tema oscuro"
+    },
+    "auth": {
+        "hero": {
+            "title": "SENTINELA",
+            "subtitle": "Lluvia acumulada, nivel de los ríos y alertas en todo Brasil, del estado hasta tu municipio.",
+            "hint": "Toca un estado para explorar sus municipios"
+        },
+        "card": {
+            "title": "Inicia sesión o regístrate",
+            "subtitle": "Sigue la lluvia y los ríos de tu estado y de tu ciudad."
+        },
+        "tabs": {
+            "login": "Iniciar sesión",
+            "register": "Crear cuenta"
+        },
+        "google": "Continuar con Google",
+        "googleNotConfigured": "El inicio de sesión con Google no está configurado",
+        "login": {
+            "submit": "Iniciar sesión",
+            "forgot": "Olvidé mi contraseña"
+        },
+        "register": {
+            "submit": "Crear cuenta",
+            "passwordHint": "Entre 8 y 72 caracteres.",
+            "success": "¡Cuenta creada! Enviamos un código a tu correo."
+        },
+        "legalNotice": "Al continuar, aceptas los <terms>Términos de uso</terms> y la <privacy>Política de privacidad</privacy>.",
+        "verify": {
+            "title": "Confirma tu correo",
+            "subtitle": "Enviamos un código de 8 dígitos a <strong>{{email}}</strong>. Es válido por 15 minutos.",
+            "codeLabel": "Código de verificación",
+            "submit": "Confirmar e ingresar",
+            "noCode": "¿No lo recibiste?",
+            "resend": "Reenviar código",
+            "resendIn": "Reenviar en {{seconds}}s",
+            "resent": "Te enviamos un código nuevo.",
+            "changeEmail": "Usar otro correo",
+            "emailLabel": "¿Con qué correo te registraste?"
+        },
+        "forgot": {
+            "title": "¿Olvidaste tu contraseña?",
+            "subtitle": "Ingresa tu correo y te enviaremos un código para crear una nueva contraseña.",
+            "submit": "Enviar código",
+            "backToLogin": "Volver al inicio de sesión"
+        },
+        "reset": {
+            "title": "Crea una nueva contraseña",
+            "subtitleCode": "Ingresa el código de 8 dígitos enviado a <strong>{{email}}</strong>.",
+            "subtitlePassword": "Código validado. Ahora elige tu nueva contraseña.",
+            "validate": "Validar código",
+            "newPassword": "Nueva contraseña",
+            "confirmPassword": "Confirmar nueva contraseña",
+            "submit": "Restablecer contraseña",
+            "success": "¡Contraseña restablecida! Inicia sesión con la nueva contraseña."
+        },
+        "notices": {
+            "passwordReset": "¡Contraseña restablecida! Inicia sesión con la nueva contraseña.",
+            "loggedOutAll": "Cerraste sesión en todos los dispositivos.",
+            "accountDeleted": "Tu cuenta fue eliminada. Te extrañaremos."
+        }
+    },
+    "validation": {
+        "required": "Campo obligatorio.",
+        "email": "Ingresa un correo válido.",
+        "passwordLength": "La contraseña debe tener entre 8 y 72 caracteres.",
+        "nameMax": "El nombre debe tener como máximo 120 caracteres.",
+        "code": "El código debe tener 8 dígitos.",
+        "passwordMismatch": "Las contraseñas no coinciden.",
+        "url": "Usa una dirección http:// o https://.",
+        "urlMax": "La dirección debe tener como máximo 512 caracteres."
+    },
+    "errors": {
+        "network": "No fue posible conectar con el servidor. Revisa tu conexión.",
+        "generic": "Algo salió mal. Inténtalo de nuevo.",
+        "invalidData": "Revisa los datos ingresados.",
+        "sessionExpired": "Tu sesión expiró. Inicia sesión de nuevo.",
+        "rateLimited": "Demasiados intentos. Espera un momento e inténtalo de nuevo.",
+        "invalidCredentials": "Correo o contraseña inválidos.",
+        "emailNotVerified": "Confirma tu correo antes de iniciar sesión.",
+        "emailTaken": "Este correo ya está en uso. Prueba con otro.",
+        "googleNoPassword": "Las cuentas de Google no tienen contraseña para cambiar.",
+        "googleEmailChange": "Las cuentas de Google usan el correo de la cuenta de Google y no pueden cambiarlo aquí.",
+        "invalidCode": "Código de verificación inválido.",
+        "expiredCode": "El código expiró. Solicita uno nuevo.",
+        "tooManyCodeAttempts": "Demasiados intentos con el código. Solicita uno nuevo más tarde.",
+        "tooManyCodes": "Demasiados códigos solicitados. Inténtalo más tarde.",
+        "tooManyLogins": "Demasiados intentos de inicio de sesión. Inténtalo más tarde.",
+        "incorrectPassword": "La contraseña es incorrecta.",
+        "googleInvalid": "Inicio de sesión con Google inválido o expirado. Inténtalo de nuevo.",
+        "googleEmailNotVerified": "Google no verificó el correo de la cuenta.",
+        "googleUnavailable": "No pudimos validar el inicio de sesión con Google ahora. Inténtalo en unos instantes.",
+        "userNotFound": "Usuario no encontrado.",
+        "emailSend": "No pudimos enviar el correo ahora. Inténtalo de nuevo.",
+        "saveFailed": "No fue posible guardar. Inténtalo de nuevo.",
+        "deleteFailed": "No fue posible eliminar la cuenta. Inténtalo de nuevo."
+    },
+    "nav": {
+        "home": "Inicio",
+        "properties": "Propiedades",
+        "dashboard": "Dashboard",
+        "reports": "Informes",
+        "settings": "Configuración",
+        "logout": "Cerrar sesión",
+        "account": "Cuenta"
+    },
+    "reports": {
+        "title": "Informes",
+        "subtitle": "Genera archivos con los datos de tus propiedades y actividades.",
+        "generatorTitle": "Generar informe",
+        "generatorSubtitle": "Elige los datos, el período y el formato del archivo.",
+        "dataLabel": "Datos del informe",
+        "options": {
+            "sentinela_properties_activities": "Propiedades y actividades de campo",
+            "sentinela_activity_summary_by_property": "Resumen de actividades por propiedad y tipo",
+            "sentinela_irrigation_monthly_summary": "Resumen mensual de riego",
+            "snirh_rainfall_24h_by_station": "SNIRH · Lluvia acumulada en las últimas 24 horas",
+            "snirh_hydro_levels_station_status": "SNIRH · niveles hidrológicos por estación"
+        },
+        "loadingReports": "Cargando opciones de informes…",
+        "reportsError": "No se pudo cargar la lista de informes.",
+        "propertyActivities": "Propiedades y actividades de campo",
+        "propertyLabel": "Propiedad",
+        "allProperties": "Todas las propiedades",
+        "selectPropertiesHint": "Usa Ctrl (Windows) o Command (Mac) para seleccionar varias propiedades.",
+        "selectAtLeastOneProperty": "Selecciona al menos una propiedad o elige todas.",
+        "loadingProperties": "Cargando propiedades…",
+        "propertiesError": "No se pudieron cargar las propiedades.",
+        "periodLabel": "Período de actividades",
+        "range": "Intervalo de fechas",
+        "singleDate": "Una fecha específica",
+        "date": "Fecha",
+        "fromDate": "Fecha inicial",
+        "toDate": "Fecha final",
+        "invalidDates": "La fecha inicial debe ser anterior o igual a la final.",
+        "filterByTime": "Filtrar también por hora",
+        "fromTime": "Hora inicial de cada día",
+        "toTime": "Hora final de cada día",
+        "timeNote": "El filtro de hora incluye actividades con una hora registrada. Los registros antiguos sin hora quedan excluidos.",
+        "invalidTimes": "La hora inicial debe ser anterior o igual a la final.",
+        "stateFilter": "Estado (UF)",
+        "allStates": "Todos los estados",
+        "onlyAttention": "Mostrar solo estaciones que requieren atención",
+        "formatLabel": "Formato del archivo",
+        "text": "Texto (.txt)",
+        "generating": "Generando…",
+        "generate": "Generar informe",
+        "infoTitle": "Sobre este informe",
+        "infoText": "El período filtra las actividades. También se incluyen los datos de las propiedades seleccionadas para dar contexto.",
+        "activitySummaryInfoText": "Compara el número de actividades, los días activos y la última actividad por propiedad y tipo. Para el riego, también muestra las láminas registradas.",
+        "irrigationSummaryInfoText": "Agrupa los registros de riego por propiedad y mes, con el total y el promedio de la lámina registrada en milímetros.",
+        "securityNote": "El archivo incluye solo propiedades y actividades de tu cuenta.",
+        "snirhInfoText": "Muestra los niveles más recientes disponibles por estación hidrológica. Usa los filtros de estado y atención para reducir la lista.",
+        "rainfallInfoText": "Muestra la lluvia acumulada en 24 horas por estación, con clasificación, hora de la última lectura y antigüedad del dato. Los datos reflejan la consulta actual al SNIRH.",
+        "snirhSecurityNote": "Los niveles son datos públicos consultados en SNIRH."
+    },
+    "dashboard": {
+        "title": "Dashboard ambiental",
+        "subtitle": "Resumen de lluvia, clima y niveles de los ríos con datos recientes de estaciones monitoreadas.",
+        "refresh": "Actualizar datos",
+        "updatedAt": "Actualizado a las {{time}}",
+        "metricsTitle": "Indicadores de monitoreo",
+        "partialData": "Algunas fuentes no están disponibles. Los demás indicadores conservan los datos recibidos.",
+        "loadingHydro": "Cargando estaciones...",
+        "loadingWeather": "Consultando WeatherAPI...",
+        "noWeatherLocation": "Elige una ciudad monitoreada para consultar el clima.",
+        "liveNote": "Los datos se actualizan automáticamente cada 10 minutos",
+        "sources": "Fuentes: ANA/SNIRH y WeatherAPI",
+        "filters": {
+            "title": "Filtros del dashboard",
+            "region": "Región",
+            "city": "Ciudad monitoreada",
+            "period": "Período del gráfico",
+            "allRegions": "Todas las regiones",
+            "allCities": "Todas las ciudades",
+            "citySearchHint": "Escribe para buscar. Hasta {{count}} ciudades a la vez.",
+            "lastHours": "Próximas {{count}} horas"
+        },
+        "cards": {
+            "rain": "Lluvia media en 24 h",
+            "rainDetail": "promedio de {{count}} estaciones filtradas",
+            "temperature": "Temperatura actual",
+            "levels": "Lecturas de nivel",
+            "levelDetail": "de {{count}} estaciones fluviales",
+            "alerts": "Estaciones en alerta",
+            "alertDetail": "lluvia fuerte o nivel en atención",
+            "stations": "Estaciones operativas",
+            "stationDetail": "de {{total}} estaciones monitoreadas"
+        },
+        "charts": {
+            "weatherTitle": "Pronóstico meteorológico por hora",
+            "weatherSubtitle": "{{city}} · próximas {{count}} horas",
+            "forecastBadge": "Pronóstico de 3 días",
+            "forecastSourceNote": "Temperatura y precipitación por hora proporcionadas por WeatherAPI.",
+            "noForecast": "No hay horarios disponibles para este período.",
+            "temperatureLine": "Temperatura (°C)",
+            "rainLine": "Precipitación (mm)",
+            "levelTitle": "Lecturas recientes de los ríos",
+            "levelSubtitle": "Hasta {{count}} lecturas recientes con este filtro",
+            "noLevels": "No hay lecturas de nivel para este filtro.",
+            "levelValue": "Nivel del río (cm)",
+            "levelSourceNote": "Niveles en centímetros. Los colores siguen la clasificación de ANA/SNIRH. Pasa sobre una lectura para ver los detalles."
+        },
+        "summary": {
+            "title": "Resumen hidrológico",
+            "subtitle": "Área: {{location}}",
+            "rain": "Lluvia acumulada en 24 h",
+            "rainValue": "{{value}} mm de promedio por estación",
+            "rainReadings": "{{count}} estaciones de lluvia con datos",
+            "river": "Niveles de los ríos",
+            "levelsValue": "{{count}} lecturas con nivel",
+            "riverRisk": "{{count}} lecturas requieren atención"
+        },
+        "weather": {
+            "title": "Condiciones meteorológicas",
+            "forecastTitle": "Pronóstico de 3 días",
+            "forecastUnavailable": "El pronóstico no está disponible en este momento.",
+            "localTime": "Hora local: {{time}} ({{zone}})",
+            "observedAt": "Fuente actualizada a las {{time}}"
+        }
+    },
+    "home": {
+        "greeting": "Hola, {{name}}",
+        "subtitle": "Explora el mapa: elige un estado para ver sus municipios y toca una ciudad para ver los detalles.",
+        "stats": {
+            "users": "Usuarios registrados",
+            "states": "Estados",
+            "cities": "Municipios",
+            "population": "Población estimada"
+        },
+        "mapTitle": "Brasil en detalle",
+        "mapSubtitle": "Límites oficiales del IBGE para los 26 estados, el Distrito Federal y los 5.570 municipios.",
+        "verifyBanner": "Tu correo aún no ha sido confirmado."
+    },
+    "map": {
+        "brazil": "Brasil",
+        "back": "Volver",
+        "searchPlaceholder": "Buscar ciudad...",
+        "searchEmpty": "Ninguna ciudad encontrada",
+        "hintCountry": "Haz clic en un estado",
+        "hintState": "Haz clic en un municipio",
+        "loading": "Cargando mapa...",
+        "error": "No fue posible cargar el mapa.",
+        "retry": "Intentar de nuevo",
+        "capital": "Capital",
+        "capitalOf": "Capital: {{name}}",
+        "municipalities_one": "{{count}} municipio",
+        "municipalities_other": "{{count}} municipios",
+        "population": "Población",
+        "meso": "Mesorregión",
+        "micro": "Microrregión",
+        "ibgeCode": "Código IBGE",
+        "region": "Región",
+        "inhabitants": "{{value}} hab.",
+        "source": "Fuente: IBGE · población estimada {{year}}",
+        "zoomOut": "Alejar",
+        "openState": "Ver municipios",
+        "regions": {
+            "N": "Norte",
+            "NE": "Nordeste",
+            "CO": "Centro-Oeste",
+            "SE": "Sudeste",
+            "S": "Sur"
+        },
+        "statsStates": "Estados",
+        "statsCities": "Municipios",
+        "statsPopulation": "Habitantes",
+        "zoomIn": "Acercar",
+        "gestures": {
+            "windows": "Usa Ctrl + desplazamiento para hacer zoom en el mapa",
+            "mac": "Usa ⌘ + desplazamiento para hacer zoom en el mapa",
+            "mobile": "Usa dos dedos para mover el mapa"
+        },
+        "resetView": "Volver a todo Brasil"
+    },
+    "weather": {
+        "title": "Clima en la ubicación seleccionada",
+        "current": "Clima actual",
+        "timeZone": "Zona horaria",
+        "currentLocation": "Ubicación actual",
+        "selectHint": "Haz clic en el mapa o usa tu ubicación actual.",
+        "empty": "Elige un punto en el mapa para consultar el clima actual y el pronóstico de 3 días.",
+        "loading": "Consultando el clima...",
+        "loadError": "No se pudieron cargar los datos del clima.",
+        "retry": "Intentar de nuevo",
+        "selectedMarker": "Ubicación seleccionada para consultar el clima",
+        "source": {
+            "map": "seleccionada en el mapa",
+            "device": "ubicación del dispositivo"
+        },
+        "feelsLike": "Sensación",
+        "humidity": "Humedad",
+        "precipitation": "Precipitación",
+        "wind": "Viento",
+        "forecast": "Pronóstico de 3 días",
+        "forecastError": "El pronóstico no está disponible en este momento.",
+        "geolocationUnsupported": "Este navegador no ofrece ubicación.",
+        "locationDenied": "Permite el acceso a la ubicación en el navegador e inténtalo de nuevo.",
+        "locationUnavailable": "No se pudo determinar tu ubicación.",
+        "locationTimeout": "La ubicación tardó demasiado. Inténtalo de nuevo."
+    },
+    "settings": {
+        "title": "Configuración",
+        "subtitle": "Administra tus datos, tu contraseña y la seguridad de tu cuenta.",
+        "tabs": {
+            "profile": "Perfil",
+            "properties": "Propiedades",
+            "team": "Equipo",
+            "security": "Seguridad",
+            "appearance": "Apariencia"
+        },
+        "appearance": {
+            "title": "Apariencia e idioma",
+            "description": "Elige cómo se muestra Sentinela en este navegador.",
+            "theme": "Tema",
+            "system": "Usar configuración del dispositivo",
+            "light": "Claro",
+            "dark": "Oscuro",
+            "saved": "Las preferencias se guardan automáticamente en este navegador."
+        },
+        "team": {
+            "description": "Trabaja solo o comparte cada propiedad con tu equipo.",
+            "organizer": "Organizador",
+            "participating": "Participando",
+            "noOrganized": "Todavía no organizas ninguna propiedad.",
+            "noParticipating": "Todavía no participas en otros equipos.",
+            "titleLabel": "Título del equipo",
+            "saveTitle": "Guardar título",
+            "titleSaved": "Título del equipo actualizado.",
+            "leave": "Salir del equipo",
+            "confirmLeave": "¿Salir del equipo {{title}}? Perderás el acceso a esta propiedad.",
+            "left": "Has salido del equipo.",
+            "property": "Propiedad", "empty": "Registra una propiedad para configurar su equipo.", "loading": "Cargando equipo…",
+            "mode": "Modo de esta propiedad", "active": "Equipo activo", "solo": "Uso individual", "access": "Tu acceso: {{role}}",
+            "useSolo": "Trabajar solo", "activate": "Activar equipo",
+            "confirmSolo": "Volver al uso individual eliminará a todos los miembros e invitaciones de esta propiedad. ¿Continuar?",
+            "inviteEmail": "Invitar por correo", "role": "Función", "sendInvite": "Enviar invitación",
+            "permissions": "El visualizador consulta; el editor crea y modifica sin eliminar; el administrador también puede eliminar y gestionar el equipo.",
+            "members": "Miembros", "owner": "Propietario", "remove": "Eliminar", "confirmRemove": "¿Eliminar a {{name}} de la propiedad?",
+            "pending": "Invitaciones pendientes", "noPending": "No hay invitaciones pendientes.", "expires": "vence el {{date}}", "cancel": "Cancelar",
+            "adminOnly": "Solo los administradores pueden gestionar invitaciones y funciones.",
+            "viewer": "Visualizador", "editor": "Editor", "admin": "Administrador",
+            "invited": "Invitación creada. Se procesará el envío del correo.",
+            "accepted": "Invitación aceptada. La propiedad ya está disponible en tu cuenta.",
+            "acceptError": "No se pudo aceptar la invitación.", "loadError": "No se pudo cargar el equipo.", "saveError": "No se pudo guardar el equipo."
+        },
+        "properties": {
+            "title": "Mis propiedades",
+            "subtitle": "Selecciona una propiedad para eliminar su registro y contorno.",
+            "loading": "Cargando tus propiedades…",
+            "empty": "Todavía no tienes propiedades registradas.",
+            "loadError": "No se pudieron cargar tus propiedades.",
+            "retry": "Intentar de nuevo",
+            "deleteError": "No se pudo eliminar esta propiedad.",
+            "select": "Seleccionar {{name}} para eliminar",
+            "areaUnknown": "Área sin delimitar",
+            "confirmTitle": "¿Eliminar propiedad?",
+            "confirmText": "Se eliminarán el registro y el contorno de la propiedad “{{name}}”. Esta acción no se puede deshacer.",
+            "confirm": "Eliminar propiedad",
+            "deleted": "Propiedad “{{name}}” eliminada."
+        },
+        "profile": {
+            "title": "Información personal",
+            "subtitle": "Tu nombre y tu foto en Sentinela.",
+            "picture": "Foto (URL)",
+            "pictureHint": "Dirección de una imagen pública. Déjalo vacío para usar tus iniciales.",
+            "saved": "Perfil actualizado.",
+            "emailVerified": "Verificado",
+            "emailNotVerified": "No verificado",
+            "provider": "Método de acceso",
+            "providers": {
+                "LOCAL": "Correo y contraseña",
+                "GOOGLE": "Google"
+            }
+        },
+        "password": {
+            "title": "Contraseña",
+            "subtitle": "Al cambiar la contraseña, se cierra la sesión en los demás dispositivos.",
+            "current": "Contraseña actual",
+            "new": "Nueva contraseña",
+            "confirm": "Confirmar nueva contraseña",
+            "submit": "Cambiar contraseña",
+            "saved": "Contraseña cambiada. Sigues conectado aquí; los demás dispositivos fueron desconectados.",
+            "googleOnly": "Inicias sesión con Google, así que no hay contraseña para cambiar."
+        },
+        "email": {
+            "title": "Correo electrónico",
+            "subtitle": "Enviaremos un código de 8 dígitos a la nueva dirección.",
+            "current": "Correo actual",
+            "new": "Nuevo correo",
+            "password": "Contraseña actual",
+            "submit": "Enviar código",
+            "codeTitle": "Ingresa el código enviado a {{email}}",
+            "confirm": "Confirmar cambio",
+            "saved": "Correo cambiado a {{email}}. Sigues conectado aquí; los demás dispositivos fueron desconectados.",
+            "googleOnly": "Las cuentas de Google usan el correo de la cuenta de Google."
+        },
+        "sessions": {
+            "title": "Sesiones",
+            "subtitle": "Cierra el acceso en todos los computadores y celulares, incluido este.",
+            "submit": "Cerrar sesión en todos los dispositivos"
+        },
+        "delete": {
+            "title": "Eliminar cuenta",
+            "subtitle": "Elimina tu cuenta y tus datos de forma permanente. Esta acción no se puede deshacer.",
+            "submit": "Eliminar mi cuenta",
+            "modalTitle": "¿Eliminar la cuenta definitivamente?",
+            "modalText": "Se borrarán tu perfil, tus datos de acceso y el historial de correos que te enviamos. Para confirmar, escribe {{word}} abajo.",
+            "keyword": "ELIMINAR",
+            "confirm": "Eliminar para siempre"
+        },
+        "dangerZone": "Zona de peligro"
+    },
+    "legal": {
+        "privacy": "Política de privacidad",
+        "terms": "Términos de uso",
+        "updatedAt": "Última actualización: {{date}}",
+        "contents": "En esta página",
+        "otherDoc": "Lee también",
+        "backHome": "Volver al inicio"
+    },
+    "maintenance": {
+        "code": "Mantenimiento del sistema",
+        "title": "Estamos cuidando de Sentinela",
+        "subtitle": "El sistema está temporalmente fuera de servicio por mantenimiento. Esta pantalla se actualizará automáticamente cuando el servicio regrese.",
+        "startedAt": "Inicio del mantenimiento",
+        "expectedEnd": "Regreso previsto",
+        "noEstimate": "Aún no hay una hora prevista",
+        "version": "Versión del sistema",
+        "retry": "Comprobar disponibilidad",
+        "autoRefresh": "Comprobamos la disponibilidad cada 30 segundos. Tu sesión se conservará.",
+        "checkFailed": "No se pudo consultar el estado. Volveremos a intentarlo automáticamente."
+    },
+    "notFound": {
+        "code": "Error 404",
+        "title": "No encontramos esta página",
+        "subtitle": "La dirección puede estar equivocada o la página fue eliminada.",
+        "back": "Volver",
+        "home": "Ir al inicio"
+    },
+    "footer": {
+        "rights": "© {{year}} {{company}}. Datos geográficos: IBGE."
+    },
+    "hydro": {
+        "theme": "Datos",
+        "apiFilters": "Filtros",
+        "apiResults": "Datos meteorológicos",
+        "filters": {
+            "selectAll": "Seleccionar todas",
+            "selectedCount": "{{count}} fuentes seleccionadas",
+            "noneSelected": "Ninguna fuente seleccionada",
+            "activeTables": "Tablas de {{count}} fuentes hidrológicas seleccionadas",
+            "noHydroSelected": "Selecciona lluvia, niveles de ríos o estaciones para mostrar las tablas."
+        },
+        "mapControls": {
+            "title": "Mapa base y capas"
+        },
+        "themes": {
+            "rain": "Lluvia (24h)",
+            "level": "Nivel de los ríos",
+            "stations": "Estaciones (HidroWeb)"
+        },
+        "themeHints": {
+            "rain": "Lluvia acumulada en las últimas 24 horas en las estaciones telemétricas.",
+            "level": "Situación del nivel respecto a las cotas de referencia.",
+            "stations": "Inventario de la Red Hidrometeorológica Nacional de Brasil."
+        },
+        "basemaps": {
+            "title": "Mapa base",
+            "monitoring": "Sentinela · Detallado",
+            "satellite": "Satélite",
+            "hybrid": "Satélite con nombres",
+            "streets": "Calles (OpenStreetMap)",
+            "topo": "Relieve",
+            "ocean": "Océano",
+            "light": "Claro",
+            "dark": "Oscuro",
+            "minimal": "Mínimo"
+        },
+        "layers": {
+            "title": "Capas",
+            "rivers": "Ríos",
+            "riversHint": "Ríos principales de la ANA y ríos y lagos de OpenStreetMap",
+            "points": "Estaciones del tema",
+            "inactive": "Estaciones inactivas"
+        },
+        "legend": {
+            "title": "Leyenda",
+            "empty": "Abre los filtros y selecciona las fuentes que deseas visualizar.",
+            "show": "Mostrar leyenda",
+            "hide": "Ocultar leyenda",
+            "toggleHint": "Haz clic para mostrar u ocultar"
+        },
+        "rain": {
+            "veryStrong": "Muy fuerte (más de 70 mm)",
+            "strong": "Fuerte (30 a 70 mm)",
+            "moderate": "Moderada (10 a 30 mm)",
+            "weak": "Débil (hasta 10 mm)",
+            "none": "Sin lluvia"
+        },
+        "level": {
+            "attention": "Atención (nivel alto)",
+            "normal": "Normal",
+            "drought": "Estiaje (nivel bajo)",
+            "stale": "Sin datos recientes",
+            "noRef": "Sin cota de referencia"
+        },
+        "stations": {
+            "fluvio": "Fluviométrica",
+            "pluvio": "Pluviométrica",
+            "operating": "En operación",
+            "inactive": "Inactiva",
+            "maintenance": "En mantenimiento",
+            "telemetry": "Telemétrica",
+            "conventional": "Convencional"
+        },
+        "table": {
+            "title": "Datos hidrológicos",
+            "show": "Ver tabla",
+            "hide": "Ocultar tabla",
+            "tabStates": "Estados",
+            "search": "Buscar estación, municipio o código...",
+            "allStates": "Todos los estados",
+            "onlyState": "Solo {{uf}}",
+            "empty": "No se encontraron registros.",
+            "noData": "SNIRH no devolvió datos ahora. Inténtalo en unos minutos.",
+            "error": "No fue posible cargar los datos.",
+            "retry": "Intentar de nuevo",
+            "loading": "Cargando datos de SNIRH...",
+            "range": "{{from}}–{{to}} de {{total}}",
+            "prev": "Anterior",
+            "next": "Siguiente",
+            "sort": "Ordenar por {{column}}",
+            "restartBackend": "Si la tabla no carga, reinicia el backend para que tenga los endpoints nuevos.",
+            "cols": {
+                "station": "Estación",
+                "code": "Código",
+                "city": "Municipio",
+                "uf": "UF",
+                "rain": "Lluvia 24h",
+                "class": "Clase",
+                "updated": "Actualizado",
+                "level": "Cota",
+                "status": "Situación",
+                "type": "Tipo",
+                "river": "Río",
+                "responsible": "Responsable",
+                "operator": "Operadora",
+                "project": "Proyecto",
+                "telemetry": "Telemetría",
+                "basin": "Cuenca",
+                "region": "Región",
+                "capital": "Capital",
+                "cities": "Municipios",
+                "population": "Población",
+                "state": "Estado"
+            }
+        },
+        "popup": {
+            "title": "Información",
+            "close": "Cerrar",
+            "selectedPoint": "Detalles del punto seleccionado",
+            "selectHint": "Selecciona una estación en el mapa o en la tabla para ver los detalles.",
+            "lastData": "Último dato",
+            "source": "Fuente: ANA/SNIRH",
+            "altitude": "Altitud",
+            "drainage": "Área de drenaje"
+        }
+    }
+}

@@ -51,13 +51,17 @@ public class FieldActionService {
         if (!"IRRIGATION".equals(action.getKind()) && request.amountMm() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lâmina só é permitida em irrigação");
         }
+        String note = request.completionNote().trim();
         action.setStatus("DONE");
-        action.setCompletionNote(request.completionNote().trim());
+        action.setCompletionNote(note);
         action.setCompletedAt(LocalDateTime.now());
+        // Grava a acao (com @Version) antes de criar a atividade: numa conclusao concorrente a segunda
+        // transacao falha aqui com conflito de versao (409) e nao gera atividade duplicada.
+        FieldAction saved = actionRepository.saveAndFlush(action);
         activityService.create(ownerId, propertyId, new PropertyActivityRequestDto(action.getKind(),
-                LocalDate.now(), null, request.completionNote(), request.amountMm(),
+                LocalDate.now(), null, note, request.amountMm(),
                 action.getPlot() == null ? null : action.getPlot().getPlotId()));
-        return response(actionRepository.saveAndFlush(action));
+        return response(saved);
     }
 
     @Transactional

@@ -10,6 +10,14 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
+  flyway:
+    # Bancos criados antes do Flyway (pelo ddl-auto) nao tem historico: marca a versao 0 e aplica
+    # a V0_1 (idempotente) e as seguintes. out-of-order permite aplicar a V0_1 em bancos que ja
+    # registraram V1..V4 (ela nao altera nada nesse caso).
+    baseline-on-migrate: true
+    baseline-version: 0
+    out-of-order: true
+
   jpa:
     open-in-view: false
     hibernate:
@@ -32,6 +40,17 @@ spring:
     properties:
       mail.smtp.auth: ${MAIL_SMTP_AUTH}
       mail.smtp.starttls.enable: ${MAIL_SMTP_STARTTLS}
+      # Sem estes limites o JavaMail espera para sempre e um SMTP travado congela todo envio.
+      mail.smtp.connectiontimeout: 10000
+      mail.smtp.timeout: 15000
+      mail.smtp.writetimeout: 15000
+
+  task:
+    execution:
+      shutdown:
+        # Da tempo aos e-mails ja enfileirados de sairem antes do container parar.
+        await-termination: true
+        await-termination-period: 30s
 
 server:
   port: ${SERVER_PORT:8080}

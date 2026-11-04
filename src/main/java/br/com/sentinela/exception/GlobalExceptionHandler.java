@@ -1,6 +1,8 @@
 package br.com.sentinela.exception;
 
 import br.com.sentinela.util.LogUtil;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -176,6 +178,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         LogUtil.error("Falha ao gerar relatório Jasper", exception);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Não foi possível gerar o relatório");
+    }
+
+    // 409 Conflict: gravacao concorrente (versao otimista) ou violacao de unicidade em corrida
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<String> optimisticLockHandler(ObjectOptimisticLockingFailureException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body("O registro foi alterado por outra operação. Atualize a página e tente novamente");
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> dataIntegrityHandler(DataIntegrityViolationException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body("O registro já existe ou conflita com outro registro");
     }
 
     @ExceptionHandler(ResponseStatusException.class)

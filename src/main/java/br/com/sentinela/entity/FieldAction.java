@@ -13,6 +13,9 @@ public class FieldAction {
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "action_id")
     private UUID actionId;
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;

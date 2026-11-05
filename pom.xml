@@ -34,7 +34,7 @@
 		<google-api-client.version>2.7.2</google-api-client.version>
 		<bucket4j.version>8.14.0</bucket4j.version>
 		<mapstruct.version>1.6.3</mapstruct.version>
-		<jsoup.version>1.21.2</jsoup.version>
+		<jsoup.version>1.23.2</jsoup.version>
 	</properties>
 	<dependencies>
 		<dependency>

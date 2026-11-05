@@ -12,6 +12,7 @@ import java.util.UUID;
 public interface FieldActionRepository extends JpaRepository<FieldAction, UUID> {
     List<FieldAction> findAllByProperty_PropertyIdOrderByDueDateAscCreatedAtAsc(UUID propertyId);
     Optional<FieldAction> findByActionIdAndProperty_PropertyId(UUID actionId, UUID propertyId);
+    List<FieldAction> findAllByStatusAndReminderSentAtIsNullAndDueDateLessThanEqualAndAssigneeIsNotNull(String status, java.time.LocalDate dueDate);
     void deleteAllByProperty_PropertyId(UUID propertyId);
     void deleteAllByProperty_User_UserId(UUID ownerId);
     @Modifying(flushAutomatically = true, clearAutomatically = true)

@@ -1,5 +1,7 @@
 package br.com.sentinela.controller;
 
+import br.com.sentinela.enums.Feature;
+import br.com.sentinela.infra.security.RequiresFeature;
 import br.com.sentinela.dto.response.CurrentWeatherDto;
 import br.com.sentinela.dto.response.ForecastWeatherDto;
 import br.com.sentinela.dto.response.WeatherTimeZoneDto;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/weather")
+@RequiresFeature(Feature.BASE)
 public class WeatherController {
 
     private final WeatherService weatherService;

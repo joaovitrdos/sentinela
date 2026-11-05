@@ -1,12 +1,13 @@
 import type { FormEvent, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Lock01, LogOut01, Map01, Sun, Trash01, User01 } from "@untitledui/icons";
+import { ChevronDown, Edit03, Lock01, LogOut01, Map01, Sun, Trash01, User01 } from "@untitledui/icons";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router";
 import { initialsOf } from "@/components/app/app-shell";
 import { CodeInput } from "@/components/app/code-input";
 import { ConfirmationModal } from "@/components/app/confirmation-modal";
 import { FormAlert } from "@/components/app/form-alert";
+import { FieldSettingsCard } from "@/components/app/field-settings-card";
 import { GoogleButton } from "@/components/app/google-button";
 import { notify } from "@/components/app/notifications";
 import { fieldProps } from "@/components/app/form-styles";
@@ -85,7 +86,7 @@ export const SettingsPage = () => {
     const wide = useBreakpoint("lg");
     const location = useLocation();
     const navigate = useNavigate();
-    const [tab, setTab] = useState<"profile" | "properties" | "team" | "security" | "appearance">(() =>
+    const [tab, setTab] = useState<"profile" | "properties" | "team" | "field" | "security" | "appearance">(() =>
         new URLSearchParams(location.search).get("tab") === "team" ? "team" : "profile");
     const [teamReload, setTeamReload] = useState(0);
     const invitationStarted = useRef(false);
@@ -128,6 +129,7 @@ export const SettingsPage = () => {
                     <Tabs.Item id="profile" icon={User01} label={t("settings.tabs.profile")} />
                     <Tabs.Item id="properties" icon={Map01} label={t("settings.tabs.properties")} />
                     <Tabs.Item id="team" icon={User01} label={t("settings.tabs.team")} />
+                    <Tabs.Item id="field" icon={Map01} label={t("settings.tabs.field")} />
                     <Tabs.Item id="security" icon={Lock01} label={t("settings.tabs.security")} />
                     <Tabs.Item id="appearance" icon={Sun} label={t("settings.tabs.appearance")} />
                 </Tabs.List>
@@ -141,6 +143,9 @@ export const SettingsPage = () => {
                     </Tabs.Panel>
                     <Tabs.Panel id="team" animation="fade" className="flex w-full min-w-0 flex-col gap-5">
                         <TeamCard reloadKey={teamReload} />
+                    </Tabs.Panel>
+                    <Tabs.Panel id="field" animation="fade" className="flex w-full min-w-0 flex-col gap-5">
+                        <FieldSettingsCard />
                     </Tabs.Panel>
                     <Tabs.Panel id="security" animation="fade" className="flex w-full min-w-0 flex-col gap-5">
                         <PasswordCard />
@@ -447,6 +452,7 @@ const ProfileCard = () => {
 
 const PropertiesCard = () => {
     const { t, i18n } = useTranslation();
+    const navigate = useNavigate();
     const [properties, setProperties] = useState<SavedProperty[]>([]);
     const [selected, setSelected] = useState<SavedProperty | null>(null);
     const [open, setOpen] = useState(false);
@@ -463,7 +469,7 @@ const PropertiesCard = () => {
         setLoadError(undefined);
         listProperties(controller.signal)
             .then((result) => {
-                if (!controller.signal.aborted) setProperties(result.filter((property) => property.teamOwner));
+                if (!controller.signal.aborted) setProperties(result.filter((property) => property.accessRole !== "VIEWER"));
             })
             .catch((error: unknown) => {
                 if (!controller.signal.aborted) setLoadError(propertyErrorMessage(error, t("settings.properties.loadError")));
@@ -526,14 +532,7 @@ const PropertiesCard = () => {
                 <ul className="space-y-2" aria-label={t("settings.properties.title")}>
                     {properties.map((property) => (
                         <li key={property.propertyId}>
-                            <button
-                                type="button"
-                                onClick={() => select(property)}
-                                disabled={busy}
-                                aria-haspopup="dialog"
-                                aria-label={t("settings.properties.select", { name: property.name })}
-                                className="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-secondary p-4 text-left outline-brand transition-colors hover:bg-primary_hover focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-wait disabled:opacity-50"
-                            >
+                            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-secondary p-4">
                                 <Map01 className="size-5 shrink-0 text-tertiary" aria-hidden="true" />
                                 <span className="min-w-0 flex-1">
                                     <span className="block truncate text-sm font-semibold text-primary">{property.name}</span>
@@ -542,8 +541,18 @@ const PropertiesCard = () => {
                                     </span>
                                     <span className="mt-1 block text-xs text-secondary tabular-nums">{formatArea(property)}</span>
                                 </span>
-                                <Trash01 className="size-5 shrink-0 text-error-primary" aria-hidden="true" />
-                            </button>
+                                <div className="flex flex-wrap gap-2">
+                                    <Button type="button" size="sm" color="secondary" iconLeading={Edit03}
+                                        onClick={() => navigate(`/properties?edit=${encodeURIComponent(property.propertyId)}`)}
+                                        isDisabled={busy}>
+                                        {t("settings.properties.edit")}
+                                    </Button>
+                                    {property.teamOwner && <Button type="button" size="sm" color="primary-destructive" iconLeading={Trash01}
+                                        onClick={() => select(property)} isDisabled={busy}>
+                                        {t("settings.properties.delete")}
+                                    </Button>}
+                                </div>
+                            </div>
                         </li>
                     ))}
                 </ul>

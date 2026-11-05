@@ -1,5 +1,7 @@
 package br.com.sentinela.controller;
 
+import br.com.sentinela.enums.Feature;
+import br.com.sentinela.infra.security.RequiresFeature;
 import br.com.sentinela.dto.response.PropertyMonitoringDto;
 import br.com.sentinela.entity.User;
 import br.com.sentinela.service.CopernicusService;
@@ -21,6 +23,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/properties/{propertyId}")
 @RequiredArgsConstructor
+@RequiresFeature(Feature.NDVI)
 public class PropertyMonitoringController {
 
     private final CopernicusService copernicusService;

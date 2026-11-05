@@ -36,6 +36,7 @@ public class PropertyService {
     private final PropertyMapper propertyMapper;
     private final ObjectMapper objectMapper;
     private final TeamService teamService;
+    private final PlanService planService;
 
     @Transactional(readOnly = true)
     public List<PropertyResponseDto> findAll(UUID ownerId) {
@@ -52,6 +53,7 @@ public class PropertyService {
 
     @Transactional
     public PropertyResponseDto create(UUID ownerId, PropertyRequestDto request) {
+        planService.requirePropertySlot(ownerId);
         Property property = Property.builder()
                 .user(userRepository.getReferenceById(ownerId))
                 .build();

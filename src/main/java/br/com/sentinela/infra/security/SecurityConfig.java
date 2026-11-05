@@ -38,8 +38,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Rotas protegidas que casariam com as regras publicas abaixo: precisam vir antes.
                         .requestMatchers("/auth/logout", "/auth/logout-all", "/users/me", "/users/me/**").authenticated()
-                        .requestMatchers("/auth/**", "/actuator/health/**", "/error").permitAll()
+                        .requestMatchers("/auth/**", "/actuator/health/**", "/error",
+                                "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/system/status").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/plans").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/billing/webhooks/asaas").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/connection/probe").permitAll()
                         .requestMatchers(HttpMethod.HEAD, "/api/connection/probe").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/connection/status").permitAll()

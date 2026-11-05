@@ -36,6 +36,42 @@ public class Property implements Serializable {
     @Column(name = "team_title", length = 120)
     private String teamTitle;
 
+    @Builder.Default
+    @Column(name = "action_reminder_enabled", nullable = false)
+    private Boolean actionReminderEnabled = true;
+
+    @Builder.Default
+    @Column(name = "action_reminder_days", nullable = false)
+    private Integer actionReminderDays = 1;
+
+    @Builder.Default
+    @Column(name = "require_season_for_field_records", nullable = false)
+    private Boolean requireSeasonForFieldRecords = false;
+
+    @Builder.Default
+    @Column(name = "default_harvest_unit", nullable = false, length = 16)
+    private String defaultHarvestUnit = "kg";
+
+    @Builder.Default
+    @Column(name = "alert_enabled", nullable = false)
+    private Boolean alertEnabled = false;
+
+    @Builder.Default
+    @Column(name = "alert_frost_temperature_c", nullable = false)
+    private Double alertFrostTemperatureC = 2.0;
+
+    @Builder.Default
+    @Column(name = "alert_heavy_rain_mm", nullable = false)
+    private Double alertHeavyRainMm = 50.0;
+
+    @Builder.Default
+    @Column(name = "alert_ndvi_drop", nullable = false)
+    private Double alertNdviDrop = 0.15;
+
+    @Builder.Default
+    @Column(name = "alert_river_radius_km", nullable = false)
+    private Double alertRiverRadiusKm = 30.0;
+
     @Column(name = "name", nullable = false)
     private String name;
 

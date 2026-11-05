@@ -29,6 +29,8 @@ class FieldActionServiceTest {
     @Mock PlotService plotService;
     @Mock PropertyActivityService activityService;
     @Mock FieldActionRepository actionRepository;
+    @Mock br.com.sentinela.repository.UserRepository users;
+    @Mock TeamService teamService;
     @InjectMocks FieldActionService service;
 
     @Test
@@ -40,6 +42,7 @@ class FieldActionServiceTest {
                 .dueDate(LocalDate.now()).status("OPEN").build();
         when(actionRepository.findByActionIdAndProperty_PropertyId(actionId, propertyId)).thenReturn(Optional.of(action));
         when(actionRepository.saveAndFlush(action)).thenReturn(action);
+        when(users.getReferenceById(ownerId)).thenReturn(br.com.sentinela.entity.User.builder().userId(ownerId).name("Responsável").build());
 
         var result = service.complete(ownerId, propertyId, actionId, new CompleteActionRequestDto("Aplicados 12 mm", 12.0));
 
@@ -58,5 +61,22 @@ class FieldActionServiceTest {
         assertThatThrownBy(() -> service.complete(ownerId, propertyId, actionId, new CompleteActionRequestDto("Feito", null)))
                 .isInstanceOf(ResponseStatusException.class);
         verifyNoInteractions(activityService);
+    }
+
+    @Test
+    void assignsOnlyARealMemberOfTheProperty() {
+        UUID actorId = UUID.randomUUID(), propertyId = UUID.randomUUID(), assigneeId = UUID.randomUUID();
+        Property property = Property.builder().propertyId(propertyId).build();
+        br.com.sentinela.entity.User member = br.com.sentinela.entity.User.builder()
+                .userId(assigneeId).name("Ana Técnica").build();
+        when(propertyService.requireEdit(propertyId, actorId)).thenReturn(property);
+        when(teamService.requireActiveMember(property, assigneeId)).thenReturn(member);
+        when(actionRepository.saveAndFlush(any(FieldAction.class))).thenAnswer(call -> call.getArgument(0));
+
+        var result = service.create(actorId, propertyId, new br.com.sentinela.dto.request.FieldActionRequestDto(
+                "INSPECTION", "Vistoriar talhão", null, LocalDate.now().plusDays(1), null, null, assigneeId));
+
+        assertThat(result.assigneeUserId()).isEqualTo(assigneeId);
+        assertThat(result.responsibleName()).isEqualTo("Ana Técnica");
     }
 }

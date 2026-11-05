@@ -1,4 +1,4 @@
-import { ApiError, api, apiBlob } from "@/lib/api";
+import { ApiError, api, apiBlob, apiUpload } from "@/lib/api";
 
 export type PropertyCoordinate = [number, number];
 
@@ -50,7 +50,7 @@ export interface PropertyRequest {
     cropStage: string;
 }
 
-export type PropertyActivityType = "IRRIGATION" | "RAINFALL" | "INSPECTION" | "INCIDENT";
+export type PropertyActivityType = "IRRIGATION" | "RAINFALL" | "INSPECTION" | "INCIDENT" | "PLANTING" | "FERTILIZATION" | "SPRAYING" | "HARVEST" | "OTHER";
 export interface PropertyActivity {
     activityId: string;
     type: PropertyActivityType;
@@ -60,6 +60,14 @@ export interface PropertyActivity {
     amountMm: number | null;
     createdAt: string;
     plotId: string | null;
+    seasonId: string | null;
+    responsibleUserId: string | null;
+    responsibleName: string | null;
+    inputName: string | null;
+    inputQuantity: number | null;
+    inputUnit: string | null;
+    harvestQuantity: number | null;
+    harvestUnit: string | null;
 }
 export interface PropertyActivityRequest {
     type: PropertyActivityType;
@@ -68,6 +76,13 @@ export interface PropertyActivityRequest {
     notes: string;
     amountMm: number | null;
     plotId: string | null;
+    seasonId?: string | null;
+    responsibleUserId?: string | null;
+    inputName?: string | null;
+    inputQuantity?: number | null;
+    inputUnit?: string | null;
+    harvestQuantity?: number | null;
+    harvestUnit?: string | null;
 }
 
 export interface Plot {
@@ -79,12 +94,32 @@ export interface Plot {
     areaHectares: number | null;
 }
 export type PlotRequest = Omit<Plot, "plotId">;
+export interface PlotSeason {
+    seasonId: string;
+    plotId: string;
+    cropName: string;
+    variety: string | null;
+    plantingDate: string;
+    harvestDate: string | null;
+    status: "ACTIVE" | "CLOSED";
+}
+export interface TeamAssignee { userId: string; name: string }
+export interface ActivityPhoto { photoId: string; fileName: string }
+export interface FieldSettings {
+    actionReminderEnabled: boolean;
+    actionReminderDays: number;
+    requireSeasonForFieldRecords: boolean;
+    defaultHarvestUnit: "kg" | "sacas" | "toneladas";
+}
 export interface FieldAction {
     actionId: string;
     plotId: string | null;
     kind: "INSPECTION" | "IRRIGATION";
     title: string;
     responsibleName: string;
+    assigneeUserId: string | null;
+    completedByUserId: string | null;
+    completedByName: string | null;
     dueDate: string;
     status: "OPEN" | "DONE";
     sourceNote: string | null;
@@ -92,7 +127,7 @@ export interface FieldAction {
     completedAt: string | null;
     createdAt: string;
 }
-export type FieldActionRequest = Pick<FieldAction, "kind" | "title" | "responsibleName" | "dueDate" | "plotId" | "sourceNote">;
+export type FieldActionRequest = Pick<FieldAction, "kind" | "title" | "dueDate" | "plotId" | "sourceNote"> & { assigneeUserId: string; responsibleName?: string | null };
 
 export interface NdviObservation {
     date: string;
@@ -127,11 +162,16 @@ export interface PropertyImageOverlay {
 const endpoint = "/api/properties";
 
 export const listProperties = (signal?: AbortSignal) => api<SavedProperty[]>(endpoint, { signal });
+export const loadFieldSettings = (propertyId: string, signal?: AbortSignal) =>
+    api<FieldSettings>(`${endpoint}/${encodeURIComponent(propertyId)}/field-settings`, { signal });
+export const saveFieldSettings = (propertyId: string, settings: FieldSettings) =>
+    api<FieldSettings>(`${endpoint}/${encodeURIComponent(propertyId)}/field-settings`, { method: "PUT", body: settings });
 export const saveProperty = (request: PropertyRequest, id?: string) =>
     api<SavedProperty>(id ? `${endpoint}/${encodeURIComponent(id)}` : endpoint, { method: id ? "PUT" : "POST", body: request });
 export const deleteProperty = (id: string) => api(`${endpoint}/${encodeURIComponent(id)}`, { method: "DELETE" });
 const teamEndpoint = (id: string) => `${endpoint}/${encodeURIComponent(id)}/team`;
 export const loadTeam = (id: string, signal?: AbortSignal) => api<TeamOverview>(teamEndpoint(id), { signal });
+export const listTeamAssignees = (id: string) => api<TeamAssignee[]>(`${teamEndpoint(id)}/assignees`);
 export const setTeamMode = (id: string, enabled: boolean) => api<TeamOverview>(`${teamEndpoint(id)}/mode`, { method: "PUT", body: { enabled } });
 export const setTeamTitle = (id: string, title: string) => api<TeamOverview>(`${teamEndpoint(id)}/title`, { method: "PUT", body: { title } });
 export const leaveTeam = (id: string) => api<void>(`${teamEndpoint(id)}/me`, { method: "DELETE" });
@@ -145,18 +185,29 @@ export const createPropertyActivity = (id: string, body: PropertyActivityRequest
     api<PropertyActivity>(`${endpoint}/${encodeURIComponent(id)}/activities`, { method: "POST", body });
 export const deletePropertyActivity = (id: string, activityId: string) =>
     api(`${endpoint}/${encodeURIComponent(id)}/activities/${encodeURIComponent(activityId)}`, { method: "DELETE" });
+const activityPhotosEndpoint = (id: string, activityId: string) => `${endpoint}/${encodeURIComponent(id)}/activities/${encodeURIComponent(activityId)}/photos`;
+export const listActivityPhotos = (id: string, activityId: string) => api<ActivityPhoto[]>(activityPhotosEndpoint(id, activityId));
+export const uploadActivityPhoto = (id: string, activityId: string, file: File) => apiUpload<ActivityPhoto>(activityPhotosEndpoint(id, activityId), file);
+export const loadActivityPhoto = (id: string, activityId: string, photoId: string) => apiBlob(`${activityPhotosEndpoint(id, activityId)}/${encodeURIComponent(photoId)}`);
 const plotEndpoint = (id: string) => `${endpoint}/${encodeURIComponent(id)}/plots`;
 export const listPlots = (id: string, signal?: AbortSignal) => api<Plot[]>(plotEndpoint(id), { signal });
 export const savePlot = (id: string, body: PlotRequest, plotId?: string) =>
     api<Plot>(plotId ? `${plotEndpoint(id)}/${encodeURIComponent(plotId)}` : plotEndpoint(id), { method: plotId ? "PUT" : "POST", body });
 export const deletePlot = (id: string, plotId: string) =>
     api(`${plotEndpoint(id)}/${encodeURIComponent(plotId)}`, { method: "DELETE" });
+export const listPlotSeasons = (id: string) => api<PlotSeason[]>(`${endpoint}/${encodeURIComponent(id)}/seasons`);
+export const createPlotSeason = (id: string, plotId: string, body: { cropName: string; variety: string | null; plantingDate: string }) =>
+    api<PlotSeason>(`${plotEndpoint(id)}/${encodeURIComponent(plotId)}/seasons`, { method: "POST", body });
+export const closePlotSeason = (id: string, plotId: string, seasonId: string, harvestDate: string) =>
+    api<PlotSeason>(`${plotEndpoint(id)}/${encodeURIComponent(plotId)}/seasons/${encodeURIComponent(seasonId)}/close`, { method: "POST", body: { harvestDate } });
 const actionEndpoint = (id: string) => `${endpoint}/${encodeURIComponent(id)}/actions`;
 export const listFieldActions = (id: string, signal?: AbortSignal) => api<FieldAction[]>(actionEndpoint(id), { signal });
 export const createFieldAction = (id: string, body: FieldActionRequest) =>
     api<FieldAction>(actionEndpoint(id), { method: "POST", body });
 export const completeFieldAction = (id: string, actionId: string, body: { completionNote: string; amountMm: number | null }) =>
     api<FieldAction>(`${actionEndpoint(id)}/${encodeURIComponent(actionId)}/complete`, { method: "POST", body });
+export const reassignFieldAction = (id: string, actionId: string, assigneeUserId: string) =>
+    api<FieldAction>(`${actionEndpoint(id)}/${encodeURIComponent(actionId)}/assignee`, { method: "PUT", body: { assigneeUserId } });
 export const deleteFieldAction = (id: string, actionId: string) =>
     api(`${actionEndpoint(id)}/${encodeURIComponent(actionId)}`, { method: "DELETE" });
 

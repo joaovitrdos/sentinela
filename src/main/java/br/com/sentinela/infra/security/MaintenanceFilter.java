@@ -31,6 +31,7 @@ public class MaintenanceFilter extends OncePerRequestFilter {
         return HttpMethod.OPTIONS.matches(request.getMethod())
                 || path.equals("/api/system/status")
                 || path.equals("/api/connection/probe")
+                || path.equals("/api/billing/webhooks/asaas")
                 || path.equals("/actuator/health") || path.startsWith("/actuator/health/")
                 || path.equals("/error");
     }

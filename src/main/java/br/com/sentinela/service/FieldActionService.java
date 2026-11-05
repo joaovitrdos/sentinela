@@ -20,6 +20,8 @@ public class FieldActionService {
     private final PlotService plotService;
     private final PropertyActivityService activityService;
     private final FieldActionRepository actionRepository;
+    private final TeamService teamService;
+    private final br.com.sentinela.repository.UserRepository users;
 
     @Transactional(readOnly = true)
     public List<FieldActionResponseDto> list(UUID ownerId, UUID propertyId) {
@@ -32,8 +34,12 @@ public class FieldActionService {
     public FieldActionResponseDto create(UUID ownerId, UUID propertyId, FieldActionRequestDto request) {
         var property = propertyService.requireEdit(propertyId, ownerId);
         var plot = request.plotId() == null ? null : plotService.requirePlot(propertyId, ownerId, request.plotId());
+        if (request.assigneeUserId() == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selecione um membro responsável");
+        var assignee = teamService.requireActiveMember(property, request.assigneeUserId());
         FieldAction action = FieldAction.builder().property(property).plot(plot).kind(request.kind())
-                .title(request.title().trim()).responsibleName(request.responsibleName().trim())
+                .title(request.title().trim()).assignee(assignee)
+                .responsibleName(assignee.getName())
                 .dueDate(request.dueDate()).status("OPEN")
                 .sourceNote(request.sourceNote() == null || request.sourceNote().isBlank() ? null : request.sourceNote().trim())
                 .build();
@@ -55,6 +61,7 @@ public class FieldActionService {
         action.setStatus("DONE");
         action.setCompletionNote(note);
         action.setCompletedAt(LocalDateTime.now());
+        action.setCompletedBy(users.getReferenceById(ownerId));
         // Grava a acao (com @Version) antes de criar a atividade: numa conclusao concorrente a segunda
         // transacao falha aqui com conflito de versao (409) e nao gera atividade duplicada.
         FieldAction saved = actionRepository.saveAndFlush(action);
@@ -62,6 +69,19 @@ public class FieldActionService {
                 LocalDate.now(), null, note, request.amountMm(),
                 action.getPlot() == null ? null : action.getPlot().getPlotId()));
         return response(saved);
+    }
+
+    @Transactional
+    public FieldActionResponseDto reassign(UUID userId, UUID propertyId, UUID actionId, UUID assigneeUserId) {
+        var property = propertyService.requireEdit(propertyId, userId);
+        FieldAction action = actionRepository.findByActionIdAndProperty_PropertyId(actionId, propertyId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ação não encontrada"));
+        if (!"OPEN".equals(action.getStatus())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Ação já concluída");
+        var assignee = teamService.requireActiveMember(property, assigneeUserId);
+        action.setAssignee(assignee);
+        action.setResponsibleName(assignee.getName());
+        action.setReminderSentAt(null);
+        return response(actionRepository.saveAndFlush(action));
     }
 
     @Transactional
@@ -75,6 +95,9 @@ public class FieldActionService {
     private FieldActionResponseDto response(FieldAction action) {
         return new FieldActionResponseDto(action.getActionId(), action.getPlot() == null ? null : action.getPlot().getPlotId(),
                 action.getKind(), action.getTitle(), action.getResponsibleName(), action.getDueDate(), action.getStatus(),
-                action.getSourceNote(), action.getCompletionNote(), action.getCompletedAt(), action.getCreatedAt());
+                action.getSourceNote(), action.getCompletionNote(), action.getCompletedAt(), action.getCreatedAt(),
+                action.getAssignee() == null ? null : action.getAssignee().getUserId(),
+                action.getCompletedBy() == null ? null : action.getCompletedBy().getUserId(),
+                action.getCompletedBy() == null ? null : action.getCompletedBy().getName());
     }
 }

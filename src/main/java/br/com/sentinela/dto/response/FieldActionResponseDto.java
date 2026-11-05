@@ -7,4 +7,5 @@ import java.util.UUID;
 public record FieldActionResponseDto(UUID actionId, UUID plotId, String kind, String title,
                                      String responsibleName, LocalDate dueDate, String status,
                                      String sourceNote, String completionNote,
-                                     LocalDateTime completedAt, LocalDateTime createdAt) {}
+                                     LocalDateTime completedAt, LocalDateTime createdAt,
+                                     UUID assigneeUserId, UUID completedByUserId, String completedByName) {}

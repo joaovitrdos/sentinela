@@ -20,6 +20,7 @@ public class PlotService {
     private final PlotRepository plotRepository;
     private final PropertyActivityRepository activityRepository;
     private final FieldActionRepository actionRepository;
+    private final br.com.sentinela.repository.PlotSeasonRepository seasonRepository;
 
     @Transactional(readOnly = true)
     public List<PlotResponseDto> list(UUID ownerId, UUID propertyId) {
@@ -43,18 +44,34 @@ public class PlotService {
         }
         Plot plot = Plot.builder().property(property).build();
         apply(plot, request);
-        return response(plotRepository.saveAndFlush(plot));
+        plotRepository.saveAndFlush(plot);
+        if (plot.getCropName() != null && plot.getPlantingDate() != null) {
+            seasonRepository.saveAndFlush(br.com.sentinela.entity.PlotSeason.builder().plot(plot)
+                    .cropName(plot.getCropName()).plantingDate(plot.getPlantingDate()).status("ACTIVE").build());
+        }
+        return response(plot);
     }
 
     @Transactional
     public PlotResponseDto update(UUID ownerId, UUID propertyId, UUID plotId, PlotRequestDto request) {
         propertyService.requireEdit(propertyId, ownerId);
         Plot plot = requirePlot(propertyId, ownerId, plotId);
+        if (seasonRepository.existsByPlot_PlotIdAndStatus(plotId, "ACTIVE") &&
+                (!java.util.Objects.equals(plot.getCropName(), clean(request.cropName())) ||
+                 !java.util.Objects.equals(plot.getPlantingDate(), request.plantingDate())))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Encerre a safra ativa antes de alterar cultura ou plantio");
         if (!plot.getName().equalsIgnoreCase(request.name().trim()) &&
                 plotRepository.existsByProperty_PropertyIdAndNameIgnoreCase(propertyId, request.name().trim())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um talhão com esse nome");
         }
         apply(plot, request);
+        if (!seasonRepository.existsByPlot_PlotIdAndStatus(plotId, "ACTIVE") && plot.getCropName() != null && plot.getPlantingDate() != null) {
+            if (seasonRepository.findAllByPlot_PlotIdOrderByPlantingDateDesc(plotId).stream().anyMatch(previous ->
+                    previous.getHarvestDate() == null || !plot.getPlantingDate().isAfter(previous.getHarvestDate())))
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "O novo plantio deve ocorrer depois da última colheita");
+            seasonRepository.save(br.com.sentinela.entity.PlotSeason.builder().plot(plot).cropName(plot.getCropName())
+                    .plantingDate(plot.getPlantingDate()).status("ACTIVE").build());
+        }
         return response(plotRepository.saveAndFlush(plot));
     }
 

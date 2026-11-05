@@ -97,3 +97,22 @@ export async function apiDownload(path: string, options: RequestOptions = {}): P
     const filename = encodedFilename ? decodeURIComponent(encodedFilename) : plainFilename ?? null;
     return { blob: await response.blob(), filename };
 }
+
+export async function apiUpload<T>(path: string, file: File): Promise<T> {
+    const form = new FormData();
+    form.append("file", file);
+    const token = apiSession.getToken();
+    let response: Response;
+    try {
+        response = await fetch(BASE_URL + path, {
+            method: "POST", body: form,
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+    } catch { throw new ApiError(0, ""); }
+    if (!response.ok) {
+        const error = new ApiError(response.status, await response.text().catch(() => ""));
+        if (token && error.isSessionRejected) apiSession.onSessionRejected();
+        throw error;
+    }
+    return response.json() as Promise<T>;
+}

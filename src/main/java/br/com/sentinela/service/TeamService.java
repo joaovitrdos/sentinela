@@ -5,6 +5,7 @@ import br.com.sentinela.dto.response.TeamOverviewDto;
 import br.com.sentinela.entity.Property;
 import br.com.sentinela.entity.PropertyInvitation;
 import br.com.sentinela.entity.PropertyMember;
+import br.com.sentinela.entity.User;
 import br.com.sentinela.enums.TeamRole;
 import br.com.sentinela.exception.PropertyNotFoundException;
 import br.com.sentinela.notification.EmailFactory;
@@ -81,6 +82,27 @@ public class TeamService {
         return members.findByProperty_PropertyIdAndUser_UserId(property.getPropertyId(), userId)
                 .map(PropertyMember::getRole).orElse(null);
     }
+
+    @Transactional(readOnly = true)
+    public User requireActiveMember(Property property, UUID userId) {
+        if (property.getUser().getUserId().equals(userId)) return property.getUser();
+        if (!Boolean.TRUE.equals(property.getTeamEnabled())) throw forbidden();
+        return members.findByProperty_PropertyIdAndUser_UserId(property.getPropertyId(), userId)
+                .map(PropertyMember::getUser).orElseThrow(this::forbidden);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Assignee> assignees(UUID propertyId, UUID userId) {
+        Property property = requireView(propertyId, userId);
+        var result = new java.util.ArrayList<Assignee>();
+        result.add(new Assignee(property.getUser().getUserId(), property.getUser().getName()));
+        if (Boolean.TRUE.equals(property.getTeamEnabled()))
+            members.findAllByProperty_PropertyIdOrderByJoinedAtAsc(propertyId).forEach(member ->
+                    result.add(new Assignee(member.getUser().getUserId(), member.getUser().getName())));
+        return result;
+    }
+
+    public record Assignee(UUID userId, String name) {}
 
     @Transactional(readOnly = true)
     public TeamOverviewDto overview(UUID propertyId, UUID userId) {

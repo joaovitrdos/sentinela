@@ -1,5 +1,7 @@
 package br.com.sentinela.controller;
 
+import br.com.sentinela.enums.Feature;
+import br.com.sentinela.infra.security.RequiresFeature;
 import br.com.sentinela.dto.response.HydroStationResponseDto;
 import br.com.sentinela.dto.response.RainReadingResponseDto;
 import br.com.sentinela.dto.response.RiverLevelResponseDto;
@@ -21,6 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/hydro")
 @RequiredArgsConstructor
+@RequiresFeature(Feature.BASE)
 public class HydroController {
 
     private final RainService rainService;

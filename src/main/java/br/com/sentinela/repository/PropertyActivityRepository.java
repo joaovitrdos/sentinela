@@ -11,6 +11,8 @@ import java.util.UUID;
 
 public interface PropertyActivityRepository extends JpaRepository<PropertyActivity, UUID> {
     List<PropertyActivity> findAllByProperty_PropertyIdOrderByDateDescCreatedAtDesc(UUID propertyId);
+    List<PropertyActivity> findAllByProperty_PropertyIdAndDateBetween(UUID propertyId, java.time.LocalDate from, java.time.LocalDate to);
+    boolean existsBySeason_SeasonIdAndDateAfter(UUID seasonId, java.time.LocalDate date);
     @Query("select activity from PropertyActivity activity join fetch activity.property " +
             "where activity.property.user.userId = :ownerId " +
             "and (:propertyId is null or activity.property.propertyId = :propertyId) " +

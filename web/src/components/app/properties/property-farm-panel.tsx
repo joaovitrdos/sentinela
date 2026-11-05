@@ -7,6 +7,7 @@ import type { PropertyActivity, PropertyActivityType, SavedProperty } from "@/li
 import type { RainReading } from "@/components/app/hydro/hydro-data";
 import type { ForecastDay } from "@/components/app/hydro/weather-data";
 import { PropertyOperations } from "./property-operations";
+import { PropertySeasonNotebook } from "./property-season-notebook";
 
 type ForecastResponse = { forecast: { forecastday: ForecastDay[] } };
 const today = () => {
@@ -22,6 +23,11 @@ const activityLabels: Record<PropertyActivityType, string> = {
     RAINFALL: "Chuva medida",
     INSPECTION: "Vistoria",
     INCIDENT: "Ocorrência",
+    PLANTING: "Plantio",
+    FERTILIZATION: "Adubação",
+    SPRAYING: "Aplicação",
+    HARVEST: "Colheita",
+    OTHER: "Outra operação",
 };
 
 const distanceKm = (aLat: number, aLon: number, bLat: number, bLon: number) => {
@@ -148,6 +154,7 @@ export const PropertyFarmPanel = ({ property, inspectionSuggestion }: { property
     return (
         <div className="grid gap-4 lg:grid-cols-2">
             <PropertyOperations property={property} observedRain={rain} forecast={forecast} inspectionSuggestion={inspectionSuggestion} />
+            <PropertySeasonNotebook property={property} />
             <section className="rounded-2xl bg-primary p-4 ring-1 ring-secondary sm:p-5 lg:col-span-2" aria-label="Resumo da propriedade">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>

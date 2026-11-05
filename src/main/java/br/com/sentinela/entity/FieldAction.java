@@ -28,6 +28,11 @@ public class FieldAction {
     private String title;
     @Column(name = "responsible_name", nullable = false, length = 120)
     private String responsibleName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assignee_user_id") private User assignee;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "completed_by_user_id") private User completedBy;
+    @Column(name = "reminder_sent_at") private LocalDateTime reminderSentAt;
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
     @Column(nullable = false, length = 16)

@@ -1,4 +1,4 @@
-{$SITE_DOMAIN} {
+$SITE_DOMAIN} {
 	encode zstd gzip
 	reverse_proxy web:80 {
 		header_up X-Forwarded-For {remote_host}

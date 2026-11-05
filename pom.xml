@@ -61,6 +61,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>3.2.0</version>
+		</dependency>
 		<!-- No Boot 4 o RestClient.Builder auto-configurado fica neste starter (usado pelo cliente do SNIRH) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

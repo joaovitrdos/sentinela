@@ -10,6 +10,11 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+
   flyway:
     baseline-on-migrate: true
     baseline-version: 0
@@ -50,11 +55,16 @@ spring:
 server:
   port: ${SERVER_PORT:8080}
   forward-headers-strategy: native
-
   compression:
     enabled: true
     mime-types: application/json,text/plain
     min-response-size: 2KB
+
+springdoc:
+  api-docs:
+    enabled: ${SPRINGDOC_ENABLED:true}
+  swagger-ui:
+    enabled: ${SPRINGDOC_ENABLED:true}
 
 api:
   security:
@@ -103,12 +113,23 @@ snirh:
     rivers-cache: 7d
     preload: true
 
+asaas:
+  base-url: ${ASAAS_BASE_URL:https://api-sandbox.asaas.com/v3}
+  api-key: ${ASAAS_API_KEY:}
+  webhook-token: ${ASAAS_WEBHOOK_TOKEN:}
+
+public-data:
+  inmet-warnings-url: https://apiprevmet3.inmet.gov.br/avisos/ativos
+  nasa-power-url: https://power.larc.nasa.gov/api/temporal/daily/point
+  car-wfs-url: https://geoserver.car.gov.br/geoserver/sicar/wfs
+
 weather:
   api:
     current-url: https://api.weatherapi.com/v1/current.json
     forecast-url: https://api.weatherapi.com/v1/forecast.json
     time-zone-url: https://api.weatherapi.com/v1/timezone.json
     key: ${WEATHER_API_KEY}
+    monthly-limit: ${WEATHER_API_MONTHLY_LIMIT:100000}
 
 copernicus:
   client-id: ${COPERNICUS_CLIENT_ID:}

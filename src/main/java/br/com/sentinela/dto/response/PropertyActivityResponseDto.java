@@ -14,6 +14,14 @@ public record PropertyActivityResponseDto(
         String notes,
         Double amountMm,
         LocalDateTime createdAt,
-        UUID plotId
+        UUID plotId,
+        UUID seasonId,
+        UUID responsibleUserId,
+        String responsibleName,
+        String inputName,
+        java.math.BigDecimal inputQuantity,
+        String inputUnit,
+        java.math.BigDecimal harvestQuantity,
+        String harvestUnit
 ) {
 }

@@ -2,6 +2,7 @@ import { FormAlert } from "@/components/app/form-alert";
 import { ConfirmationModal } from "@/components/app/confirmation-modal";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Check, Edit03, Map01, Plus } from "@untitledui/icons";
+import { useNavigate } from "react-router";
 import { ApiFilterMenu } from "@/components/app/hydro/api-filter-menu";
 import { Legend } from "@/components/app/hydro/map-controls";
 import { PropertyMap } from "@/components/app/properties/property-map";
@@ -23,6 +24,8 @@ const localToday = () => {
 const emptyForm = { name: "", city: "", state: "", cropName: "", plotName: "", plantingDate: "", cropStage: "" };
 
 export const PropertiesPage = () => {
+    const navigate = useNavigate();
+    const pendingEditId = useRef(new URLSearchParams(window.location.search).get("edit"));
     const [properties, setProperties] = useState<SavedProperty[]>([]);
     const [visibleIds, setVisibleIds] = useState<string[]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -60,11 +63,34 @@ export const PropertiesPage = () => {
                 if (controller.signal.aborted) return;
                 setProperties(result);
                 setVisibleIds(result.map((property) => property.propertyId));
-                setSelectedId(null);
-                setVertices([]);
-                setClosed(false);
+                const editProperty = result.find((property) => property.propertyId === pendingEditId.current && property.accessRole !== "VIEWER");
+                if (editProperty) {
+                    returnId.current = editProperty.propertyId;
+                    setSelectedId(editProperty.propertyId);
+                    setForm({
+                        name: editProperty.name, city: editProperty.city, state: editProperty.state,
+                        cropName: editProperty.cropName ?? "", plotName: editProperty.plotName ?? "",
+                        plantingDate: editProperty.plantingDate ?? "", cropStage: editProperty.cropStage ?? "",
+                    });
+                    setVertices(openPropertyRing(editProperty.geometry));
+                    setClosed(Boolean(editProperty.geometry));
+                    setDrawing(!editProperty.geometry);
+                    setEditing(true);
+                    setInfoOpen(true);
+                    pendingEditId.current = null;
+                    navigate("/properties", { replace: true });
+                } else {
+                    setSelectedId(null);
+                    setVertices([]);
+                    setClosed(false);
+                    setInfoOpen(!result.length);
+                    if (pendingEditId.current) {
+                        setFormError("Esta propriedade não está disponível para edição na sua conta.");
+                        setInfoOpen(true);
+                        pendingEditId.current = null;
+                    }
+                }
                 setOverlay(null);
-                setInfoOpen(!result.length);
             })
             .catch((reason: unknown) => {
                 if (!controller.signal.aborted) {
@@ -76,7 +102,7 @@ export const PropertiesPage = () => {
                 if (!controller.signal.aborted) setLoading(false);
             });
         return () => controller.abort();
-    }, [reload]);
+    }, [reload, navigate]);
 
     const loadIntoForm = (property: SavedProperty | null) => {
         setSelectedId(property?.propertyId ?? null);

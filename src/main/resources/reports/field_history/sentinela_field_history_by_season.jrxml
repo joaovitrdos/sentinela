@@ -1,0 +1,143 @@
+<!-- JasperReports Library 7.x; SQL and authorization remain in this template. -->
+<jasperReport whenNoDataType="NoDataSection" name="sentinela_field_history_by_season" language="java" orientation="Landscape"
+              pageWidth="842" pageHeight="595" columnWidth="794"
+              leftMargin="24" rightMargin="24" topMargin="24" bottomMargin="24"
+              uuid="74be80d0-f046-40ca-b42d-1e0a93c3807c">
+    <parameter name="REPORT_TITLE" class="java.lang.String"/>
+    <parameter name="PERIOD_LABEL" class="java.lang.String"/>
+    <parameter name="TIME_LABEL" class="java.lang.String"/>
+    <parameter name="OWNER_ID" class="java.lang.String"/>
+    <parameter name="ALL_PROPERTIES" class="java.lang.Boolean"/>
+    <parameter name="PROPERTY_IDS" class="java.util.Collection"/>
+    <parameter name="FROM_DATE" class="java.sql.Date"/>
+    <parameter name="TO_DATE" class="java.sql.Date"/>
+    <parameter name="FROM_TIME" class="java.sql.Time"/>
+    <parameter name="TO_TIME" class="java.sql.Time"/>
+    <query language="sql"><![CDATA[
+WITH visible_properties AS (
+    SELECT p.property_id, p.name
+    FROM tb_property p
+    WHERE (p.user_id = CAST($P{OWNER_ID} AS uuid)
+        OR (p.team_enabled = true AND EXISTS (
+            SELECT 1 FROM tb_property_member m
+            WHERE m.property_id = p.property_id AND m.user_id = CAST($P{OWNER_ID} AS uuid)
+        )))
+      AND ($P{ALL_PROPERTIES} = true OR $X{IN, p.property_id, PROPERTY_IDS})
+), events AS (
+    SELECT s.planting_date AS event_date, NULL::time AS event_time,
+           p.name::text AS property_name, pl.name::text AS plot_name,
+           concat_ws(' / ', s.crop_name, nullif(s.variety, ''))::text AS season_name,
+           'Início de Safra'::text AS record_type, NULL::text AS responsible_name,
+           'Registrada'::text AS status_name,
+           ('Plantio: ' || to_char(s.planting_date, 'DD/MM/YYYY'))::text AS detail
+    FROM tb_plot_season s
+    JOIN tb_plot pl ON pl.plot_id = s.plot_id
+    JOIN visible_properties p ON p.property_id = pl.property_id
+    UNION ALL
+    SELECT s.harvest_date, NULL::time, p.name::text, pl.name::text,
+           concat_ws(' / ', s.crop_name, nullif(s.variety, ''))::text,
+           'Encerramento de Safra'::text, NULL::text, 'Concluída'::text,
+           ('Colheita: ' || to_char(s.harvest_date, 'DD/MM/YYYY'))::text
+    FROM tb_plot_season s
+    JOIN tb_plot pl ON pl.plot_id = s.plot_id
+    JOIN visible_properties p ON p.property_id = pl.property_id
+    WHERE s.harvest_date IS NOT NULL
+    UNION ALL
+    SELECT a.activity_date, a.activity_time, p.name::text,
+           COALESCE(pl.name, 'Propriedade')::text,
+           concat_ws(' / ', s.crop_name, nullif(s.variety, ''))::text,
+           (CASE a.activity_type
+               WHEN 'PLANTING' THEN 'Plantio'
+               WHEN 'FERTILIZATION' THEN 'Adubação'
+               WHEN 'SPRAYING' THEN 'Aplicação'
+               WHEN 'HARVEST' THEN 'Colheita'
+               WHEN 'IRRIGATION' THEN 'Irrigação'
+               WHEN 'RAINFALL' THEN 'Chuva'
+               WHEN 'INSPECTION' THEN 'Vistoria'
+               WHEN 'INCIDENT' THEN 'Ocorrência'
+               ELSE 'Outra Operação'
+           END)::text,
+           COALESCE(a.responsible_name, u.name, 'Não Informado')::text,
+           'Registrada'::text,
+           concat_ws(' | ', nullif(a.notes, ''),
+               CASE WHEN a.input_name IS NOT NULL THEN concat('Insumo: ', a.input_name, ' ', a.input_quantity, ' ', a.input_unit) END,
+               CASE WHEN a.harvest_quantity IS NOT NULL THEN concat('Colheita: ', a.harvest_quantity, ' ', a.harvest_unit) END,
+               CASE WHEN ph.photo_count > 0 THEN concat('Fotos: ', ph.photo_count) END
+           )::text
+    FROM tb_property_activity a
+    JOIN visible_properties p ON p.property_id = a.property_id
+    LEFT JOIN tb_plot pl ON pl.plot_id = a.plot_id
+    LEFT JOIN tb_plot_season s ON s.season_id = a.season_id
+    LEFT JOIN tb_users u ON u.user_id = a.responsible_user_id
+    LEFT JOIN LATERAL (
+        SELECT count(*) AS photo_count FROM tb_activity_photo photo WHERE photo.activity_id = a.activity_id
+    ) ph ON true
+    UNION ALL
+    SELECT a.due_date, NULL::time, p.name::text,
+           COALESCE(pl.name, 'Propriedade')::text, NULL::text,
+           (CASE a.kind WHEN 'IRRIGATION' THEN 'Ação de Irrigação' ELSE 'Ação de Vistoria' END)::text,
+           a.responsible_name::text,
+           (CASE a.status WHEN 'DONE' THEN 'Concluída' ELSE 'Aberta' END)::text,
+           concat_ws(' | ', nullif(a.title, ''), nullif(a.source_note, ''),
+               CASE WHEN a.completed_at IS NOT NULL
+                   THEN concat('Executada em ', to_char(a.completed_at, 'DD/MM/YYYY HH24:MI'),
+                       ' por ', COALESCE(done.name, 'usuário'),
+                       ': ', COALESCE(a.completion_note, '')) END
+           )::text
+    FROM tb_field_action a
+    JOIN visible_properties p ON p.property_id = a.property_id
+    LEFT JOIN tb_plot pl ON pl.plot_id = a.plot_id
+    LEFT JOIN tb_users done ON done.user_id = a.completed_by_user_id
+)
+SELECT e.event_date, e.property_name, e.plot_name, e.season_name, e.record_type,
+       e.responsible_name, e.status_name, e.detail
+FROM events e
+WHERE e.event_date BETWEEN $P{FROM_DATE} AND $P{TO_DATE}
+  AND (CAST($P{FROM_TIME} AS time) IS NULL OR e.event_time IS NULL
+       OR e.event_time BETWEEN $P{FROM_TIME} AND $P{TO_TIME})
+ORDER BY e.event_date, e.property_name, e.plot_name, e.record_type
+    ]]></query>
+    <field name="event_date" class="java.sql.Date"/>
+    <field name="property_name" class="java.lang.String"/>
+    <field name="plot_name" class="java.lang.String"/>
+    <field name="season_name" class="java.lang.String"/>
+    <field name="record_type" class="java.lang.String"/>
+    <field name="responsible_name" class="java.lang.String"/>
+    <field name="status_name" class="java.lang.String"/>
+    <field name="detail" class="java.lang.String"/>
+    <title height="68">
+        <element kind="textField" uuid="00000000-0000-4000-8000-000000000017" x="0" y="0" width="794" height="30" forecolor="#000000" fontSize="17.0" bold="true" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$P{REPORT_TITLE}]]></expression></element>
+        <element kind="textField" uuid="00000000-0000-4000-8000-000000000018" x="0" y="40" width="794" height="20" forecolor="#252525" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA["Período: " + $P{PERIOD_LABEL} + "   |   Horário: " + $P{TIME_LABEL}]]></expression></element>
+    </title>
+    <columnHeader height="30">
+        <element kind="staticText" uuid="00000000-0000-4000-8000-000000000001" x="0" y="0" width="64" height="30" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Data]]></text><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="00000000-0000-4000-8000-000000000002" x="64" y="0" width="108" height="30" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Propriedade]]></text><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="00000000-0000-4000-8000-000000000003" x="172" y="0" width="80" height="30" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Talhão]]></text><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="00000000-0000-4000-8000-000000000004" x="252" y="0" width="96" height="30" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Safra]]></text><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="00000000-0000-4000-8000-000000000005" x="348" y="0" width="88" height="30" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Registro]]></text><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="00000000-0000-4000-8000-000000000006" x="436" y="0" width="100" height="30" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Responsável]]></text><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="00000000-0000-4000-8000-000000000007" x="536" y="0" width="72" height="30" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Situação]]></text><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        <element kind="staticText" uuid="00000000-0000-4000-8000-000000000008" x="608" y="0" width="186" height="30" mode="Opaque" backcolor="#D2D2D7" forecolor="#000000" bold="true" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Detalhe]]></text><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+    </columnHeader>
+    <detail>
+        <band height="34" splitType="Stretch">
+            <element kind="textField" uuid="00000000-0000-4000-8000-000000000009" x="0" y="0" width="64" height="34" fontSize="7.4" blankWhenNull="true" textAdjust="StretchHeight" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle" pattern="dd/MM/yyyy"><expression><![CDATA[$F{event_date}]]></expression><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="00000000-0000-4000-8000-000000000010" x="64" y="0" width="108" height="34" fontSize="7.4" blankWhenNull="true" textAdjust="StretchHeight" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{property_name})]]></expression><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="00000000-0000-4000-8000-000000000011" x="172" y="0" width="80" height="34" fontSize="7.4" blankWhenNull="true" textAdjust="StretchHeight" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{plot_name})]]></expression><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="00000000-0000-4000-8000-000000000012" x="252" y="0" width="96" height="34" fontSize="7.4" blankWhenNull="true" textAdjust="StretchHeight" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{season_name})]]></expression><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="00000000-0000-4000-8000-000000000013" x="348" y="0" width="88" height="34" fontSize="7.4" blankWhenNull="true" textAdjust="StretchHeight" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{record_type})]]></expression><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="00000000-0000-4000-8000-000000000014" x="436" y="0" width="100" height="34" fontSize="7.4" blankWhenNull="true" textAdjust="StretchHeight" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{responsible_name})]]></expression><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="00000000-0000-4000-8000-000000000015" x="536" y="0" width="72" height="34" fontSize="7.4" blankWhenNull="true" textAdjust="StretchHeight" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[br.com.sentinela.util.Util.capitalizeWords($F{status_name})]]></expression><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+            <element kind="textField" uuid="00000000-0000-4000-8000-000000000016" x="608" y="0" width="186" height="34" fontSize="7.4" blankWhenNull="true" textAdjust="StretchHeight" stretchType="ContainerHeight" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$F{detail}]]></expression><box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#A7ADB3"/></box></element>
+        </band>
+    </detail>
+    <pageFooter height="22">
+        <element kind="line" uuid="00000000-0000-4000-8000-000000000019" x="0" y="0" width="794" height="1" forecolor="#A7ADB3"/>
+        <element kind="textField" uuid="00000000-0000-4000-8000-000000000020" x="674" y="5" width="120" height="14" forecolor="#555555" fontSize="8.0" hTextAlign="Right"><expression><![CDATA["Página " + $V{PAGE_NUMBER}]]></expression></element>
+    </pageFooter>
+    <noData height="110">
+        <element kind="textField" uuid="00000000-0000-4000-8000-000000000021" x="0" y="0" width="794" height="30" forecolor="#000000" fontSize="17.0" bold="true" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA[$P{REPORT_TITLE}]]></expression></element>
+        <element kind="textField" uuid="00000000-0000-4000-8000-000000000022" x="0" y="40" width="794" height="20" forecolor="#252525" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle"><expression><![CDATA["Período: " + $P{PERIOD_LABEL}]]></expression></element>
+        <element kind="staticText" uuid="00000000-0000-4000-8000-000000000023" x="0" y="75" width="794" height="24" forecolor="#333333" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle"><text><![CDATA[Nenhum Registro Encontrado Para Os Filtros Selecionados.]]></text></element>
+    </noData>
+</jasperReport>

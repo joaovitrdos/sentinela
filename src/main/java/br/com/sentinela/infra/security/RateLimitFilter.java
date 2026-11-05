@@ -61,7 +61,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !rateLimit.enabled() || HttpMethod.OPTIONS.matches(request.getMethod());
+        // O Asaas pode pausar a fila após 15 falhas seguidas; a rota é protegida pelo token do webhook.
+        return !rateLimit.enabled() || HttpMethod.OPTIONS.matches(request.getMethod())
+                || request.getRequestURI().equals("/api/billing/webhooks/asaas");
     }
 
     private Target targetFor(HttpServletRequest request) {

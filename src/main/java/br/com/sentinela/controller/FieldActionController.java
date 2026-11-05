@@ -33,6 +33,14 @@ public class FieldActionController {
         return actionService.complete(user.getUserId(), propertyId, actionId, request);
     }
 
+    @PutMapping("/{actionId}/assignee")
+    public FieldActionResponseDto reassign(@AuthenticationPrincipal User user, @PathVariable UUID propertyId,
+            @PathVariable UUID actionId, @Valid @RequestBody AssignActionRequest request) {
+        return actionService.reassign(user.getUserId(), propertyId, actionId, request.assigneeUserId());
+    }
+
+    public record AssignActionRequest(@jakarta.validation.constraints.NotNull UUID assigneeUserId) {}
+
     @DeleteMapping("/{actionId}") @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@AuthenticationPrincipal User user, @PathVariable UUID propertyId, @PathVariable UUID actionId) {
         actionService.delete(user.getUserId(), propertyId, actionId);

@@ -104,8 +104,39 @@ abstract class WebLayerTestSupport {
     @MockitoBean
     protected TeamService teamService;
 
+    @MockitoBean
+    protected br.com.sentinela.service.PlotSeasonService plotSeasonService;
+
+    @MockitoBean
+    protected br.com.sentinela.service.FieldSettingsService fieldSettingsService;
+
+    @MockitoBean
+    protected br.com.sentinela.service.SprayWindowService sprayWindowService;
+
+    @MockitoBean
+    protected br.com.sentinela.service.IrrigationService irrigationService;
+
+    @MockitoBean
+    protected br.com.sentinela.service.PropertyAlertService propertyAlertService;
+
+    @MockitoBean
+    protected br.com.sentinela.service.CarService carService;
+
+    @MockitoBean
+    protected br.com.sentinela.service.PlanService planService;
+
+    @MockitoBean
+    protected br.com.sentinela.service.BillingService billingService;
+
+    @MockitoBean
+    protected br.com.sentinela.repository.PropertyActivityRepository propertyActivityRepository;
+
+    @MockitoBean
+    protected br.com.sentinela.repository.ActivityPhotoRepository activityPhotoRepository;
+
     @BeforeEach
     void systemIsAvailable() {
+        when(planService.allows(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(br.com.sentinela.enums.Feature.class))).thenReturn(true);
         when(maintenanceService.getStatus()).thenReturn(new SystemStatusDto(false, "test", null, null, "America/Sao_Paulo"));
     }
 

@@ -5,8 +5,8 @@ import { FormAlert } from "@/components/app/form-alert";
 import { ConfirmationModal } from "@/components/app/confirmation-modal";
 import type { RainReading } from "@/components/app/hydro/hydro-data";
 import type { ForecastDay } from "@/components/app/hydro/weather-data";
-import { completeFieldAction, createFieldAction, createPropertyActivity, deleteFieldAction, deletePlot, listFieldActions, listPlots, listPropertyActivities, propertyErrorMessage, savePlot } from "@/lib/property-data";
-import type { FieldAction, Plot, PropertyActivity, SavedProperty } from "@/lib/property-data";
+import { completeFieldAction, createFieldAction, createPropertyActivity, deleteFieldAction, deletePlot, listFieldActions, listPlots, listPropertyActivities, listTeamAssignees, propertyErrorMessage, reassignFieldAction, savePlot } from "@/lib/property-data";
+import type { FieldAction, Plot, PropertyActivity, SavedProperty, TeamAssignee } from "@/lib/property-data";
 import { useAuth } from "@/providers/auth-provider";
 
 const input = "min-h-11 w-full rounded-lg border border-primary bg-primary px-3 py-2 text-sm text-primary outline-brand focus-visible:outline-2";
@@ -30,6 +30,7 @@ export const PropertyOperations = ({ property, observedRain, forecast, inspectio
     const canDelete = property.accessRole === "ADMIN";
     const [plots, setPlots] = useState<Plot[]>([]);
     const [actions, setActions] = useState<FieldAction[]>([]);
+    const [assignees, setAssignees] = useState<TeamAssignee[]>([]);
     const [activities, setActivities] = useState<PropertyActivity[]>([]);
     const [error, setError] = useState("");
     const [busy, setBusy] = useState(false);
@@ -44,18 +45,30 @@ export const PropertyOperations = ({ property, observedRain, forecast, inspectio
     const [area, setArea] = useState("");
     const [actionKind, setActionKind] = useState<"INSPECTION" | "IRRIGATION">("INSPECTION");
     const [actionTitle, setActionTitle] = useState("");
-    const [responsible, setResponsible] = useState(user?.name ?? "");
+    const [responsible, setResponsible] = useState(user?.userId ?? "");
     const [dueDate, setDueDate] = useState(today());
     const [sourceNote, setSourceNote] = useState("");
     const [completingId, setCompletingId] = useState("");
     const [completionNote, setCompletionNote] = useState("");
     const [completionAmount, setCompletionAmount] = useState("");
+    const [reassigningId, setReassigningId] = useState("");
+    const [nextAssigneeId, setNextAssigneeId] = useState("");
     const [waterType, setWaterType] = useState<"RAINFALL" | "IRRIGATION">("RAINFALL");
     const [waterDate, setWaterDate] = useState(today());
     const [waterFrom, setWaterFrom] = useState(daysAgo(30));
     const [waterTo, setWaterTo] = useState(today());
     const [waterAmount, setWaterAmount] = useState("");
     const [waterNote, setWaterNote] = useState("");
+
+    useEffect(() => {
+        let active = true;
+        listTeamAssignees(property.propertyId).then((rows) => {
+            if (!active) return;
+            setAssignees(rows);
+            setResponsible((value) => rows.some((row) => row.userId === value) ? value : rows[0]?.userId ?? "");
+        }).catch((reason: unknown) => { if (active) setError(propertyErrorMessage(reason, "Não foi possível carregar os membros da equipe.")); });
+        return () => { active = false; };
+    }, [property.propertyId]);
 
     useEffect(() => {
         if (!inspectionSuggestion || inspectionSuggestion.propertyId !== property.propertyId) return;
@@ -134,7 +147,7 @@ export const PropertyOperations = ({ property, observedRain, forecast, inspectio
         if (!actionTitle.trim() || !responsible.trim() || !dueDate) return;
         void run(async () => {
             await createFieldAction(property.propertyId, {
-                kind: actionKind, title: actionTitle.trim(), responsibleName: responsible.trim(), dueDate,
+                kind: actionKind, title: actionTitle.trim(), assigneeUserId: responsible, dueDate,
                 plotId: actionPlotId || null, sourceNote: sourceNote.trim() || null,
             });
             setActionTitle(""); setSourceNote("");
@@ -196,13 +209,15 @@ export const PropertyOperations = ({ property, observedRain, forecast, inspectio
                     <label className="text-xs font-medium text-secondary">Ação<select className={input} value={actionKind} onChange={(e) => setActionKind(e.target.value as typeof actionKind)}><option value="INSPECTION">Vistoria</option><option value="IRRIGATION">Irrigação</option></select></label>
                     <label className="text-xs font-medium text-secondary">Talhão<select className={input} value={actionPlotId} onChange={(e) => setActionPlotId(e.target.value)}><option value="">Toda a propriedade</option>{plots.map((plot) => <option key={plot.plotId} value={plot.plotId}>{plot.name}</option>)}</select></label>
                     <label className="text-xs font-medium text-secondary sm:col-span-2">Título<input className={input} required maxLength={160} value={actionTitle} onChange={(e) => setActionTitle(e.target.value)} placeholder="Ex.: Verificar queda do NDVI" /></label>
-                    <label className="text-xs font-medium text-secondary">Responsável<input className={input} required maxLength={120} value={responsible} onChange={(e) => setResponsible(e.target.value)} /></label>
+                    <label className="text-xs font-medium text-secondary">Responsável<select className={input} required value={responsible} onChange={(e) => setResponsible(e.target.value)}><option value="">Selecione um membro</option>{assignees.map((member) => <option key={member.userId} value={member.userId}>{member.name}</option>)}</select></label>
                     <label className="text-xs font-medium text-secondary">Prazo<input className={input} required type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} /></label>
                     <label className="text-xs font-medium text-secondary sm:col-span-2">Origem ou observação<input className={input} maxLength={500} value={sourceNote} onChange={(e) => setSourceNote(e.target.value)} placeholder="Ex.: Alerta de monitoramento" /></label>
                     <div><Button type="submit" size="sm" isLoading={busy}>Criar ação</Button></div>
                 </form>}
                 <ul className="mt-4 divide-y divide-secondary">{actions.map((action) => <li key={action.actionId} className="py-3 text-sm">
-                    <div className="flex items-start justify-between gap-2"><div><p className="font-semibold text-primary">{action.title} · {action.status === "DONE" ? "Concluída" : "Aberta"}</p><p className="text-tertiary">{action.responsibleName} · prazo {dateLabel(action.dueDate)}{action.plotId ? ` · ${plots.find((plot) => plot.plotId === action.plotId)?.name ?? "Talhão removido"}` : " · Propriedade"}</p>{action.sourceNote && <p className="text-tertiary">{action.sourceNote}</p>}{action.completionNote && <p className="text-secondary">Conclusão: {action.completionNote}</p>}</div><div className="flex gap-2">{canEdit && action.status === "OPEN" && <button type="button" className="text-brand-secondary" onClick={() => setCompletingId(action.actionId)}>Concluir</button>}{canDelete && <button type="button" className="text-error-primary" onClick={() => { setError(""); setPendingDelete({ kind: "action", id: action.actionId, name: action.title }); }}>Excluir</button>}</div></div>
+                    <div className="flex items-start justify-between gap-2"><div><p className="font-semibold text-primary">{action.title} · {action.status === "DONE" ? "Concluída" : "Aberta"}</p><p className="text-tertiary">{action.responsibleName} · prazo {dateLabel(action.dueDate)}{action.plotId ? ` · ${plots.find((plot) => plot.plotId === action.plotId)?.name ?? "Talhão removido"}` : " · Propriedade"}</p>{action.status === "OPEN" && action.dueDate <= today() && <p className="text-error-primary">{action.dueDate < today() ? "Prazo vencido" : "Vence hoje"}</p>}{action.sourceNote && <p className="text-tertiary">{action.sourceNote}</p>}{action.completionNote && <p className="text-secondary">Conclusão por {action.completedByName ?? "usuário"}: {action.completionNote}</p>}</div><div className="flex gap-2">{canEdit && action.status === "OPEN" && <button type="button" className="text-brand-secondary" onClick={() => setCompletingId(action.actionId)}>Concluir</button>}{canDelete && <button type="button" className="text-error-primary" onClick={() => { setError(""); setPendingDelete({ kind: "action", id: action.actionId, name: action.title }); }}>Excluir</button>}</div></div>
+                    {canEdit && action.status === "OPEN" && <button type="button" className="mt-2 text-xs text-brand-secondary" onClick={() => { setReassigningId(action.actionId === reassigningId ? "" : action.actionId); setNextAssigneeId(action.assigneeUserId ?? assignees[0]?.userId ?? ""); }}>Alterar responsável</button>}
+                    {reassigningId === action.actionId && <form className="mt-2 flex flex-wrap items-end gap-2" onSubmit={(event) => { event.preventDefault(); if (!nextAssigneeId) return; void run(async () => { await reassignFieldAction(property.propertyId, action.actionId, nextAssigneeId); setReassigningId(""); }); }}><label className="text-xs text-secondary">Novo responsável<select className={input} required value={nextAssigneeId} onChange={(event) => setNextAssigneeId(event.target.value)}>{assignees.map((member) => <option key={member.userId} value={member.userId}>{member.name}</option>)}</select></label><Button type="submit" size="sm" isLoading={busy}>Salvar</Button></form>}
                     {completingId === action.actionId && <form onSubmit={submitCompletion} className="mt-3 grid gap-2"><textarea className={input} required maxLength={1000} value={completionNote} onChange={(e) => setCompletionNote(e.target.value)} placeholder="O que foi feito?" />{action.kind === "IRRIGATION" && <input className={input} type="number" min="0" step="0.1" value={completionAmount} onChange={(e) => setCompletionAmount(e.target.value)} placeholder="Lâmina aplicada (mm), se medida" />}<div className="flex gap-2"><Button type="submit" size="sm" isLoading={busy}>Registrar conclusão</Button><Button type="button" size="sm" color="secondary" onClick={() => setCompletingId("")}>Cancelar</Button></div></form>}
                 </li>)}</ul>
                 {actions.length === 0 && <p className="mt-3 text-sm text-tertiary">Nenhuma ação planejada.</p>}

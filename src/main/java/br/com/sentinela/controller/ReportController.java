@@ -1,5 +1,7 @@
 package br.com.sentinela.controller;
 
+import br.com.sentinela.enums.Feature;
+import br.com.sentinela.infra.security.RequiresFeature;
 import br.com.sentinela.dto.request.ReportRequestDto;
 import br.com.sentinela.dto.response.GeneratedReportResposneDto;
 import br.com.sentinela.dto.response.ReportOptionResponseDto;
@@ -25,6 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/reports")
 @RequiredArgsConstructor
+@RequiresFeature(Feature.REPORTS)
 public class ReportController {
 
     private final ReportService reportService;

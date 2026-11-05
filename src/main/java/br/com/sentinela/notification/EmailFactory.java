@@ -24,6 +24,26 @@ public class EmailFactory {
                 layout("Você recebeu um convite para colaborar no Sentinela.", "Um convite para colaborar", content));
     }
 
+    public EmailMessage createFieldActionReminder(String recipient, String propertyName, String actionTitle, String dueDate) {
+        String link = webBaseUrl + "/properties";
+        String content = paragraph("Há uma ação de campo atribuída a você na propriedade <strong>" + escape(propertyName) + "</strong>.")
+                + paragraph("<strong>" + escape(actionTitle) + "</strong><br>Prazo: " + escape(dueDate))
+                + button("Ver propriedade", link) + fallbackLink(link);
+        return message(recipient, "Prazo de ação de campo - " + APP_NAME, TypeEmail.FIELD_ACTION_REMINDER,
+                layout("Uma ação de campo está próxima do prazo.", "Ação de campo", content));
+    }
+
+    public EmailMessage createPropertyAlert(String recipient, String propertyName, String title, String description,
+                                            String disclaimer) {
+        String link = webBaseUrl + "/properties";
+        String content = paragraph("Novo alerta para a propriedade <strong>" + escape(propertyName) + "</strong>.")
+                + paragraph("<strong>" + escape(title) + "</strong><br>" + escape(description))
+                + button("Ver propriedade", link) + fallbackLink(link)
+                + (disclaimer == null ? "" : note(disclaimer));
+        return message(recipient, title + " - " + APP_NAME, TypeEmail.PROPERTY_ALERT,
+                layout("Novo alerta na sua propriedade.", "Alerta da propriedade", content));
+    }
+
     public EmailMessage createEmailVerification(String recipient, String code) {
         return codeEmail(recipient, TypeEmail.EMAIL_VERIFICATION,
                 "Confirme seu e-mail", "Use este código para confirmar seu cadastro.", code);

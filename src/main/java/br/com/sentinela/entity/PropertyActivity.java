@@ -31,6 +31,32 @@ public class PropertyActivity {
     @JoinColumn(name = "plot_id")
     private Plot plot;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "season_id")
+    private PlotSeason season;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "responsible_user_id")
+    private User responsibleUser;
+
+    @Column(name = "responsible_name", length = 120)
+    private String responsibleName;
+
+    @Column(name = "input_name", length = 120)
+    private String inputName;
+
+    @Column(name = "input_quantity", precision = 14, scale = 3)
+    private java.math.BigDecimal inputQuantity;
+
+    @Column(name = "input_unit", length = 24)
+    private String inputUnit;
+
+    @Column(name = "harvest_quantity", precision = 14, scale = 3)
+    private java.math.BigDecimal harvestQuantity;
+
+    @Column(name = "harvest_unit", length = 24)
+    private String harvestUnit;
+
     @Column(name = "activity_type", nullable = false, length = 24)
     private String type;
 

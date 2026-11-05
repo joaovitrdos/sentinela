@@ -1,5 +1,7 @@
 package br.com.sentinela.controller;
 
+import br.com.sentinela.enums.Feature;
+import br.com.sentinela.infra.security.RequiresFeature;
 import br.com.sentinela.dto.request.*;
 import br.com.sentinela.dto.response.TeamOverviewDto;
 import br.com.sentinela.entity.User;
@@ -14,11 +16,17 @@ import java.util.UUID;
 public class TeamController {
     private final TeamService teamService;
 
+    @GetMapping("/api/properties/{propertyId}/team/assignees")
+    public java.util.List<TeamService.Assignee> assignees(@AuthenticationPrincipal User user, @PathVariable UUID propertyId) {
+        return teamService.assignees(propertyId, user.getUserId());
+    }
+
     @GetMapping("/api/properties/{propertyId}/team")
     public TeamOverviewDto overview(@AuthenticationPrincipal User user, @PathVariable UUID propertyId) {
         return teamService.overview(propertyId, user.getUserId());
     }
 
+    @RequiresFeature(Feature.TEAM)
     @PutMapping("/api/properties/{propertyId}/team/mode")
     public TeamOverviewDto mode(@AuthenticationPrincipal User user, @PathVariable UUID propertyId,
                                 @Valid @RequestBody TeamModeRequestDto request) {
@@ -36,6 +44,7 @@ public class TeamController {
         teamService.leave(propertyId, user.getUserId());
     }
 
+    @RequiresFeature(Feature.TEAM)
     @PostMapping("/api/properties/{propertyId}/team/invitations")
     public TeamOverviewDto invite(@AuthenticationPrincipal User user, @PathVariable UUID propertyId,
                                   @Valid @RequestBody TeamInviteRequestDto request) {

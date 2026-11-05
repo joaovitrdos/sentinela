@@ -25,6 +25,11 @@ public interface PropertyRepository extends JpaRepository<Property, UUID> {
             "where member.property = property and member.user.userId = :userId)))")
     List<Property> findAllAccessibleByIds(@Param("propertyIds") Collection<UUID> propertyIds, @Param("userId") UUID userId);
 
+    @Query("select property from Property property join fetch property.user where property.alertEnabled = true")
+    List<Property> findAllWithAlertsEnabled();
+
+    long countByUser_UserId(UUID userId);
+
     Optional<Property> findByPropertyIdAndUser_UserId(UUID propertyId, UUID userId);
 
     List<Property> findAllByPropertyIdInAndUser_UserId(Collection<UUID> propertyIds, UUID userId);

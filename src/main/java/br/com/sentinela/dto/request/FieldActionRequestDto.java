@@ -6,7 +6,8 @@ import java.util.UUID;
 
 public record FieldActionRequestDto(@NotBlank @Pattern(regexp = "INSPECTION|IRRIGATION") String kind,
                                     @NotBlank @Size(max = 160) String title,
-                                    @NotBlank @Size(max = 120) String responsibleName,
+                                    @Size(max = 120) String responsibleName,
                                     @NotNull LocalDate dueDate,
                                     UUID plotId,
-                                    @Size(max = 500) String sourceNote) {}
+                                    @Size(max = 500) String sourceNote,
+                                    @NotNull UUID assigneeUserId) {}

@@ -5,7 +5,7 @@ import { Check, Map01, MarkerPin01 } from "@untitledui/icons";
 import { geoBounds } from "d3-geo";
 import type { FeatureCollection, Geometry } from "geojson";
 import * as maplibregl from "maplibre-gl";
-import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
+import { mapWorkerUrl } from "@/components/app/brazil-map/map-worker-url";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { basemapById } from "@/components/app/brazil-map/basemaps";
 import { CitySearch } from "@/components/app/brazil-map/city-search";
@@ -16,7 +16,7 @@ import { Select } from "@/components/base/select/select";
 import type { PropertyCoordinate, PropertyImageOverlay, SavedProperty } from "@/lib/property-data";
 import { cx } from "@/utils/cx";
 
-maplibregl.setWorkerUrl(workerUrl);
+maplibregl.setWorkerUrl(mapWorkerUrl);
 
 const basemapOptions = [
     { id: "satellite", label: "Satélite" },

@@ -433,7 +433,7 @@ export const HydroExplorer = ({ className, mapClassName }: { className?: string;
                                         footer={
                                             <>
                                                 {selectedThemes.length > 0 && <p>{t("hydro.popup.source")}</p>}
-                                                {selectedWeatherFilters.length > 0 && <p>WeatherAPI.com</p>}
+                                                {selectedWeatherFilters.length > 0 && <WeatherCredit className={selectedThemes.length > 0 ? "mt-1" : undefined} />}
                                             </>
                                         }
                                     >
@@ -469,7 +469,6 @@ export const HydroExplorer = ({ className, mapClassName }: { className?: string;
                                             errors={weatherErrors}
                                             onRetry={() => setWeatherRefresh((version) => version + 1)}
                                         />
-                                        {selectedWeatherFilters.length > 0 ? <WeatherCredit className="mt-2" /> : null}
                                     </Legend>
                                 </div>
                             </div>

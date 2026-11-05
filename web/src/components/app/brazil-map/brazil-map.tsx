@@ -7,7 +7,7 @@ import { geoCentroid } from "d3-geo";
 import type { Feature, FeatureCollection, MultiLineString, MultiPolygon, Point, Polygon } from "geojson";
 import type { ExpressionSpecification, GeoJSONSource, MapMouseEvent, StyleSpecification } from "maplibre-gl";
 import { AttributionControl, Map as MapLibre, Marker, Popup, ScaleControl, setWorkerUrl } from "maplibre-gl";
-import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
+import { mapWorkerUrl } from "@/components/app/brazil-map/map-worker-url";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useTranslation } from "react-i18next";
 import { LoadingIndicator } from "@/components/application/loading-indicator/loading-indicator";
@@ -21,7 +21,7 @@ import { loadCountry, loadState } from "./geo-data";
 import { monitoringLayers } from "./monitoring-basemap";
 
 // O bundler empacota o MapLibre em outro arquivo; o worker precisa do endereco explicito.
-setWorkerUrl(workerUrl);
+setWorkerUrl(mapWorkerUrl);
 
 type View = { level: "country" } | { level: "state"; uf: string } | { level: "city"; uf: string; cityId: number };
 type Hover = { kind: "state"; uf: string } | { kind: "city"; id: number } | { kind: "point"; id: number } | null;

@@ -19,6 +19,10 @@ RUN npm run build
 
 FROM nginx:1.27-alpine
 
+# O nginx nao conhece .mjs: sem isto o worker do mapa sai como octet-stream e o navegador o bloqueia por causa do nosniff.
+RUN sed -i "/^types {/a    application/javascript mjs;" /etc/nginx/mime.types \
+    && grep -q "application/javascript mjs;" /etc/nginx/mime.types
+
 # O nginx gera o default.conf a partir do template trocando ${API_UPSTREAM} na subida.
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /web/dist /usr/share/nginx/html

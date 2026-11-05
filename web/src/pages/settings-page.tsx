@@ -1,6 +1,6 @@
 import type { FormEvent, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Edit03, Lock01, LogOut01, Map01, Sun, Trash01, User01 } from "@untitledui/icons";
+import { ChevronDown, CreditCard01, Edit03, Lock01, LogOut01, Map01, Sun, Trash01, User01 } from "@untitledui/icons";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router";
 import { initialsOf } from "@/components/app/app-shell";
@@ -9,6 +9,7 @@ import { ConfirmationModal } from "@/components/app/confirmation-modal";
 import { FormAlert } from "@/components/app/form-alert";
 import { FieldSettingsCard } from "@/components/app/field-settings-card";
 import { GoogleButton } from "@/components/app/google-button";
+import { SubscriptionCard } from "@/components/app/subscription-card";
 import { notify } from "@/components/app/notifications";
 import { fieldProps } from "@/components/app/form-styles";
 import { Dialog, Modal, ModalOverlay } from "@/components/application/modals/modal";
@@ -86,8 +87,10 @@ export const SettingsPage = () => {
     const wide = useBreakpoint("lg");
     const location = useLocation();
     const navigate = useNavigate();
-    const [tab, setTab] = useState<"profile" | "properties" | "team" | "field" | "security" | "appearance">(() =>
-        new URLSearchParams(location.search).get("tab") === "team" ? "team" : "profile");
+    const [tab, setTab] = useState<"profile" | "plan" | "properties" | "team" | "field" | "security" | "appearance">(() => {
+        const requested = new URLSearchParams(location.search).get("tab");
+        return requested === "team" || requested === "plan" ? requested : "profile";
+    });
     const [teamReload, setTeamReload] = useState(0);
     const invitationStarted = useRef(false);
     const pageMounted = useRef(true);
@@ -127,6 +130,7 @@ export const SettingsPage = () => {
                     className="max-w-full overflow-x-auto lg:sticky lg:top-24 lg:w-52 lg:shrink-0 lg:overflow-visible"
                 >
                     <Tabs.Item id="profile" icon={User01} label={t("settings.tabs.profile")} />
+                    <Tabs.Item id="plan" icon={CreditCard01} label={t("settings.tabs.plan")} />
                     <Tabs.Item id="properties" icon={Map01} label={t("settings.tabs.properties")} />
                     <Tabs.Item id="team" icon={User01} label={t("settings.tabs.team")} />
                     <Tabs.Item id="field" icon={Map01} label={t("settings.tabs.field")} />
@@ -137,6 +141,9 @@ export const SettingsPage = () => {
                 <div className="w-full max-w-3xl min-w-0">
                     <Tabs.Panel id="profile" animation="fade" className="flex w-full min-w-0 flex-col gap-5">
                         <ProfileCard />
+                    </Tabs.Panel>
+                    <Tabs.Panel id="plan" animation="fade" className="flex w-full min-w-0 flex-col gap-5">
+                        <SubscriptionCard />
                     </Tabs.Panel>
                     <Tabs.Panel id="properties" animation="fade" className="flex w-full min-w-0 flex-col gap-5">
                         <PropertiesCard />

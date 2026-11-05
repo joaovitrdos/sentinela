@@ -1,5 +1,6 @@
 import { FormAlert } from "@/components/app/form-alert";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { WeatherCredit } from "@/components/app/weather-credit";
 import { Button } from "@/components/base/buttons/button";
 import { api } from "@/lib/api";
 import { createPropertyActivity, deletePropertyActivity, listPropertyActivities, propertyErrorMessage } from "@/lib/property-data";
@@ -206,6 +207,7 @@ export const PropertyFarmPanel = ({ property, inspectionSuggestion }: { property
                                 </table>
                             </div>}
                             <p className="mt-3 text-xs leading-5 text-tertiary">A chuva observada vem da estação ANA/SNIRH mais próxima, se estiver até 50 km. Ela pode não representar toda a propriedade. A previsão é fornecida pela WeatherAPI.</p>
+                            <WeatherCredit className="mt-2" />
                         </>
                     )}
             </section>

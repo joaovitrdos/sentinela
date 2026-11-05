@@ -90,6 +90,13 @@ export const AuthPage = () => {
                         <RegisterForm returnTo={state.from} />
                     </FormSlot>
                 </div>
+
+                <p className="text-center text-sm text-tertiary">
+                    {t("plans.authHint")}{" "}
+                    <Button color="link-color" size="sm" href="/plans">
+                        {t("plans.authLink")}
+                    </Button>
+                </p>
             </div>
         </AuthLayout>
     );

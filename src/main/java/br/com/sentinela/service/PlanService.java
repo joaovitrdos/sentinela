@@ -76,7 +76,8 @@ public class PlanService {
                 subscription.getPlan() == null ? null : subscription.getPlan().getCode(),
                 subscription.getPendingPlan() == null ? null : subscription.getPendingPlan().getCode(),
                 subscription.getCycle(), subscription.getTrialEndsAt(), subscription.getPaidUntil(),
-                effective == null ? null : effective.getMaxProperties(), effective == null ? Set.of() : effective.getFeatures());
+                effective == null ? null : effective.getMaxProperties(), effective == null ? Set.of() : effective.getFeatures(),
+                subscription.getAsaasCustomerId() != null);
     }
 
     private Plan effectivePlan(UUID userId) {

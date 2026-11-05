@@ -8,4 +8,4 @@ import java.util.Set;
 /** {@code effectivePlan} nulo indica acesso somente leitura aos dados já cadastrados. */
 public record BillingStatusResponseDto(String status, String effectivePlan, String contractedPlan, String pendingPlan,
                                        String cycle, LocalDateTime trialEndsAt, LocalDate paidUntil,
-                                       Integer maxProperties, Set<Feature> features) {}
+                                       Integer maxProperties, Set<Feature> features, boolean hasCustomer) {}

@@ -130,7 +130,12 @@
         "userNotFound": "Usuario no encontrado.",
         "emailSend": "No pudimos enviar el correo ahora. Inténtalo de nuevo.",
         "saveFailed": "No fue posible guardar. Inténtalo de nuevo.",
-        "deleteFailed": "No fue posible eliminar la cuenta. Inténtalo de nuevo."
+        "deleteFailed": "No fue posible eliminar la cuenta. Inténtalo de nuevo.",
+        "planRequired": "Tu plan no incluye este recurso.",
+        "planPropertyLimit": "Alcanzaste el límite de propiedades de tu plan.",
+        "invalidDocument": "Informa un CPF o CNPJ válido.",
+        "paymentsUnavailable": "Pagos no disponibles en este momento. Inténtalo de nuevo en breve.",
+        "noSubscription": "No tienes una suscripción activa para cancelar."
     },
     "nav": {
         "home": "Inicio",
@@ -139,7 +144,8 @@
         "reports": "Informes",
         "settings": "Configuración",
         "logout": "Cerrar sesión",
-        "account": "Cuenta"
+        "account": "Cuenta",
+        "plans": "Planes"
     },
     "reports": {
         "title": "Informes",
@@ -355,7 +361,8 @@
             "team": "Equipo",
             "field": "Campo",
             "security": "Seguridad",
-            "appearance": "Apariencia"
+            "appearance": "Apariencia",
+            "plan": "Plan"
         },
         "field": {
             "title": "Trabajo de campo",
@@ -405,19 +412,37 @@
             "leave": "Salir del equipo",
             "confirmLeave": "¿Salir del equipo {{title}}? Perderás el acceso a esta propiedad.",
             "left": "Has salido del equipo.",
-            "property": "Propiedad", "empty": "Registra una propiedad para configurar su equipo.", "loading": "Cargando equipo…",
-            "mode": "Modo de esta propiedad", "active": "Equipo activo", "solo": "Uso individual", "access": "Tu acceso: {{role}}",
-            "useSolo": "Trabajar solo", "activate": "Activar equipo",
+            "property": "Propiedad",
+            "empty": "Registra una propiedad para configurar su equipo.",
+            "loading": "Cargando equipo…",
+            "mode": "Modo de esta propiedad",
+            "active": "Equipo activo",
+            "solo": "Uso individual",
+            "access": "Tu acceso: {{role}}",
+            "useSolo": "Trabajar solo",
+            "activate": "Activar equipo",
             "confirmSolo": "Volver al uso individual eliminará a todos los miembros e invitaciones de esta propiedad. ¿Continuar?",
-            "inviteEmail": "Invitar por correo", "role": "Función", "sendInvite": "Enviar invitación",
+            "inviteEmail": "Invitar por correo",
+            "role": "Función",
+            "sendInvite": "Enviar invitación",
             "permissions": "El visualizador consulta; el editor crea y modifica sin eliminar; el administrador también puede eliminar y gestionar el equipo.",
-            "members": "Miembros", "owner": "Propietario", "remove": "Eliminar", "confirmRemove": "¿Eliminar a {{name}} de la propiedad?",
-            "pending": "Invitaciones pendientes", "noPending": "No hay invitaciones pendientes.", "expires": "vence el {{date}}", "cancel": "Cancelar",
+            "members": "Miembros",
+            "owner": "Propietario",
+            "remove": "Eliminar",
+            "confirmRemove": "¿Eliminar a {{name}} de la propiedad?",
+            "pending": "Invitaciones pendientes",
+            "noPending": "No hay invitaciones pendientes.",
+            "expires": "vence el {{date}}",
+            "cancel": "Cancelar",
             "adminOnly": "Solo los administradores pueden gestionar invitaciones y funciones.",
-            "viewer": "Visualizador", "editor": "Editor", "admin": "Administrador",
+            "viewer": "Visualizador",
+            "editor": "Editor",
+            "admin": "Administrador",
             "invited": "Invitación creada. Se procesará el envío del correo.",
             "accepted": "Invitación aceptada. La propiedad ya está disponible en tu cuenta.",
-            "acceptError": "No se pudo aceptar la invitación.", "loadError": "No se pudo cargar el equipo.", "saveError": "No se pudo guardar el equipo."
+            "acceptError": "No se pudo aceptar la invitación.",
+            "loadError": "No se pudo cargar el equipo.",
+            "saveError": "No se pudo guardar el equipo."
         },
         "properties": {
             "title": "Mis propiedades",
@@ -642,6 +667,159 @@
             "source": "Fuente: ANA/SNIRH",
             "altitude": "Altitud",
             "drainage": "Área de drenaje"
+        }
+    },
+    "plans": {
+        "title": "Elige tu plan",
+        "subtitle": "Empieza con 7 días gratis, con todo incluido. Cancela cuando quieras.",
+        "perMonth": "/mes",
+        "perYear": "/año",
+        "yearlyEquivalent": "Equivale a {{value}} por mes",
+        "complete": "Completo",
+        "startTrial": "Empezar 7 días gratis",
+        "subscribe": "Suscribirse",
+        "change": "Cambiar a este plan",
+        "currentPlan": "Plan actual",
+        "pendingPlan": "Empieza en el próximo pago",
+        "hasAccount": "¿Ya tienes cuenta?",
+        "login": "Entrar",
+        "authHint": "7 días gratis con todo incluido.",
+        "authLink": "Ver planes y precios",
+        "properties_one": "Hasta {{count}} propiedad",
+        "properties_other": "Hasta {{count}} propiedades",
+        "unlimitedProperties": "Propiedades sin límite",
+        "cycle": {
+            "label": "Periodicidad",
+            "monthly": "Mensual",
+            "yearly": "Anual"
+        },
+        "features": {
+            "BASE": "Clima, lluvia, ríos, cuaderno de campo e importación por CAR",
+            "REPORTS": "Informes en PDF",
+            "SPRAY_WINDOW": "Ventana de pulverización",
+            "NDVI": "NDVI por satélite",
+            "ALERTS": "Alertas automáticas",
+            "TEAM": "Equipo",
+            "IRRIGATION": "Recomendación de riego",
+            "EARLY_ACCESS": "Novedades en primicia"
+        },
+        "status": {
+            "TRIAL": "Prueba gratis",
+            "PENDING": "Esperando pago",
+            "ACTIVE": "Activo",
+            "OVERDUE": "Atrasado",
+            "CANCELED": "Cancelado"
+        },
+        "gate": {
+            "title": "Recurso de otro plan",
+            "description": "{{feature}} no está incluido en tu plan actual.",
+            "action": "Ver planes"
+        },
+        "banner": {
+            "trial_one": "Prueba gratis: falta {{count}} día.",
+            "trial_other": "Prueba gratis: faltan {{count}} días.",
+            "readOnly": "Tu acceso es de solo lectura. Suscríbete a un plan para volver a usar todo. Tus datos siguen guardados.",
+            "overdue": "Tu pago está atrasado. Regularízalo para no perder el acceso.",
+            "action": "Ver planes",
+            "ending": "Tu suscripción fue cancelada. El plan sigue activo hasta {{date}}."
+        },
+        "modal": {
+            "title": "Suscribirse",
+            "document": "CPF o CNPJ",
+            "documentHint": "Se usa solo para emitir el cobro.",
+            "paymentNote": "Irás a la factura de Asaas para elegir tarjeta, Pix o boleto.",
+            "changeNote": "El nuevo plan empieza en el próximo pago, al terminar el período ya pagado.",
+            "confirm": "Continuar",
+            "noInvoice": "Suscripción registrada. La factura estará disponible cerca del vencimiento, {{date}}.",
+            "downgradeNote": "Con este plan dejas de tener: {{features}}. Tus datos siguen guardados."
+        },
+        "settings": {
+            "title": "Plan actual",
+            "noPlan": "Sin plan",
+            "trial_one": "Prueba gratis: falta {{count}} día (hasta {{date}}).",
+            "trial_other": "Prueba gratis: faltan {{count}} días (hasta {{date}}).",
+            "contracted": "Contratado: {{plan}}, {{cycle}}.",
+            "paidUntil": "Pagado hasta {{date}}.",
+            "endsAt": "Acceso hasta {{date}}.",
+            "pending": "Cambia a {{plan}} en el próximo pago.",
+            "change": "Mejorar o cambiar plan",
+            "choose": "Elegir plan",
+            "cancel": "Cancelar suscripción",
+            "canceled": "Suscripción cancelada.",
+            "cancelTitle": "¿Cancelar suscripción?",
+            "cancelDescription": "No se te cobrará de nuevo. El acceso será de solo lectura y tus datos siguen guardados. Puedes reactivar cuando quieras.",
+            "cancelConfirm": "Cancelar suscripción",
+            "canceledUntil": "Suscripción cancelada. Tu plan sigue activo hasta {{date}}.",
+            "reactivate": "Reactivar suscripción",
+            "cancelDescriptionUntil": "No se te cobrará de nuevo y tu plan sigue activo hasta {{date}}. Después, el acceso será de solo lectura y tus datos siguen guardados. Puedes reactivar cuando quieras.",
+            "keep": "Mantener suscripción"
+        },
+        "upgrade": "Mejorar plan",
+        "downgrade": "Bajar de plan",
+        "reactivate": "Reactivar con este plan"
+    },
+    "advisor": {
+        "weatherSource": "Datos del clima: WeatherAPI.com.",
+        "weatherDisclaimer": "Información solo para fines informativos generales. Los pronósticos y condiciones son probabilísticos y pueden no ser precisos para tu ubicación u horario. No uses estos datos como única base para decisiones que involucren seguridad personal, aviación, navegación marítima, planificación de emergencias u otras actividades críticas. Cuando la precisión sea esencial, consulta siempre los servicios meteorológicos oficiales y las autoridades competentes.",
+        "source": "Fuente: {{source}}.",
+        "alerts": {
+            "title": "Alertas de la propiedad",
+            "subtitle": "Avisos por correo sobre heladas, lluvia fuerte, INMET, nivel de río y caída de NDVI.",
+            "enabled": "Activar alertas",
+            "enabledHint": "El dueño y el equipo los reciben por correo.",
+            "frostTemperatureC": "Helada: temperatura mínima (°C)",
+            "heavyRainMm": "Lluvia fuerte: mm por día",
+            "ndviDrop": "Caída de NDVI",
+            "riverRadiusKm": "Radio de ríos (km)",
+            "save": "Guardar alertas",
+            "saved": "Alertas guardadas.",
+            "saveError": "No se pudieron guardar las alertas.",
+            "loadError": "No se pudieron cargar las alertas.",
+            "adminOnly": "Solo los administradores cambian estas opciones.",
+            "history": "Últimas alertas",
+            "empty": "Ninguna alerta hasta ahora.",
+            "emptyDisabled": "Activa las alertas para seguir esta propiedad.",
+            "severity": {
+                "ATENCAO": "Atención",
+                "PERIGO": "Peligro"
+            }
+        },
+        "spray": {
+            "title": "Ventana de pulverización",
+            "subtitle": "Horarios favorables en los próximos 3 días, según viento, temperatura, humedad y lluvia.",
+            "best": "Mejores horarios",
+            "none": "Ningún horario favorable en los próximos días.",
+            "hours_one": "({{count}} hora)",
+            "hours_other": "({{count}} horas)",
+            "legend": "Verde: horario favorable. Pasa el ratón para ver detalles.",
+            "loadError": "No se pudo consultar la ventana de pulverización."
+        },
+        "irrigation": {
+            "title": "Recomendación de riego",
+            "subtitle": "Balance hídrico de la parcela, considerando lluvia y riegos registrados.",
+            "plot": "Parcela",
+            "noPlots": "Registra una parcela para ver la recomendación.",
+            "recommended": "Lámina sugerida",
+            "recommendedHint": "Déficit estimado al final del pronóstico.",
+            "crop": "Cultivo",
+            "noCrop": "No informado",
+            "day": "Día",
+            "demand": "Demanda",
+            "rain": "Lluvia",
+            "applied": "Regado",
+            "deficit": "Déficit",
+            "forecast": "pronóstico",
+            "loadError": "No se pudo calcular la recomendación."
+        },
+        "car": {
+            "label": "Importar por CAR (opcional)",
+            "search": "Buscar",
+            "hint": "Informa el código CAR para completar el contorno y la ciudad.",
+            "found": "Inmueble encontrado en {{city}}/{{state}}. Revisa el contorno en el mapa.",
+            "simplified": "El contorno se simplificó para respetar el límite de puntos.",
+            "parts_one": "{{count}} parte menor del inmueble quedó fuera.",
+            "parts_other": "{{count}} partes menores del inmueble quedaron fuera.",
+            "error": "No se pudo consultar el CAR."
         }
     }
 }

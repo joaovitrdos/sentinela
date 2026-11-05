@@ -25,6 +25,11 @@ const SERVER_MESSAGES: Record<string, string> = {
     "Não foi possível gerar o código de verificação. Tente novamente": "errors.saveFailed",
     "Autenticação necessária para acessar este recurso": "errors.sessionExpired",
     "Serviço de clima indisponível. Tente novamente em instantes": "weather.loadError",
+    "Seu plano não inclui este recurso": "errors.planRequired",
+    "Informe um CPF ou CNPJ válido": "errors.invalidDocument",
+    "Pagamentos ainda não configurados": "errors.paymentsUnavailable",
+    "Pagamentos indisponíveis. Tente novamente em instantes": "errors.paymentsUnavailable",
+    "Nenhuma assinatura ativa para cancelar": "errors.noSubscription",
 };
 
 const BY_STATUS: Record<number, string> = {
@@ -46,7 +51,9 @@ const BY_STATUS: Record<number, string> = {
 /** Chave i18n da mensagem de erro para mostrar ao usuario. */
 export const errorKey = (error: unknown): string => {
     if (!(error instanceof ApiError)) return "errors.generic";
-    return SERVER_MESSAGES[error.serverMessage.trim()] ?? BY_STATUS[error.status] ?? "errors.generic";
+    const message = error.serverMessage.trim();
+    if (message.startsWith("Seu plano permite até")) return "errors.planPropertyLimit";
+    return SERVER_MESSAGES[message] ?? BY_STATUS[error.status] ?? "errors.generic";
 };
 
 export const isEmailNotVerified = (error: unknown) => error instanceof ApiError && error.status === 403;

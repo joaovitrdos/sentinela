@@ -130,7 +130,12 @@
         "userNotFound": "User not found.",
         "emailSend": "We could not send the email right now. Try again.",
         "saveFailed": "Could not save. Please try again.",
-        "deleteFailed": "Could not delete the account. Please try again."
+        "deleteFailed": "Could not delete the account. Please try again.",
+        "planRequired": "Your plan does not include this feature.",
+        "planPropertyLimit": "You have reached your plan property limit.",
+        "invalidDocument": "Enter a valid CPF or CNPJ.",
+        "paymentsUnavailable": "Payments are unavailable right now. Try again shortly.",
+        "noSubscription": "You have no active subscription to cancel."
     },
     "nav": {
         "home": "Home",
@@ -139,7 +144,8 @@
         "reports": "Reports",
         "settings": "Settings",
         "logout": "Sign out",
-        "account": "Account"
+        "account": "Account",
+        "plans": "Plans"
     },
     "reports": {
         "title": "Reports",
@@ -355,7 +361,8 @@
             "team": "Team",
             "field": "Field",
             "security": "Security",
-            "appearance": "Appearance"
+            "appearance": "Appearance",
+            "plan": "Plan"
         },
         "field": {
             "title": "Field operations",
@@ -405,19 +412,37 @@
             "leave": "Leave team",
             "confirmLeave": "Leave {{title}}? You will lose access to this property.",
             "left": "You left the team.",
-            "property": "Property", "empty": "Add a property to configure its team.", "loading": "Loading team…",
-            "mode": "Property mode", "active": "Team enabled", "solo": "Individual use", "access": "Your access: {{role}}",
-            "useSolo": "Work alone", "activate": "Enable team",
+            "property": "Property",
+            "empty": "Add a property to configure its team.",
+            "loading": "Loading team…",
+            "mode": "Property mode",
+            "active": "Team enabled",
+            "solo": "Individual use",
+            "access": "Your access: {{role}}",
+            "useSolo": "Work alone",
+            "activate": "Enable team",
             "confirmSolo": "Switching to individual use will remove every member and invitation from this property. Continue?",
-            "inviteEmail": "Invite by email", "role": "Role", "sendInvite": "Send invitation",
+            "inviteEmail": "Invite by email",
+            "role": "Role",
+            "sendInvite": "Send invitation",
             "permissions": "Viewers can read; editors can create and update but cannot delete; administrators can also delete and manage the team.",
-            "members": "Members", "owner": "Owner", "remove": "Remove", "confirmRemove": "Remove {{name}} from this property?",
-            "pending": "Pending invitations", "noPending": "No pending invitations.", "expires": "expires on {{date}}", "cancel": "Cancel",
+            "members": "Members",
+            "owner": "Owner",
+            "remove": "Remove",
+            "confirmRemove": "Remove {{name}} from this property?",
+            "pending": "Pending invitations",
+            "noPending": "No pending invitations.",
+            "expires": "expires on {{date}}",
+            "cancel": "Cancel",
             "adminOnly": "Only administrators can manage invitations and roles.",
-            "viewer": "Viewer", "editor": "Editor", "admin": "Administrator",
+            "viewer": "Viewer",
+            "editor": "Editor",
+            "admin": "Administrator",
             "invited": "Invitation created. The email will be processed.",
             "accepted": "Invitation accepted. The property is now available to your account.",
-            "acceptError": "The invitation could not be accepted.", "loadError": "The team could not be loaded.", "saveError": "The team could not be saved."
+            "acceptError": "The invitation could not be accepted.",
+            "loadError": "The team could not be loaded.",
+            "saveError": "The team could not be saved."
         },
         "properties": {
             "title": "My properties",
@@ -644,6 +669,159 @@
             "source": "Source: ANA/SNIRH",
             "altitude": "Elevation",
             "drainage": "Drainage area"
+        }
+    },
+    "plans": {
+        "title": "Choose your plan",
+        "subtitle": "Start with 7 free days, everything included. Cancel anytime.",
+        "perMonth": "/month",
+        "perYear": "/year",
+        "yearlyEquivalent": "Equals {{value}} per month",
+        "complete": "Complete",
+        "startTrial": "Start 7 free days",
+        "subscribe": "Subscribe",
+        "change": "Switch to this plan",
+        "currentPlan": "Current plan",
+        "pendingPlan": "Starts on next payment",
+        "hasAccount": "Already have an account?",
+        "login": "Sign in",
+        "authHint": "7 free days, everything included.",
+        "authLink": "See plans and pricing",
+        "properties_one": "Up to {{count}} property",
+        "properties_other": "Up to {{count}} properties",
+        "unlimitedProperties": "Unlimited properties",
+        "cycle": {
+            "label": "Billing cycle",
+            "monthly": "Monthly",
+            "yearly": "Yearly"
+        },
+        "features": {
+            "BASE": "Weather, rain, rivers, field notebook and CAR import",
+            "REPORTS": "PDF reports",
+            "SPRAY_WINDOW": "Spray window",
+            "NDVI": "Satellite NDVI",
+            "ALERTS": "Automatic alerts",
+            "TEAM": "Team",
+            "IRRIGATION": "Irrigation recommendation",
+            "EARLY_ACCESS": "Early access to new features"
+        },
+        "status": {
+            "TRIAL": "Free trial",
+            "PENDING": "Awaiting payment",
+            "ACTIVE": "Active",
+            "OVERDUE": "Overdue",
+            "CANCELED": "Canceled"
+        },
+        "gate": {
+            "title": "Feature from another plan",
+            "description": "{{feature}} is not included in your current plan.",
+            "action": "See plans"
+        },
+        "banner": {
+            "trial_one": "Free trial: {{count}} day left.",
+            "trial_other": "Free trial: {{count}} days left.",
+            "readOnly": "Your access is read-only. Subscribe to a plan to use everything again. Your data stays saved.",
+            "overdue": "Your payment is overdue. Settle it to keep your access.",
+            "action": "See plans",
+            "ending": "Your subscription was canceled. Your plan stays active until {{date}}."
+        },
+        "modal": {
+            "title": "Subscribe",
+            "document": "CPF or CNPJ",
+            "documentHint": "Used only to issue the charge.",
+            "paymentNote": "You will be taken to the Asaas invoice to choose card, Pix or boleto.",
+            "changeNote": "The new plan starts on the next payment, when the paid period ends.",
+            "confirm": "Continue",
+            "noInvoice": "Subscription registered. The invoice becomes available near the due date, {{date}}.",
+            "downgradeNote": "With this plan you lose: {{features}}. Your data stays saved."
+        },
+        "settings": {
+            "title": "Current plan",
+            "noPlan": "No plan",
+            "trial_one": "Free trial: {{count}} day left (until {{date}}).",
+            "trial_other": "Free trial: {{count}} days left (until {{date}}).",
+            "contracted": "Subscribed: {{plan}}, {{cycle}}.",
+            "paidUntil": "Paid until {{date}}.",
+            "endsAt": "Access until {{date}}.",
+            "pending": "Changes to {{plan}} on next payment.",
+            "change": "Upgrade or change plan",
+            "choose": "Choose plan",
+            "cancel": "Cancel subscription",
+            "canceled": "Subscription canceled.",
+            "cancelTitle": "Cancel subscription?",
+            "cancelDescription": "You will not be charged again. Access becomes read-only and your data stays saved. You can reactivate anytime.",
+            "cancelConfirm": "Cancel subscription",
+            "canceledUntil": "Subscription canceled. Your plan stays active until {{date}}.",
+            "reactivate": "Reactivate subscription",
+            "cancelDescriptionUntil": "You will not be charged again and your plan stays active until {{date}}. After that, access becomes read-only and your data stays saved. You can reactivate anytime.",
+            "keep": "Keep subscription"
+        },
+        "upgrade": "Upgrade",
+        "downgrade": "Downgrade",
+        "reactivate": "Reactivate with this plan"
+    },
+    "advisor": {
+        "weatherSource": "Weather data: WeatherAPI.com.",
+        "weatherDisclaimer": "Information for general informational purposes only. Forecasts and conditions are probabilistic and may not be accurate for your specific location or time. Do not use this data as the sole basis for decisions involving personal safety, aviation, marine navigation, emergency planning or other safety-critical activities. Always consult official meteorological services and relevant authorities when accuracy is critical.",
+        "source": "Source: {{source}}.",
+        "alerts": {
+            "title": "Property alerts",
+            "subtitle": "Email warnings for frost, heavy rain, INMET, river level and NDVI drops.",
+            "enabled": "Enable alerts",
+            "enabledHint": "Owner and team receive them by email.",
+            "frostTemperatureC": "Frost: minimum temperature (°C)",
+            "heavyRainMm": "Heavy rain: mm per day",
+            "ndviDrop": "NDVI drop",
+            "riverRadiusKm": "River radius (km)",
+            "save": "Save alerts",
+            "saved": "Alerts saved.",
+            "saveError": "Could not save the alerts.",
+            "loadError": "Could not load the alerts.",
+            "adminOnly": "Only administrators can change these options.",
+            "history": "Latest alerts",
+            "empty": "No alerts so far.",
+            "emptyDisabled": "Enable alerts to follow this property.",
+            "severity": {
+                "ATENCAO": "Attention",
+                "PERIGO": "Danger"
+            }
+        },
+        "spray": {
+            "title": "Spray window",
+            "subtitle": "Favorable hours for the next 3 days, based on wind, temperature, humidity and rain.",
+            "best": "Best hours",
+            "none": "No favorable hours in the coming days.",
+            "hours_one": "({{count}} hour)",
+            "hours_other": "({{count}} hours)",
+            "legend": "Green: favorable hour. Hover to see details.",
+            "loadError": "Could not load the spray window."
+        },
+        "irrigation": {
+            "title": "Irrigation recommendation",
+            "subtitle": "Plot water balance, considering recorded rain and irrigation.",
+            "plot": "Plot",
+            "noPlots": "Add a plot to see the recommendation.",
+            "recommended": "Suggested depth",
+            "recommendedHint": "Estimated deficit at the end of the forecast.",
+            "crop": "Crop",
+            "noCrop": "Not informed",
+            "day": "Day",
+            "demand": "Demand",
+            "rain": "Rain",
+            "applied": "Irrigated",
+            "deficit": "Deficit",
+            "forecast": "forecast",
+            "loadError": "Could not calculate the recommendation."
+        },
+        "car": {
+            "label": "Import from CAR (optional)",
+            "search": "Search",
+            "hint": "Enter the CAR code to fill in the boundary and city.",
+            "found": "Property found in {{city}}/{{state}}. Check the boundary on the map.",
+            "simplified": "The boundary was simplified to fit the point limit.",
+            "parts_one": "{{count}} smaller part of the property was left out.",
+            "parts_other": "{{count}} smaller parts of the property were left out.",
+            "error": "Could not query the CAR."
         }
     }
 }

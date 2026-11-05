@@ -7,9 +7,14 @@ import { ApiFilterMenu } from "@/components/app/hydro/api-filter-menu";
 import { Legend } from "@/components/app/hydro/map-controls";
 import { PropertyMap } from "@/components/app/properties/property-map";
 import { PropertyMonitoring } from "@/components/app/properties/property-monitoring";
+import { PropertyAlerts } from "@/components/app/properties/property-alerts";
+import { PropertyCarImport } from "@/components/app/properties/property-car-import";
 import { PropertyFarmPanel } from "@/components/app/properties/property-farm-panel";
+import { PropertyIrrigation } from "@/components/app/properties/property-irrigation";
+import { PropertySprayWindows } from "@/components/app/properties/property-spray-windows";
 import { Button } from "@/components/base/buttons/button";
 import { approximateHectares, closedPropertyGeometry, listProperties, openPropertyRing, propertyErrorMessage, saveProperty } from "@/lib/property-data";
+import type { CarProperty } from "@/lib/advisory";
 import type { PropertyCoordinate, PropertyImageOverlay, SavedProperty } from "@/lib/property-data";
 
 const fieldClass =
@@ -45,6 +50,7 @@ export const PropertiesPage = () => {
     const [overlay, setOverlay] = useState<PropertyImageOverlay | null>(null);
     const [inspectionSuggestion, setInspectionSuggestion] = useState<{ propertyId: string; note: string; key: number } | null>(null);
     const [reload, setReload] = useState(0);
+    const [carImports, setCarImports] = useState(0);
     const returnId = useRef<string | null>(null);
     const selected = useMemo(() => properties.find((property) => property.propertyId === selectedId) ?? null, [properties, selectedId]);
     const visibleProperties = useMemo(() => properties.filter((property) => visibleIds.includes(property.propertyId)), [properties, visibleIds]);
@@ -200,6 +206,14 @@ export const PropertiesPage = () => {
         [editing],
     );
 
+    const importCar = (car: CarProperty) => {
+        setCarImports((count) => count + 1);
+        setVertices(openPropertyRing(car.geometry));
+        setClosed(true);
+        setDrawing(false);
+        setForm((current) => ({ ...current, city: car.city, state: car.state }));
+    };
+
     const save = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setFormError(null);
@@ -245,7 +259,7 @@ export const PropertiesPage = () => {
                     closed={closed}
                     editable={editing && !busy}
                     drawing={drawing}
-                    fitKey={`${visibleIds.join(",")}:${selectedId ?? "all"}:${editing ? "editing" : "view"}`}
+                    fitKey={`${carImports}:${visibleIds.join(",")}:${selectedId ?? "all"}:${editing ? "editing" : "view"}`}
                     overlay={editing ? null : overlay}
                     visibleProperties={visibleProperties}
                     onVerticesChange={setVertices}
@@ -354,6 +368,7 @@ export const PropertiesPage = () => {
                                         </div>
                                         {editing ? (
                                             <form className="mt-4 space-y-3.5" onSubmit={(event) => void save(event)}>
+                                                <PropertyCarImport onImport={importCar} disabled={busy} />
                                                 <label className="flex flex-col gap-1.5 text-xs font-medium text-secondary">
                                                     Nome da propriedade
                                                     <input
@@ -527,6 +542,13 @@ export const PropertiesPage = () => {
                 />
             </section>
             <PropertyMonitoring property={editing ? null : selected} onOverlay={setOverlay} onPlanInspection={(note) => { if (selected) setInspectionSuggestion({ propertyId: selected.propertyId, note, key: Date.now() }); }} />
+            {selected && !editing ? <PropertyAlerts property={selected} /> : null}
+            {selected && !editing ? (
+                <div className="grid min-w-0 gap-3 xl:grid-cols-2">
+                    <PropertySprayWindows property={selected} />
+                    <PropertyIrrigation property={selected} />
+                </div>
+            ) : null}
             <PropertyFarmPanel property={editing ? null : selected} inspectionSuggestion={inspectionSuggestion} />
             <ConfirmationModal open={pendingDiscard !== null} title="Descartar alterações?"
                 description={pendingDiscard?.description ?? ""} confirmLabel="Descartar" cancelLabel="Continuar editando"

@@ -130,7 +130,12 @@
         "userNotFound": "Usuário não encontrado.",
         "emailSend": "Não conseguimos enviar o e-mail agora. Tente novamente.",
         "saveFailed": "Não foi possível salvar. Tente novamente.",
-        "deleteFailed": "Não foi possível excluir a conta. Tente novamente."
+        "deleteFailed": "Não foi possível excluir a conta. Tente novamente.",
+        "planRequired": "Seu plano não inclui este recurso.",
+        "planPropertyLimit": "Você atingiu o limite de propriedades do seu plano.",
+        "invalidDocument": "Informe um CPF ou CNPJ válido.",
+        "paymentsUnavailable": "Pagamentos indisponíveis no momento. Tente novamente em instantes.",
+        "noSubscription": "Você não tem assinatura ativa para cancelar."
     },
     "nav": {
         "home": "Início",
@@ -139,7 +144,8 @@
         "reports": "Relatórios",
         "settings": "Configurações",
         "logout": "Sair",
-        "account": "Conta"
+        "account": "Conta",
+        "plans": "Planos"
     },
     "reports": {
         "title": "Relatórios",
@@ -355,7 +361,8 @@
             "team": "Equipe",
             "field": "Campo",
             "security": "Segurança",
-            "appearance": "Aparência"
+            "appearance": "Aparência",
+            "plan": "Plano"
         },
         "field": {
             "title": "Rotina de campo",
@@ -662,6 +669,159 @@
             "source": "Fonte: ANA/SNIRH",
             "altitude": "Altitude",
             "drainage": "Área de drenagem"
+        }
+    },
+    "plans": {
+        "title": "Escolha seu plano",
+        "subtitle": "Comece com 7 dias grátis, com tudo liberado. Cancele quando quiser.",
+        "perMonth": "/mês",
+        "perYear": "/ano",
+        "yearlyEquivalent": "Equivale a {{value}} por mês",
+        "complete": "Completo",
+        "startTrial": "Começar 7 dias grátis",
+        "subscribe": "Assinar",
+        "change": "Mudar para este plano",
+        "currentPlan": "Plano atual",
+        "pendingPlan": "Entra no próximo pagamento",
+        "hasAccount": "Já tem conta?",
+        "login": "Entrar",
+        "authHint": "7 dias grátis com tudo liberado.",
+        "authLink": "Ver planos e preços",
+        "properties_one": "Até {{count}} propriedade",
+        "properties_other": "Até {{count}} propriedades",
+        "unlimitedProperties": "Propriedades sem limite",
+        "cycle": {
+            "label": "Periodicidade",
+            "monthly": "Mensal",
+            "yearly": "Anual"
+        },
+        "features": {
+            "BASE": "Clima, chuva, rios, caderno de campo e importação pelo CAR",
+            "REPORTS": "Relatórios em PDF",
+            "SPRAY_WINDOW": "Janela de pulverização",
+            "NDVI": "NDVI por satélite",
+            "ALERTS": "Alertas automáticos",
+            "TEAM": "Equipe",
+            "IRRIGATION": "Recomendação de irrigação",
+            "EARLY_ACCESS": "Novidades em primeira mão"
+        },
+        "status": {
+            "TRIAL": "Teste grátis",
+            "PENDING": "Aguardando pagamento",
+            "ACTIVE": "Ativo",
+            "OVERDUE": "Em atraso",
+            "CANCELED": "Cancelado"
+        },
+        "gate": {
+            "title": "Recurso de outro plano",
+            "description": "{{feature}} não está incluído no seu plano atual.",
+            "action": "Ver planos"
+        },
+        "banner": {
+            "trial_one": "Teste grátis: falta {{count}} dia.",
+            "trial_other": "Teste grátis: faltam {{count}} dias.",
+            "readOnly": "Seu acesso está em modo somente leitura. Assine um plano para voltar a usar tudo. Seus dados continuam salvos.",
+            "overdue": "Seu pagamento está em atraso. Regularize para não perder o acesso.",
+            "action": "Ver planos",
+            "ending": "Sua assinatura foi cancelada. O plano continua ativo até {{date}}."
+        },
+        "modal": {
+            "title": "Assinar",
+            "document": "CPF ou CNPJ",
+            "documentHint": "Usado apenas para emitir a cobrança.",
+            "paymentNote": "Você será levado à fatura do Asaas para escolher cartão, Pix ou boleto.",
+            "changeNote": "O novo plano entra em vigor no próximo pagamento, ao fim do período já pago.",
+            "confirm": "Continuar",
+            "noInvoice": "Assinatura registrada. A fatura fica disponível perto do vencimento, em {{date}}.",
+            "downgradeNote": "Ao mudar para este plano, você deixa de ter: {{features}}. Seus dados continuam salvos."
+        },
+        "settings": {
+            "title": "Plano atual",
+            "noPlan": "Sem plano",
+            "trial_one": "Teste grátis: falta {{count}} dia (até {{date}}).",
+            "trial_other": "Teste grátis: faltam {{count}} dias (até {{date}}).",
+            "contracted": "Contratado: {{plan}}, {{cycle}}.",
+            "paidUntil": "Pago até {{date}}.",
+            "endsAt": "Acesso até {{date}}.",
+            "pending": "Muda para {{plan}} no próximo pagamento.",
+            "change": "Fazer upgrade ou mudar plano",
+            "choose": "Escolher plano",
+            "cancel": "Cancelar assinatura",
+            "canceled": "Assinatura cancelada.",
+            "cancelTitle": "Cancelar assinatura?",
+            "cancelDescription": "Você não será cobrado novamente. O acesso fica somente leitura e seus dados continuam salvos. Você pode reativar quando quiser.",
+            "cancelConfirm": "Cancelar assinatura",
+            "canceledUntil": "Assinatura cancelada. Seu plano continua ativo até {{date}}.",
+            "reactivate": "Reativar assinatura",
+            "cancelDescriptionUntil": "Você não será cobrado novamente e seu plano continua ativo até {{date}}. Depois disso, o acesso fica somente leitura e seus dados continuam salvos. Você pode reativar quando quiser.",
+            "keep": "Manter assinatura"
+        },
+        "upgrade": "Fazer upgrade",
+        "downgrade": "Fazer downgrade",
+        "reactivate": "Reativar com este plano"
+    },
+    "advisor": {
+        "weatherSource": "Dados de clima: WeatherAPI.com.",
+        "weatherDisclaimer": "Informações apenas para fins informativos gerais. Previsões e condições são probabilísticas e podem não ser precisas para o seu local ou horário. Não use estes dados como única base para decisões que envolvam segurança pessoal, aviação, navegação marítima, planejamento de emergências ou outras atividades críticas. Em decisões em que a precisão seja essencial, consulte sempre os serviços meteorológicos oficiais e as autoridades competentes.",
+        "source": "Fonte: {{source}}.",
+        "alerts": {
+            "title": "Alertas da propriedade",
+            "subtitle": "Avisos por e-mail sobre geada, chuva forte, INMET, nível de rio e queda de NDVI.",
+            "enabled": "Ativar alertas",
+            "enabledHint": "Dono e equipe recebem por e-mail.",
+            "frostTemperatureC": "Geada: temperatura mínima (°C)",
+            "heavyRainMm": "Chuva forte: mm por dia",
+            "ndviDrop": "Queda de NDVI",
+            "riverRadiusKm": "Raio dos rios (km)",
+            "save": "Salvar alertas",
+            "saved": "Alertas salvos.",
+            "saveError": "Não foi possível salvar os alertas.",
+            "loadError": "Não foi possível carregar os alertas.",
+            "adminOnly": "Só administradores alteram estas opções.",
+            "history": "Últimos alertas",
+            "empty": "Nenhum alerta até agora.",
+            "emptyDisabled": "Ative os alertas para acompanhar esta propriedade.",
+            "severity": {
+                "ATENCAO": "Atenção",
+                "PERIGO": "Perigo"
+            }
+        },
+        "spray": {
+            "title": "Janela de pulverização",
+            "subtitle": "Horários favoráveis nos próximos 3 dias, por vento, temperatura, umidade e chuva.",
+            "best": "Melhores horários",
+            "none": "Nenhum horário favorável nos próximos dias.",
+            "hours_one": "({{count}} hora)",
+            "hours_other": "({{count}} horas)",
+            "legend": "Verde: horário favorável. Passe o mouse para ver os detalhes.",
+            "loadError": "Não foi possível consultar a janela de pulverização."
+        },
+        "irrigation": {
+            "title": "Recomendação de irrigação",
+            "subtitle": "Balanço hídrico do talhão, considerando chuva e irrigações registradas.",
+            "plot": "Talhão",
+            "noPlots": "Cadastre um talhão para ver a recomendação.",
+            "recommended": "Lâmina sugerida",
+            "recommendedHint": "Déficit estimado ao fim da previsão.",
+            "crop": "Cultura",
+            "noCrop": "Não informada",
+            "day": "Dia",
+            "demand": "Demanda",
+            "rain": "Chuva",
+            "applied": "Irrigado",
+            "deficit": "Déficit",
+            "forecast": "previsão",
+            "loadError": "Não foi possível calcular a recomendação."
+        },
+        "car": {
+            "label": "Importar pelo CAR (opcional)",
+            "search": "Buscar",
+            "hint": "Informe o código do CAR para preencher o contorno e a cidade.",
+            "found": "Imóvel encontrado em {{city}}/{{state}}. Confira o contorno no mapa.",
+            "simplified": "O contorno foi simplificado para caber no limite de pontos.",
+            "parts_one": "{{count}} parte menor do imóvel ficou de fora.",
+            "parts_other": "{{count}} partes menores do imóvel ficaram de fora.",
+            "error": "Não foi possível consultar o CAR."
         }
     }
 }

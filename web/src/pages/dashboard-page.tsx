@@ -5,6 +5,7 @@ import { loadCountry, normalizeText } from "@/components/app/brazil-map/geo-data
 import type { StateFeature } from "@/components/app/brazil-map/geo-data";
 import { HourlyWeatherChart, RiverLevelChart } from "@/components/app/dashboard/dashboard-charts";
 import { FormAlert } from "@/components/app/form-alert";
+import { WeatherCredit } from "@/components/app/weather-credit";
 import type { LevelChartRow } from "@/components/app/dashboard/dashboard-charts";
 import { DashboardCityFilter } from "@/components/app/dashboard/dashboard-city-filter";
 import { THEME_CLASSES, loadTheme, titleCase } from "@/components/app/hydro/hydro-data";
@@ -616,6 +617,7 @@ export const DashboardPage = () => {
                 <span>{t("dashboard.sources")}</span>
                 {weather?.updatedAt && <span className="ml-auto">WeatherAPI: {weather.updatedAt}</span>}
             </p>
+            <WeatherCredit />
         </div>
     );
 };

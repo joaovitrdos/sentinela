@@ -7,6 +7,7 @@ import { ErrorBoundary } from "@/components/app/error-boundary";
 import { Notifications } from "@/components/app/notifications";
 import { ConnectionMonitor } from "@/components/app/connection-monitor";
 import { AnimatedOutlet, PageFade, routeGroup } from "@/components/app/page-transition";
+import { PlanGate } from "@/components/app/plan-gate";
 import { GuestOnly, PageLoader, Redirect, RequireAuth } from "@/components/app/route-guards";
 import "@/i18n";
 import { AuthPage } from "@/pages/auth/auth-page";
@@ -17,8 +18,10 @@ import { HomePage } from "@/pages/home-page";
 import { LegalPage } from "@/pages/legal-page";
 import { MaintenancePage } from "@/pages/maintenance-page";
 import { NotFound } from "@/pages/not-found";
+import { PlansPage } from "@/pages/plans-page";
 import { SettingsPage } from "@/pages/settings-page";
 import { AuthProvider } from "@/providers/auth-provider";
+import { BillingProvider } from "@/providers/billing-provider";
 import { RouteProvider } from "@/providers/router-provider";
 import { SystemProvider, useSystem } from "@/providers/system-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
@@ -126,7 +129,9 @@ const AppRoutes = () => {
                             element={
                                 <RequireAuth>
                                     <Suspense fallback={<PageLoader />}>
-                                        <ReportsPage />
+                                        <PlanGate feature="REPORTS">
+                                            <ReportsPage />
+                                        </PlanGate>
                                     </Suspense>
                                 </RequireAuth>
                             }
@@ -139,6 +144,7 @@ const AppRoutes = () => {
                                 </RequireAuth>
                             }
                         />
+                        <Route path="/plans" element={<PlansPage />} />
                         <Route path="/privacy" element={<LegalPage doc="privacy" />} />
                         <Route path="/terms" element={<LegalPage doc="terms" />} />
                     </Route>
@@ -160,11 +166,13 @@ createRoot(document.getElementById("root")!).render(
                     <ConnectionMonitor />
                     <SystemProvider>
                         <AuthProvider>
-                            <BrowserRouter>
-                                <RouteProvider>
-                                    <AppRoutes />
-                                </RouteProvider>
-                            </BrowserRouter>
+                            <BillingProvider>
+                                <BrowserRouter>
+                                    <RouteProvider>
+                                        <AppRoutes />
+                                    </RouteProvider>
+                                </BrowserRouter>
+                            </BillingProvider>
                         </AuthProvider>
                     </SystemProvider>
                 </ThemeProvider>

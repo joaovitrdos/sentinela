@@ -22,6 +22,7 @@ import type { HydroPoint, ThemeId } from "./hydro-data";
 import { THEME_CLASSES, loadRivers, loadTheme, titleCase } from "./hydro-data";
 import { HydroTable } from "./hydro-table";
 import { BasemapGallery, ControlButton, ControlGroup, ControlPanel, LayerToggle, Legend, LegendClasses, LegendTopic, useMapPanelWheel } from "./map-controls";
+import { WeatherCredit } from "@/components/app/weather-credit";
 import type { CurrentWeather, WeatherForecast, WeatherTimeZone } from "./weather-data";
 
 const THEME_ICONS = { rain: CloudRaining01, level: Droplets01, stations: Signal01 };
@@ -468,6 +469,7 @@ export const HydroExplorer = ({ className, mapClassName }: { className?: string;
                                             errors={weatherErrors}
                                             onRetry={() => setWeatherRefresh((version) => version + 1)}
                                         />
+                                        {selectedWeatherFilters.length > 0 ? <WeatherCredit className="mt-2" /> : null}
                                     </Legend>
                                 </div>
                             </div>

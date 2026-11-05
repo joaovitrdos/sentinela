@@ -115,7 +115,7 @@ snirh:
 
 asaas:
   base-url: ${ASAAS_BASE_URL:https://api-sandbox.asaas.com/v3}
-  api-key: ${ASAAS_API_KEY:}
+  api-key: ${ASAAS_API_KEY:${WALLET_API_KEY:}}
   webhook-token: ${ASAAS_WEBHOOK_TOKEN:}
 
 public-data:

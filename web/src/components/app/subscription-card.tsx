@@ -20,7 +20,7 @@ export const SubscriptionCard = () => {
 
     if (!status) return <p className="text-sm text-tertiary">{t("common.loading")}</p>;
 
-    const trial = isInTrial(status);
+    const trial = isInTrial(status) && status.contractedPlan === null;
     const canCancel = status.contractedPlan !== null && status.status !== "CANCELED";
     const canceled = status.status === "CANCELED";
     // O teste continua valendo depois de cancelar: o acesso termina na data mais distante.

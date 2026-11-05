@@ -26,7 +26,6 @@ public class TeamController {
         return teamService.overview(propertyId, user.getUserId());
     }
 
-    @RequiresFeature(Feature.TEAM)
     @PutMapping("/api/properties/{propertyId}/team/mode")
     public TeamOverviewDto mode(@AuthenticationPrincipal User user, @PathVariable UUID propertyId,
                                 @Valid @RequestBody TeamModeRequestDto request) {

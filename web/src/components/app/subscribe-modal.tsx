@@ -6,17 +6,20 @@ import { notify } from "@/components/app/notifications";
 import { Dialog, Modal, ModalOverlay } from "@/components/application/modals/modal";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
-import type { BillingCycle, Plan } from "@/lib/billing";
+import type { BillingCycle, PaymentMethod, Plan } from "@/lib/billing";
 import { billingApi, formatDate, formatMoney } from "@/lib/billing";
 import { errorKey } from "@/lib/errors";
 import { useBilling } from "@/providers/billing-provider";
+import { cx } from "@/utils/cx";
 
 const onlyDigits = (value: string) => value.replace(/\D/g, "");
+const METHODS: PaymentMethod[] = ["CARD", "PIX", "BOLETO"];
 
-/** O cartão é digitado na fatura do Asaas; aqui só vai o CPF ou CNPJ, exigido para cadastrar o cliente. */
+/** Os dados de pagamento ficam nas telas do Asaas; aqui só vai o CPF ou CNPJ de quem paga com Pix ou boleto. */
 export const SubscribeModal = ({ plan, plans, cycle, onClose }: { plan: Plan | null; plans: Plan[]; cycle: BillingCycle; onClose: () => void }) => {
     const { t, i18n } = useTranslation();
     const { status, refresh } = useBilling();
+    const [method, setMethod] = useState<PaymentMethod>("CARD");
     const [document, setDocument] = useState("");
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState<string>();
@@ -26,7 +29,7 @@ export const SubscribeModal = ({ plan, plans, cycle, onClose }: { plan: Plan | n
         setError(undefined);
     }, [plan]);
 
-    const needsDocument = !status?.hasCustomer;
+    const needsDocument = method !== "CARD" && !status?.hasCustomer;
     const digits = onlyDigits(document);
     const documentValid = !needsDocument || digits.length === 11 || digits.length === 14;
     const price = plan ? (cycle === "YEARLY" ? plan.yearlyPrice : plan.monthlyPrice) : 0;
@@ -39,7 +42,7 @@ export const SubscribeModal = ({ plan, plans, cycle, onClose }: { plan: Plan | n
         setBusy(true);
         setError(undefined);
         try {
-            const result = await billingApi.subscribe({ planCode: plan.code, cycle, cpfCnpj: needsDocument ? digits : undefined });
+            const result = await billingApi.subscribe({ planCode: plan.code, cycle, paymentMethod: method, cpfCnpj: needsDocument ? digits : undefined });
             await refresh();
             if (result.invoiceUrl) {
                 window.location.assign(result.invoiceUrl);
@@ -67,6 +70,24 @@ export const SubscribeModal = ({ plan, plans, cycle, onClose }: { plan: Plan | n
                                 {formatMoney(price, i18n.language)} {t(cycle === "YEARLY" ? "plans.perYear" : "plans.perMonth")}
                             </p>
                         </div>
+                        <div role="radiogroup" aria-label={t("plans.modal.method")} className="grid grid-cols-3 gap-2">
+                            {METHODS.map((item) => (
+                                <button
+                                    key={item}
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={method === item}
+                                    disabled={busy}
+                                    onClick={() => setMethod(item)}
+                                    className={cx(
+                                        "cursor-pointer rounded-lg px-3 py-2 text-sm font-medium ring-1 transition duration-100 ease-linear ring-inset disabled:cursor-not-allowed disabled:opacity-50",
+                                        method === item ? "bg-brand-secondary text-primary ring-brand" : "text-secondary ring-primary",
+                                    )}
+                                >
+                                    {t(`plans.modal.methods.${item}`)}
+                                </button>
+                            ))}
+                        </div>
                         {needsDocument ? (
                             <Input
                                 label={t("plans.modal.document")}
@@ -79,7 +100,7 @@ export const SubscribeModal = ({ plan, plans, cycle, onClose }: { plan: Plan | n
                             />
                         ) : null}
                         <p className="text-sm leading-6 text-tertiary">
-                            {t(changingPaidPlan ? "plans.modal.changeNote" : "plans.modal.paymentNote")}
+                            {t(`plans.modal.notes.${method}`)}{changingPaidPlan ? ` ${t("plans.modal.changeNote")}` : ""}
                         </p>
                         {lostFeatures.length > 0 ? (
                             <p className="text-sm leading-6 text-warning-primary">

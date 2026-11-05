@@ -57,7 +57,7 @@ class BillingTest {
         when(subscriptions.lockByAsaasSubscriptionId("sub_1")).thenReturn(Optional.of(subscription));
         when(subscriptions.registerEvent(anyString(), anyString(), any())).thenReturn(1);
         when(asaas.createCustomer(any(), any(), any(), any())).thenReturn("cus_1");
-        when(asaas.createSubscription(any(), any(), any(), any(), any(), any())).thenReturn("sub_2");
+        when(asaas.createSubscription(any(), any(), any(), any(), any(), any(), any())).thenReturn("sub_2");
     }
 
     @Test
@@ -67,6 +67,14 @@ class BillingTest {
 
         trial.setTrialEndsAt(NOW);
         assertThat(PlanService.resolve(trial, premium, NOW)).isNull();
+    }
+
+    @Test
+    void contractedPlanReplacesTheTrial() {
+        Subscription chosen = Subscription.builder().status("PENDING").plan(normal).trialEndsAt(NOW.plusDays(5))
+                .paidUntil(NOW.toLocalDate().plusDays(5)).build();
+
+        assertThat(PlanService.resolve(chosen, premium, NOW)).isSameAs(normal);
     }
 
     @Test
@@ -99,13 +107,13 @@ class BillingTest {
 
     @Test
     void valueComesFromTheDatabaseAndOldRecurrenceIsRemovedFirst() {
-        var response = service.subscribe(user, new SubscribeRequestDto("PREMIUM", "YEARLY", "123.456.789-09"));
+        var response = service.subscribe(user, new SubscribeRequestDto("PREMIUM", "YEARLY", "123.456.789-09", "PIX"));
 
         assertThat(response.value()).isEqualByComparingTo("1200.00");
         var order = inOrder(asaas);
         order.verify(asaas).createCustomer("Ana", "ana@example.com", "12345678909", user.getUserId().toString());
         order.verify(asaas).deleteActiveSubscriptions(user.getUserId().toString());
-        order.verify(asaas).createSubscription(eq("cus_1"), eq(new BigDecimal("1200.00")), eq("YEARLY"), any(), any(), any());
+        order.verify(asaas).createSubscription(eq("cus_1"), eq(new BigDecimal("1200.00")), eq("YEARLY"), any(), any(), any(), eq("PIX"));
         assertThat(subscription.getStatus()).isEqualTo("PENDING");
         assertThat(subscription.getAsaasSubscriptionId()).isEqualTo("sub_2");
     }
@@ -119,7 +127,7 @@ class BillingTest {
         subscription.setPaidUntil(paidUntil);
         subscription.setAsaasCustomerId("cus_1");
 
-        var response = service.subscribe(user, new SubscribeRequestDto("PREMIUM", "MONTHLY", null));
+        var response = service.subscribe(user, new SubscribeRequestDto("PREMIUM", "MONTHLY", null, "PIX"));
 
         assertThat(response.nextDueDate()).isEqualTo(paidUntil);
         assertThat(subscription.getPlan()).isSameAs(normal);
@@ -136,25 +144,90 @@ class BillingTest {
         subscription.setPaidUntil(paidUntil);
         subscription.setAsaasCustomerId("cus_1");
 
-        var response = service.subscribe(user, new SubscribeRequestDto("NORMAL", "MONTHLY", null));
+        var response = service.subscribe(user, new SubscribeRequestDto("NORMAL", "MONTHLY", null, "PIX"));
 
         assertThat(response.nextDueDate()).isEqualTo(paidUntil);
         assertThat(subscription.getStatus()).isEqualTo("ACTIVE");
     }
 
     @Test
+    void cardGoesToAsaasCheckoutWithoutDocumentAndKeepsCurrentRecurrence() {
+        subscription.setStatus("ACTIVE");
+        subscription.setPlan(normal);
+        subscription.setPaidUntil(LocalDate.now().plusDays(10));
+        when(asaas.createCheckout(any(), any(), any(), any(), any())).thenReturn(new AsaasClient.Checkout("chk_1", "https://checkout"));
+
+        var response = service.subscribe(user, new SubscribeRequestDto("PREMIUM", "MONTHLY", null, "CARD"));
+
+        assertThat(response.invoiceUrl()).isEqualTo("https://checkout");
+        assertThat(subscription.getCheckoutId()).isEqualTo("chk_1");
+        assertThat(subscription.getPlan()).isSameAs(normal);
+        assertThat(subscription.getPendingPlan()).isNull();
+        assertThat(subscription.getAsaasSubscriptionId()).isEqualTo("sub_1");
+        verify(asaas, never()).deleteActiveSubscriptions(any());
+        verify(asaas, never()).createCustomer(any(), any(), any(), any());
+    }
+
+    @Test
+    void checkoutConclusionLinksTheSubscriptionAndRemovesTheOldOne() {
+        subscription.setCheckoutId("chk_1");
+        subscription.setCheckoutPlan(premium);
+        subscription.setCheckoutCycle("YEARLY");
+        when(subscriptions.lockByCheckoutId("chk_1")).thenReturn(Optional.of(subscription));
+        JsonNode event = JsonMapper.builder().build().readTree("""
+                {"id":"evt_1","event":"SUBSCRIPTION_CREATED","subscription":{"id":"sub_2","customer":"cus_9",
+                 "nextDueDate":"2026-12-05T03:00:00Z","checkoutSession":"chk_1"}}""");
+
+        service.handleWebhook(TOKEN, event);
+
+        verify(asaas).deleteSubscription("sub_1");
+        assertThat(subscription.getAsaasSubscriptionId()).isEqualTo("sub_2");
+        assertThat(subscription.getAsaasCustomerId()).isEqualTo("cus_9");
+        assertThat(subscription.getPlan()).isSameAs(premium);
+        assertThat(subscription.getStatus()).isEqualTo("PENDING");
+        assertThat(subscription.getCheckoutId()).isNull();
+    }
+
+    @Test
+    void paymentBeforeSubscriptionCreatedStillLinksTheCheckout() {
+        subscription.setAsaasSubscriptionId(null);
+        subscription.setCheckoutId("chk_1");
+        subscription.setCheckoutPlan(premium);
+        subscription.setCheckoutCycle("MONTHLY");
+        when(subscriptions.lockByAsaasSubscriptionId("sub_2")).thenReturn(Optional.empty());
+        when(subscriptions.lockByCheckoutId("chk_1")).thenReturn(Optional.of(subscription));
+        JsonNode event = JsonMapper.builder().build().readTree("""
+                {"id":"evt_1","event":"PAYMENT_CONFIRMED","payment":{"subscription":"sub_2","customer":"cus_9",
+                 "checkoutSession":"chk_1","dueDate":"2026-11-05"}}""");
+
+        service.handleWebhook(TOKEN, event);
+
+        assertThat(subscription.getStatus()).isEqualTo("ACTIVE");
+        assertThat(subscription.getPlan()).isSameAs(premium);
+        assertThat(subscription.getPaidUntil()).isEqualTo(LocalDate.of(2026, 12, 5));
+    }
+
+    @Test
+    void subscriptionWithoutCheckoutIsIgnoredByTheLinkStep() {
+        service.handleWebhook(TOKEN, JsonMapper.builder().build().readTree(
+                "{\"id\":\"evt_1\",\"event\":\"SUBSCRIPTION_CREATED\",\"subscription\":{\"id\":\"sub_2\",\"checkoutSession\":null}}"));
+
+        verify(subscriptions, never()).lockByCheckoutId(any());
+    }
+
+    @Test
     void newCustomerNeedsAValidDocument() {
-        assertThatThrownBy(() -> service.subscribe(user, new SubscribeRequestDto("NORMAL", "MONTHLY", null)))
+        assertThatThrownBy(() -> service.subscribe(user, new SubscribeRequestDto("NORMAL", "MONTHLY", null, "PIX")))
                 .isInstanceOfSatisfying(ResponseStatusException.class,
                         exception -> assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST));
-        verify(asaas, never()).createSubscription(any(), any(), any(), any(), any(), any());
+        verify(asaas, never()).createSubscription(any(), any(), any(), any(), any(), any(), any());
     }
 
     @Test
     void inactivePlanCannotBeContracted() {
         normal.setActive(false);
 
-        assertThatThrownBy(() -> service.subscribe(user, new SubscribeRequestDto("NORMAL", "MONTHLY", "12345678909")))
+        assertThatThrownBy(() -> service.subscribe(user, new SubscribeRequestDto("NORMAL", "MONTHLY", "12345678909", "PIX")))
                 .isInstanceOf(ResponseStatusException.class);
     }
 

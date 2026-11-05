@@ -122,7 +122,7 @@ public class PropertyAlertService {
     private List<Property> monitored(Feature feature) {
         return properties.findAllWithAlertsEnabled().stream().filter(property -> {
             UUID owner = property.getUser().getUserId();
-            return plans.allows(owner, Feature.ALERTS) && plans.allows(owner, feature);
+            return plans.allows(owner, property.getPropertyId(), Feature.ALERTS) && plans.allows(owner, property.getPropertyId(), feature);
         }).toList();
     }
 

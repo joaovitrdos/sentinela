@@ -53,7 +53,7 @@ class PropertyAlertScanTest {
     void setUp() {
         ReflectionTestUtils.setField(service, "mailEnabled", true);
         when(usage.automationAllowed()).thenReturn(true);
-        when(plans.allows(any(UUID.class), any(br.com.sentinela.enums.Feature.class))).thenReturn(true);
+        when(plans.allows(any(UUID.class), any(UUID.class), any(br.com.sentinela.enums.Feature.class))).thenReturn(true);
         when(properties.findAllWithAlertsEnabled()).thenReturn(List.of(property));
         when(inmet.activeWarnings()).thenReturn(List.of());
         when(rivers.getRiverLevels()).thenReturn(List.of());
@@ -131,7 +131,7 @@ class PropertyAlertScanTest {
 
     @Test
     void ownerWithoutAlertsInThePlanIsNotScanned() {
-        when(plans.allows(any(UUID.class), any(br.com.sentinela.enums.Feature.class))).thenReturn(false);
+        when(plans.allows(any(UUID.class), any(UUID.class), any(br.com.sentinela.enums.Feature.class))).thenReturn(false);
 
         service.scanWeatherAndRivers();
 

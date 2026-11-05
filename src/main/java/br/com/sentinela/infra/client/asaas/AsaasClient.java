@@ -16,6 +16,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -24,11 +25,16 @@ public class AsaasClient {
     private final RestClient client;
     private final ObjectMapper mapper;
     private final boolean configured;
+    private final String callbackUrl;
 
-    public AsaasClient(@Qualifier("asaasRestClient") RestClient client, ObjectMapper mapper, @Value("${asaas.api-key:}") String apiKey) {
+    public record Checkout(String id, String link) {}
+
+    public AsaasClient(@Qualifier("asaasRestClient") RestClient client, ObjectMapper mapper, @Value("${asaas.api-key:}") String apiKey,
+                       @Value("${asaas.callback-url}") String callbackUrl) {
         this.client = client;
         this.mapper = mapper;
         this.configured = !apiKey.isBlank();
+        this.callbackUrl = callbackUrl.replaceAll("/+$", "");
     }
 
     /** A API aceita clientes duplicados, por isso a busca pelo identificador do Sentinela vem antes da criação. */
@@ -56,12 +62,31 @@ public class AsaasClient {
         }
     }
 
-    /** UNDEFINED deixa o cliente escolher cartão, Pix ou boleto na fatura, sem o cartão passar pelo Sentinela. */
+    public void deleteSubscription(String id) {
+        call(() -> client.delete().uri("/subscriptions/{id}", id).retrieve().body(JsonNode.class));
+    }
+
+    /** Tela do Asaas para cartão: o sandbox confirmou que assinatura no Checkout só aceita CREDIT_CARD. */
+    public Checkout createCheckout(String planName, BigDecimal value, String cycle, LocalDate nextDueDate, String externalReference) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("billingTypes", List.of("CREDIT_CARD"));
+        body.put("chargeTypes", List.of("RECURRENT"));
+        body.put("minutesToExpire", 60);
+        body.put("externalReference", externalReference);
+        body.put("callback", Map.of("successUrl", callbackUrl + "/settings?tab=plan", "cancelUrl", callbackUrl + "/plans",
+                "expiredUrl", callbackUrl + "/plans"));
+        body.put("items", List.of(Map.of("name", "Sentinela " + planName, "quantity", 1, "value", value)));
+        body.put("subscription", Map.of("cycle", cycle, "nextDueDate", nextDueDate.toString()));
+        JsonNode response = post("/checkouts", body);
+        return new Checkout(response.path("id").asText(), response.path("link").asText());
+    }
+
+    /** Pix e boleto geram a fatura já no tipo escolhido; o cartão usa o Checkout. */
     public String createSubscription(String customerId, BigDecimal value, String cycle, LocalDate nextDueDate,
-                                     String description, String externalReference) {
+                                     String description, String externalReference, String billingType) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("customer", customerId);
-        body.put("billingType", "UNDEFINED");
+        body.put("billingType", billingType);
         body.put("value", value);
         body.put("cycle", cycle);
         body.put("nextDueDate", nextDueDate.toString());

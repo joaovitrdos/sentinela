@@ -32,7 +32,13 @@ class TeamServiceTest {
     @Mock UserRepository users;
     @Mock EmailFactory emailFactory;
     @Mock ApplicationEventPublisher events;
+    @Mock PlanService plans;
     @InjectMocks TeamService service;
+
+    @org.junit.jupiter.api.BeforeEach
+    void ownerPlanIncludesTeam() {
+        org.mockito.Mockito.lenient().when(plans.ownerHasTeam(org.mockito.ArgumentMatchers.any())).thenReturn(true);
+    }
 
     private Property property(UUID propertyId, UUID ownerId) {
         return Property.builder().propertyId(propertyId).user(User.builder().userId(ownerId).build())

@@ -44,8 +44,8 @@ public class BillingService {
     }
 
     /**
-     * Assinar, trocar de plano e voltar a assinar seguem o mesmo caminho: a recorrência antiga é removida e a nova
-     * começa no fim do período já pago, sem cobrança dupla. O bloqueio impede duas assinaturas por clique duplo.
+     * Cartão vai para o Checkout do Asaas; Pix e boleto, para a fatura. No Checkout a escolha fica guardada à parte até o
+     * Asaas criar a assinatura, para que desistir do pagamento não mexa no plano atual. O bloqueio evita o clique duplo.
      */
     @Transactional
     public SubscribeResponseDto subscribe(User user, SubscribeRequestDto request) {
@@ -55,36 +55,89 @@ public class BillingService {
         planService.subscriptionOf(user.getUserId());
         Subscription subscription = subscriptions.lockByUserId(user.getUserId()).orElseThrow();
         String reference = user.getUserId().toString();
+        LocalDate today = LocalDate.now(ZONE);
+        LocalDate nextDueDate = nextDueDate(today, inTrial(subscription) ? subscription.getTrialEndsAt().toLocalDate() : null,
+                inPaidPeriod(subscription, today) ? subscription.getPaidUntil() : null);
+
+        if ("CARD".equals(request.paymentMethod())) {
+            AsaasClient.Checkout checkout = asaas.createCheckout(plan.getName(), value, request.cycle(), nextDueDate, reference);
+            subscription.setCheckoutId(checkout.id());
+            subscription.setCheckoutPlan(plan);
+            subscription.setCheckoutCycle(request.cycle());
+            subscriptions.save(subscription);
+            return new SubscribeResponseDto(plan.getCode(), request.cycle(), value, nextDueDate, checkout.link());
+        }
 
         if (subscription.getAsaasCustomerId() == null) {
             subscription.setAsaasCustomerId(customer(user, request.cpfCnpj(), reference));
         }
-        asaas.deleteActiveSubscriptions(reference);
-
-        LocalDate today = LocalDate.now(ZONE);
-        boolean inTrial = LocalDateTime.now().isBefore(subscription.getTrialEndsAt());
-        boolean paidPeriod = ("ACTIVE".equals(subscription.getStatus()) || "CANCELED".equals(subscription.getStatus()))
-                && subscription.getPaidUntil() != null && !subscription.getPaidUntil().isBefore(today);
-        LocalDate nextDueDate = nextDueDate(today, inTrial ? subscription.getTrialEndsAt().toLocalDate() : null,
-                paidPeriod ? subscription.getPaidUntil() : null);
+        removeRecurrence(subscription, reference);
         String asaasId = asaas.createSubscription(subscription.getAsaasCustomerId(), value, request.cycle(), nextDueDate,
-                "Sentinela - Plano " + plan.getName(), reference);
-
+                "Sentinela - Plano " + plan.getName(), reference, request.paymentMethod());
         subscription.setAsaasSubscriptionId(asaasId);
-        if (paidPeriod) {
-            subscription.setPendingPlan(plan);
-            subscription.setPendingCycle(request.cycle());
-            subscription.setStatus("ACTIVE");
-        } else {
-            subscription.setPlan(plan);
-            subscription.setCycle(request.cycle());
-            subscription.setPendingPlan(null);
-            subscription.setPendingCycle(null);
-            subscription.setStatus("PENDING");
-            if (inTrial) subscription.setPaidUntil(nextDueDate);
-        }
+        clearCheckout(subscription);
+        applySelection(subscription, plan, request.cycle(), nextDueDate, today);
         subscriptions.save(subscription);
         return new SubscribeResponseDto(plan.getCode(), request.cycle(), value, nextDueDate, asaas.firstInvoiceUrl(asaasId));
+    }
+
+    private boolean inTrial(Subscription subscription) {
+        return LocalDateTime.now().isBefore(subscription.getTrialEndsAt());
+    }
+
+    private boolean inPaidPeriod(Subscription subscription, LocalDate today) {
+        return ("ACTIVE".equals(subscription.getStatus()) || "CANCELED".equals(subscription.getStatus()))
+                && subscription.getPaidUntil() != null && !subscription.getPaidUntil().isBefore(today);
+    }
+
+    private void applySelection(Subscription subscription, Plan plan, String cycle, LocalDate nextDueDate, LocalDate today) {
+        if (inPaidPeriod(subscription, today)) {
+            subscription.setPendingPlan(plan);
+            subscription.setPendingCycle(cycle);
+            subscription.setStatus("ACTIVE");
+            return;
+        }
+        subscription.setPlan(plan);
+        subscription.setCycle(cycle);
+        subscription.setPendingPlan(null);
+        subscription.setPendingCycle(null);
+        subscription.setStatus("PENDING");
+        if (inTrial(subscription)) subscription.setPaidUntil(nextDueDate);
+    }
+
+    private void clearCheckout(Subscription subscription) {
+        subscription.setCheckoutId(null);
+        subscription.setCheckoutPlan(null);
+        subscription.setCheckoutCycle(null);
+    }
+
+    /** A assinatura do Checkout pode não trazer o identificador do Sentinela, por isso a atual é removida pelo id. */
+    private void removeRecurrence(Subscription subscription, String reference) {
+        deleteQuietly(subscription.getAsaasSubscriptionId());
+        asaas.deleteActiveSubscriptions(reference);
+    }
+
+    private void deleteQuietly(String asaasSubscriptionId) {
+        if (asaasSubscriptionId == null) return;
+        try {
+            asaas.deleteSubscription(asaasSubscriptionId);
+        } catch (ResponseStatusException alreadyRemoved) {
+            LogUtil.warn("Assinatura anterior do Asaas já não estava disponível");
+        }
+    }
+
+    /** Liga a assinatura criada pelo Checkout ao usuário, pelo campo checkoutSession enviado pelo Asaas. */
+    private Subscription linkCheckout(Subscription subscription, String asaasId, String customerId, LocalDate nextDueDate) {
+        if (!asaasId.equals(subscription.getAsaasSubscriptionId())) deleteQuietly(subscription.getAsaasSubscriptionId());
+        subscription.setAsaasSubscriptionId(asaasId);
+        if (!customerId.isBlank()) subscription.setAsaasCustomerId(customerId);
+        applySelection(subscription, subscription.getCheckoutPlan(), subscription.getCheckoutCycle(), nextDueDate, LocalDate.now(ZONE));
+        clearCheckout(subscription);
+        return subscription;
+    }
+
+    private LocalDate date(JsonNode value) {
+        return LocalDate.parse(value.asText().substring(0, 10));
     }
 
     private String customer(User user, String rawDocument, String reference) {
@@ -112,7 +165,8 @@ public class BillingService {
         if (subscription.getAsaasSubscriptionId() == null || "CANCELED".equals(subscription.getStatus())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Nenhuma assinatura ativa para cancelar");
         }
-        asaas.deleteActiveSubscriptions(userId.toString());
+        removeRecurrence(subscription, userId.toString());
+        clearCheckout(subscription);
         subscription.setStatus("CANCELED");
         subscription.setPendingPlan(null);
         subscription.setPendingCycle(null);
@@ -130,12 +184,19 @@ public class BillingService {
 
         JsonNode payment = event.path("payment");
         switch (type) {
-            case "PAYMENT_CONFIRMED", "PAYMENT_RECEIVED" -> forSubscription(payment.path("subscription").asText(""), subscription ->
-                    applyPayment(subscription, LocalDate.parse(payment.path("dueDate").asText())));
-            case "PAYMENT_OVERDUE" -> forSubscription(payment.path("subscription").asText(""), subscription -> {
+            case "SUBSCRIPTION_CREATED" -> {
+                JsonNode created = event.path("subscription");
+                String checkoutSession = created.path("checkoutSession").asText("");
+                if (!checkoutSession.isBlank()) {
+                    subscriptions.lockByCheckoutId(checkoutSession).ifPresent(subscription -> subscriptions.save(linkCheckout(subscription,
+                            created.path("id").asText(), created.path("customer").asText(""), date(created.path("nextDueDate")))));
+                }
+            }
+            case "PAYMENT_CONFIRMED", "PAYMENT_RECEIVED" -> forPayment(payment, subscription -> applyPayment(subscription, date(payment.path("dueDate"))));
+            case "PAYMENT_OVERDUE" -> forPayment(payment, subscription -> {
                 if (!"CANCELED".equals(subscription.getStatus())) subscription.setStatus("OVERDUE");
             });
-            case "PAYMENT_REFUNDED", "PAYMENT_CHARGEBACK_REQUESTED" -> forSubscription(payment.path("subscription").asText(""), subscription -> {
+            case "PAYMENT_REFUNDED", "PAYMENT_CHARGEBACK_REQUESTED" -> forPayment(payment, subscription -> {
                 subscription.setPaidUntil(null);
                 if (!"CANCELED".equals(subscription.getStatus())) subscription.setStatus("OVERDUE");
             });
@@ -148,6 +209,21 @@ public class BillingService {
     private boolean validToken(String token) {
         return !webhookToken.isBlank() && token != null && MessageDigest.isEqual(
                 token.getBytes(StandardCharsets.UTF_8), webhookToken.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /** O pagamento pode chegar antes do SUBSCRIPTION_CREATED: nesse caso a ligação com o Checkout é feita aqui. */
+    private void forPayment(JsonNode payment, java.util.function.Consumer<Subscription> change) {
+        String asaasId = payment.path("subscription").asText("");
+        String checkoutSession = payment.path("checkoutSession").asText("");
+        var linked = subscriptions.lockByAsaasSubscriptionId(asaasId);
+        if (linked.isEmpty() && !checkoutSession.isBlank()) {
+            linked = subscriptions.lockByCheckoutId(checkoutSession).map(subscription ->
+                    linkCheckout(subscription, asaasId, payment.path("customer").asText(""), date(payment.path("dueDate"))));
+        }
+        linked.ifPresentOrElse(subscription -> {
+            change.accept(subscription);
+            subscriptions.save(subscription);
+        }, () -> LogUtil.warn("Evento do Asaas sem assinatura vigente correspondente"));
     }
 
     /** Eventos de uma recorrência já substituída não encontram registro e são ignorados de propósito. */

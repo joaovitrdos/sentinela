@@ -41,6 +41,7 @@ public class TeamService {
     private final UserRepository users;
     private final EmailFactory emailFactory;
     private final ApplicationEventPublisher events;
+    private final PlanService plans;
     private final SecureRandom random = new SecureRandom();
 
     @Value("${sentinela.web-base-url:http://localhost:5173}")
@@ -78,7 +79,7 @@ public class TeamService {
     public TeamRole role(Property property, UUID userId) {
         if (userId == null || property == null) return null;
         if (property.getUser().getUserId().equals(userId)) return TeamRole.ADMIN;
-        if (!Boolean.TRUE.equals(property.getTeamEnabled())) return null;
+        if (!Boolean.TRUE.equals(property.getTeamEnabled()) || !plans.ownerHasTeam(property.getUser().getUserId())) return null;
         return members.findByProperty_PropertyIdAndUser_UserId(property.getPropertyId(), userId)
                 .map(PropertyMember::getRole).orElse(null);
     }
@@ -86,7 +87,7 @@ public class TeamService {
     @Transactional(readOnly = true)
     public User requireActiveMember(Property property, UUID userId) {
         if (property.getUser().getUserId().equals(userId)) return property.getUser();
-        if (!Boolean.TRUE.equals(property.getTeamEnabled())) throw forbidden();
+        if (!Boolean.TRUE.equals(property.getTeamEnabled()) || !plans.ownerHasTeam(property.getUser().getUserId())) throw forbidden();
         return members.findByProperty_PropertyIdAndUser_UserId(property.getPropertyId(), userId)
                 .map(PropertyMember::getUser).orElseThrow(this::forbidden);
     }
@@ -145,6 +146,7 @@ public class TeamService {
     public TeamOverviewDto setMode(UUID propertyId, UUID userId, boolean enabled) {
         Property property = requireOwner(propertyId, userId);
         if (!property.getUser().getUserId().equals(userId)) throw forbidden();
+        if (enabled && !plans.ownerHasTeam(userId)) throw planRequired();
         if (!enabled) {
             invitations.deleteAllByProperty_PropertyId(propertyId);
             members.deleteAllByProperty_PropertyId(propertyId);
@@ -231,6 +233,7 @@ public class TeamService {
                 !Boolean.TRUE.equals(invitation.getProperty().getTeamEnabled())) throw invalidInvite();
         Property property = invitation.getProperty();
         if (property.getUser().getUserId().equals(userId)) throw invalidInvite();
+        if (!plans.ownerHasTeam(property.getUser().getUserId())) throw planRequired();
         PropertyMember member = members.findByProperty_PropertyIdAndUser_UserId(property.getPropertyId(), userId)
                 .orElseGet(() -> PropertyMember.builder().property(property).user(user).build());
         member.setRole(invitation.getRole());
@@ -251,5 +254,9 @@ public class TeamService {
         } catch (NoSuchAlgorithmException ex) {
             throw new IllegalStateException(ex);
         }
+    }
+
+    private ResponseStatusException planRequired() {
+        return new ResponseStatusException(HttpStatus.FORBIDDEN, "Seu plano não inclui este recurso");
     }
 }

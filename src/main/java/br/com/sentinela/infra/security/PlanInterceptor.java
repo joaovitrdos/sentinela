@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Sem plano vigente, o usuário ainda entra, assina e lê o que já cadastrou, mas não altera dados.
+ * Sem plano vigente, o usuário ainda entra, assina, lê o que já cadastrou e exclui propriedades, mas não altera dados.
  * Rotas de propriedade usam o plano do dono, para que a equipe acompanhe o plano contratado por ele.
  */
 @Component @RequiredArgsConstructor
@@ -48,8 +48,11 @@ public class PlanInterceptor implements HandlerInterceptor {
     }
 
     private boolean isFree(String path, String httpMethod) {
-        boolean leavingTeam = HttpMethod.DELETE.matches(httpMethod) && path.endsWith("/team/me");
-        return leavingTeam || FREE_PREFIXES.stream().anyMatch(prefix -> path.equals(prefix) || path.startsWith(prefix + "/"));
+        boolean delete = HttpMethod.DELETE.matches(httpMethod);
+        boolean leavingTeam = delete && path.endsWith("/team/me");
+        boolean removingProperty = delete && path.matches("/api/properties/[^/]+");
+        boolean disablingTeam = HttpMethod.PUT.matches(httpMethod) && path.endsWith("/team/mode");
+        return leavingTeam || removingProperty || disablingTeam || FREE_PREFIXES.stream().anyMatch(prefix -> path.equals(prefix) || path.startsWith(prefix + "/"));
     }
 
     private Feature requiredFeature(HandlerMethod method, String httpMethod) {

@@ -30,6 +30,10 @@ public interface PropertyRepository extends JpaRepository<Property, UUID> {
 
     long countByUser_UserId(UUID userId);
 
+    @Query("select property.propertyId from Property property where property.user.userId = :ownerId " +
+            "order by property.createdAt asc, property.propertyId asc")
+    List<UUID> findOwnedIdsOldestFirst(@Param("ownerId") UUID ownerId);
+
     Optional<Property> findByPropertyIdAndUser_UserId(UUID propertyId, UUID userId);
 
     List<Property> findAllByPropertyIdInAndUser_UserId(Collection<UUID> propertyIds, UUID userId);

@@ -727,11 +727,21 @@
             "title": "Suscribirse",
             "document": "CPF o CNPJ",
             "documentHint": "Se usa solo para emitir el cobro.",
-            "paymentNote": "Irás a la factura de Asaas para elegir tarjeta, Pix o boleto.",
             "changeNote": "El nuevo plan empieza en el próximo pago, al terminar el período ya pagado.",
             "confirm": "Continuar",
             "noInvoice": "Suscripción registrada. La factura estará disponible cerca del vencimiento, {{date}}.",
-            "downgradeNote": "Con este plan dejas de tener: {{features}}. Tus datos siguen guardados."
+            "downgradeNote": "Con este plan dejas de tener: {{features}}. Tus datos siguen guardados.",
+            "method": "Forma de pago",
+            "methods": {
+                "CARD": "Tarjeta",
+                "PIX": "Pix",
+                "BOLETO": "Boleto"
+            },
+            "notes": {
+                "CARD": "Irás a la pantalla segura de Asaas. La renovación es automática en la tarjeta.",
+                "PIX": "Irás a la factura de Asaas con Pix. En cada renovación se envía un nuevo cobro para pagar.",
+                "BOLETO": "Irás a la factura de Asaas con el boleto. En cada renovación se envía un nuevo cobro para pagar."
+            }
         },
         "settings": {
             "title": "Plan actual",

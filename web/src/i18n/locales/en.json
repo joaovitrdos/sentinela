@@ -729,11 +729,21 @@
             "title": "Subscribe",
             "document": "CPF or CNPJ",
             "documentHint": "Used only to issue the charge.",
-            "paymentNote": "You will be taken to the Asaas invoice to choose card, Pix or boleto.",
             "changeNote": "The new plan starts on the next payment, when the paid period ends.",
             "confirm": "Continue",
             "noInvoice": "Subscription registered. The invoice becomes available near the due date, {{date}}.",
-            "downgradeNote": "With this plan you lose: {{features}}. Your data stays saved."
+            "downgradeNote": "With this plan you lose: {{features}}. Your data stays saved.",
+            "method": "Payment method",
+            "methods": {
+                "CARD": "Card",
+                "PIX": "Pix",
+                "BOLETO": "Boleto"
+            },
+            "notes": {
+                "CARD": "You will go to the secure Asaas page. Renewal is automatic on your card.",
+                "PIX": "You will go to the Asaas invoice with Pix. Each renewal sends a new charge to pay.",
+                "BOLETO": "You will go to the Asaas invoice with the boleto. Each renewal sends a new charge to pay."
+            }
         },
         "settings": {
             "title": "Current plan",

@@ -20,5 +20,8 @@ public class Subscription {
     @Column(name = "paid_until") private LocalDate paidUntil;
     @Column(name = "asaas_customer_id", length = 64) private String asaasCustomerId;
     @Column(name = "asaas_subscription_id", length = 64) private String asaasSubscriptionId;
+    @Column(name = "asaas_checkout_id", length = 64) private String checkoutId;
+    @ManyToOne(fetch = FetchType.EAGER) @JoinColumn(name = "checkout_plan_code") private Plan checkoutPlan;
+    @Column(name = "checkout_billing_cycle", length = 8) private String checkoutCycle;
     @Column(name = "created_at", nullable = false) private LocalDateTime createdAt;
 }

@@ -27,7 +27,7 @@ public class BillingController {
 
     @GetMapping("/api/billing/me")
     public BillingStatusResponseDto status(@AuthenticationPrincipal User user) {
-        return plans.status(user.getUserId());
+        return billing.status(user.getUserId());
     }
 
     @PostMapping("/api/billing/subscribe")

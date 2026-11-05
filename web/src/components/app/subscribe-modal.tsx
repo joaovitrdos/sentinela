@@ -6,55 +6,64 @@ import { notify } from "@/components/app/notifications";
 import { Dialog, Modal, ModalOverlay } from "@/components/application/modals/modal";
 import { Button } from "@/components/base/buttons/button";
 import { Input } from "@/components/base/input/input";
-import type { BillingCycle, PaymentMethod, Plan } from "@/lib/billing";
-import { billingApi, formatDate, formatMoney } from "@/lib/billing";
+import type { BillingCycle, Plan } from "@/lib/billing";
+import { billingApi, formatDate } from "@/lib/billing";
 import { errorKey } from "@/lib/errors";
 import { useBilling } from "@/providers/billing-provider";
-import { cx } from "@/utils/cx";
 
 const onlyDigits = (value: string) => value.replace(/\D/g, "");
-const METHODS: PaymentMethod[] = ["CARD", "PIX", "BOLETO"];
 
-/** Os dados de pagamento ficam nas telas do Asaas; aqui só vai o CPF ou CNPJ de quem paga com Pix ou boleto. */
-export const SubscribeModal = ({ plan, plans, cycle, onClose }: { plan: Plan | null; plans: Plan[]; cycle: BillingCycle; onClose: () => void }) => {
+/** A fatura abre em outra aba: ao voltar para o Sentinela, o foco na janela atualiza o plano. */
+export const useSubscribe = () => {
     const { t, i18n } = useTranslation();
-    const { status, refresh } = useBilling();
-    const [method, setMethod] = useState<PaymentMethod>("CARD");
-    const [document, setDocument] = useState("");
-    const [busy, setBusy] = useState(false);
+    const { refresh } = useBilling();
+    const [busy, setBusy] = useState<string | null>(null);
     const [error, setError] = useState<string>();
 
-    useEffect(() => {
-        setDocument("");
+    const subscribe = async (plan: Plan, cycle: BillingCycle, cpfCnpj?: string) => {
+        setBusy(plan.code);
         setError(undefined);
-    }, [plan]);
+        // Aberta antes da chamada para o navegador não tratar como pop-up.
+        const invoiceTab = window.open("about:blank", "_blank");
+        try {
+            const result = await billingApi.subscribe({ planCode: plan.code, cycle, cpfCnpj });
+            await refresh();
+            if (result.invoiceUrl && invoiceTab) invoiceTab.location.href = result.invoiceUrl;
+            else if (result.invoiceUrl) window.location.assign(result.invoiceUrl);
+            else {
+                invoiceTab?.close();
+                notify(t("plans.modal.reactivated", { date: formatDate(result.nextDueDate, i18n.language) }), "success");
+            }
+            return true;
+        } catch (reason) {
+            invoiceTab?.close();
+            setError(t(errorKey(reason)));
+            return false;
+        } finally {
+            setBusy(null);
+        }
+    };
 
-    const needsDocument = method !== "CARD" && !status?.hasCustomer;
+    return { subscribe, busy, error };
+};
+
+/** Só aparece quando há algo a dizer antes da fatura: o CPF ou CNPJ da primeira vez ou o que se perde no downgrade. */
+export const SubscribeModal = ({ plan, plans, cycle, onClose }: { plan: Plan | null; plans: Plan[]; cycle: BillingCycle; onClose: () => void }) => {
+    const { t } = useTranslation();
+    const { status } = useBilling();
+    const { subscribe, busy, error } = useSubscribe();
+    const [document, setDocument] = useState("");
+
+    useEffect(() => setDocument(""), [plan]);
+
+    const needsDocument = !status?.hasCustomer;
     const digits = onlyDigits(document);
-    const documentValid = !needsDocument || digits.length === 11 || digits.length === 14;
-    const price = plan ? (cycle === "YEARLY" ? plan.yearlyPrice : plan.monthlyPrice) : 0;
-    const changingPaidPlan = status?.status === "ACTIVE" && status.contractedPlan !== null;
+    const valid = !needsDocument || digits.length === 11 || digits.length === 14;
     const contracted = plans.find((item) => item.code === status?.contractedPlan);
     const lostFeatures = plan && contracted ? contracted.features.filter((feature) => !plan.features.includes(feature)) : [];
 
     const submit = async () => {
-        if (!plan) return;
-        setBusy(true);
-        setError(undefined);
-        try {
-            const result = await billingApi.subscribe({ planCode: plan.code, cycle, paymentMethod: method, cpfCnpj: needsDocument ? digits : undefined });
-            await refresh();
-            if (result.invoiceUrl) {
-                window.location.assign(result.invoiceUrl);
-                return;
-            }
-            notify(t("plans.modal.noInvoice", { date: formatDate(result.nextDueDate, i18n.language) }), "success");
-            onClose();
-        } catch (reason) {
-            setError(t(errorKey(reason)));
-        } finally {
-            setBusy(false);
-        }
+        if (plan && (await subscribe(plan, cycle, needsDocument ? digits : undefined))) onClose();
     };
 
     return (
@@ -62,32 +71,9 @@ export const SubscribeModal = ({ plan, plans, cycle, onClose }: { plan: Plan | n
             <Modal className="max-w-md">
                 <Dialog aria-label={t("plans.modal.title")}>
                     <div className="flex w-full flex-col gap-4 p-6">
-                        <div>
-                            <h3 className="text-md font-semibold text-primary">
-                                {t("plans.modal.title")}: {plan?.name}
-                            </h3>
-                            <p className="mt-1 text-sm leading-6 text-tertiary">
-                                {formatMoney(price, i18n.language)} {t(cycle === "YEARLY" ? "plans.perYear" : "plans.perMonth")}
-                            </p>
-                        </div>
-                        <div role="radiogroup" aria-label={t("plans.modal.method")} className="grid grid-cols-3 gap-2">
-                            {METHODS.map((item) => (
-                                <button
-                                    key={item}
-                                    type="button"
-                                    role="radio"
-                                    aria-checked={method === item}
-                                    disabled={busy}
-                                    onClick={() => setMethod(item)}
-                                    className={cx(
-                                        "cursor-pointer rounded-lg px-3 py-2 text-sm font-medium ring-1 transition duration-100 ease-linear ring-inset disabled:cursor-not-allowed disabled:opacity-50",
-                                        method === item ? "bg-brand-secondary text-primary ring-brand" : "text-secondary ring-primary",
-                                    )}
-                                >
-                                    {t(`plans.modal.methods.${item}`)}
-                                </button>
-                            ))}
-                        </div>
+                        <h3 className="text-md font-semibold text-primary">
+                            {t("plans.modal.title")}: {plan?.name}
+                        </h3>
                         {needsDocument ? (
                             <Input
                                 label={t("plans.modal.document")}
@@ -99,9 +85,6 @@ export const SubscribeModal = ({ plan, plans, cycle, onClose }: { plan: Plan | n
                                 onChange={setDocument}
                             />
                         ) : null}
-                        <p className="text-sm leading-6 text-tertiary">
-                            {t(`plans.modal.notes.${method}`)}{changingPaidPlan ? ` ${t("plans.modal.changeNote")}` : ""}
-                        </p>
                         {lostFeatures.length > 0 ? (
                             <p className="text-sm leading-6 text-warning-primary">
                                 {t("plans.modal.downgradeNote", { features: lostFeatures.map((feature) => t(`plans.features.${feature}`)).join(", ") })}
@@ -109,10 +92,10 @@ export const SubscribeModal = ({ plan, plans, cycle, onClose }: { plan: Plan | n
                         ) : null}
                         <FormAlert>{error}</FormAlert>
                         <div className="mt-1 grid grid-cols-2 gap-3">
-                            <Button size="sm" color="secondary" onClick={onClose} isDisabled={busy}>
+                            <Button size="sm" color="secondary" onClick={onClose} isDisabled={busy !== null}>
                                 {t("common.cancel")}
                             </Button>
-                            <Button size="sm" onClick={() => void submit()} isDisabled={!documentValid} isLoading={busy} showTextWhileLoading>
+                            <Button size="sm" onClick={() => void submit()} isDisabled={!valid} isLoading={busy !== null} showTextWhileLoading>
                                 {t("plans.modal.confirm")}
                             </Button>
                         </div>

@@ -728,22 +728,11 @@
         "modal": {
             "title": "Assinar",
             "document": "CPF ou CNPJ",
-            "documentHint": "Usado apenas para emitir a cobrança.",
+            "documentHint": "O Asaas exige este dado para emitir a cobrança. Pedimos só uma vez.",
             "changeNote": "O novo plano entra em vigor no próximo pagamento, ao fim do período já pago.",
             "confirm": "Continuar",
-            "noInvoice": "Assinatura registrada. A fatura fica disponível perto do vencimento, em {{date}}.",
             "downgradeNote": "Ao mudar para este plano, você deixa de ter: {{features}}. Seus dados continuam salvos.",
-            "method": "Forma de pagamento",
-            "methods": {
-                "CARD": "Cartão",
-                "PIX": "Pix",
-                "BOLETO": "Boleto"
-            },
-            "notes": {
-                "CARD": "Você será levado à tela segura do Asaas. A renovação é automática no cartão.",
-                "PIX": "Você será levado à fatura do Asaas com o Pix. A cada renovação, uma nova cobrança é enviada para pagamento.",
-                "BOLETO": "Você será levado à fatura do Asaas com o boleto. A cada renovação, uma nova cobrança é enviada para pagamento."
-            }
+            "reactivated": "Assinatura reativada. A próxima cobrança vence em {{date}}."
         },
         "settings": {
             "title": "Plano atual",

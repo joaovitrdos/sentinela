@@ -3,7 +3,7 @@ import { Check } from "@untitledui/icons";
 import { useTranslation } from "react-i18next";
 import { FormAlert } from "@/components/app/form-alert";
 import { PageLoader } from "@/components/app/route-guards";
-import { SubscribeModal } from "@/components/app/subscribe-modal";
+import { SubscribeModal, useSubscribe } from "@/components/app/subscribe-modal";
 import { Tabs } from "@/components/application/tabs/tabs";
 import { Badge } from "@/components/base/badges/badges";
 import { Button } from "@/components/base/buttons/button";
@@ -24,6 +24,16 @@ export const PlansPage = () => {
     const [error, setError] = useState<string>();
     const [cycle, setCycle] = useState<BillingCycle>("MONTHLY");
     const [selected, setSelected] = useState<Plan | null>(null);
+    const { status } = useBilling();
+    const { subscribe, busy, error: subscribeError } = useSubscribe();
+
+    /** Com o cadastro pronto vai direto para a fatura; o modal só aparece para pedir o CPF ou avisar do downgrade. */
+    const choose = (plan: Plan) => {
+        const contracted = plans?.find((item) => item.code === status?.contractedPlan);
+        const losesFeatures = contracted?.features.some((feature) => !plan.features.includes(feature));
+        if (!status?.hasCustomer || losesFeatures) setSelected(plan);
+        else void subscribe(plan, cycle);
+    };
 
     useEffect(() => {
         const controller = new AbortController();
@@ -52,12 +62,12 @@ export const PlansPage = () => {
             </div>
 
             <div className="mt-4">
-                <FormAlert>{error}</FormAlert>
+                <FormAlert>{error ?? subscribeError}</FormAlert>
             </div>
 
             <div className="mt-6 grid gap-5 lg:grid-cols-3">
                 {plans?.map((plan) => (
-                    <PlanCard key={plan.code} plan={plan} plans={plans} cycle={cycle} onSelect={() => setSelected(plan)} />
+                    <PlanCard key={plan.code} plan={plan} plans={plans} cycle={cycle} busy={busy === plan.code} onSelect={() => choose(plan)} />
                 ))}
             </div>
 
@@ -75,7 +85,7 @@ export const PlansPage = () => {
     );
 };
 
-const PlanCard = ({ plan, plans, cycle, onSelect }: { plan: Plan; plans: Plan[]; cycle: BillingCycle; onSelect: () => void }) => {
+const PlanCard = ({ plan, plans, cycle, busy, onSelect }: { plan: Plan; plans: Plan[]; cycle: BillingCycle; busy: boolean; onSelect: () => void }) => {
     const { t, i18n } = useTranslation();
     const { isAuthenticated } = useAuth();
     const { status } = useBilling();
@@ -125,7 +135,7 @@ const PlanCard = ({ plan, plans, cycle, onSelect }: { plan: Plan; plans: Plan[];
                         {t(pending ? "plans.pendingPlan" : "plans.currentPlan")}
                     </Button>
                 ) : (
-                    <Button size="sm" className="w-full" color={highlighted ? "primary" : "secondary"} onClick={onSelect}>
+                    <Button size="sm" className="w-full" color={highlighted ? "primary" : "secondary"} onClick={onSelect} isLoading={busy} showTextWhileLoading>
                         {t(action)}
                     </Button>
                 )}

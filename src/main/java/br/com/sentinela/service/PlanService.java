@@ -126,7 +126,12 @@ public class PlanService {
     static Plan resolve(Subscription subscription, Plan trialPlan, LocalDateTime now) {
         if (subscription.getPlan() == null) return now.isBefore(subscription.getTrialEndsAt()) ? trialPlan : null;
         LocalDate paidUntil = subscription.getPaidUntil();
-        if (paidUntil == null) return null;
+        if (paidUntil == null) {
+            // Ainda sem pagamento: a fatura vence no fim do teste, com a mesma tolerância de qualquer cobrança.
+            boolean awaitingFirstPayment = "PENDING".equals(subscription.getStatus())
+                    && !now.toLocalDate().isAfter(subscription.getTrialEndsAt().toLocalDate().plusDays(GRACE_DAYS));
+            return awaitingFirstPayment ? subscription.getPlan() : null;
+        }
         int grace = "CANCELED".equals(subscription.getStatus()) ? 0 : GRACE_DAYS;
         return now.toLocalDate().isAfter(paidUntil.plusDays(grace)) ? null : subscription.getPlan();
     }

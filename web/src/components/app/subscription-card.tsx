@@ -24,7 +24,7 @@ export const SubscriptionCard = () => {
     const canCancel = status.contractedPlan !== null && status.status !== "CANCELED";
     const canceled = status.status === "CANCELED";
     // O teste continua valendo depois de cancelar: o acesso termina na data mais distante.
-    const trialEnd = trial ? status.trialEndsAt.slice(0, 10) : null;
+    const trialEnd = isInTrial(status) ? status.trialEndsAt.slice(0, 10) : null;
     const accessEnd = [status.paidUntil, trialEnd].filter((date): date is string => date !== null).sort().at(-1) ?? null;
     const accessEndLabel = accessEnd ? formatDate(accessEnd, i18n.language) : null;
 
@@ -64,7 +64,7 @@ export const SubscriptionCard = () => {
                         {t("plans.settings.contracted", { plan: planName(status.contractedPlan, ""), cycle: t(status.cycle === "YEARLY" ? "plans.cycle.yearly" : "plans.cycle.monthly") })}
                     </p>
                 ) : null}
-                {status.paidUntil ? <p>{t(status.status === "CANCELED" ? "plans.settings.endsAt" : "plans.settings.paidUntil", { date: formatDate(status.paidUntil, i18n.language) })}</p> : null}
+                {status.paidUntil && status.status !== "PENDING" ? <p>{t(status.status === "CANCELED" ? "plans.settings.endsAt" : "plans.settings.paidUntil", { date: formatDate(status.paidUntil, i18n.language) })}</p> : null}
                 {status.pendingPlan ? <p>{t("plans.settings.pending", { plan: planName(status.pendingPlan, "") })}</p> : null}
                 {status.effectivePlan === null ? <p>{t("plans.banner.readOnly")}</p> : null}
 

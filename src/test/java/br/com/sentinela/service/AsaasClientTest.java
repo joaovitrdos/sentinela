@@ -27,37 +27,30 @@ class AsaasClientTest {
 
     private final RestClient.Builder builder = RestClient.builder().baseUrl(BASE).defaultHeader("access_token", "chave");
     private final MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-    private final AsaasClient client = new AsaasClient(builder.build(), JsonMapper.builder().build(), "chave", "https://techlayoof.tech/");
+    private final AsaasClient client = new AsaasClient(builder.build(), JsonMapper.builder().build(), "chave");
 
     @Test
-    void createsSubscriptionWithTheChosenPaymentMethod() {
+    void createsSubscriptionLettingTheCustomerChooseOnTheInvoice() {
         server.expect(requestTo(BASE + "/subscriptions")).andExpect(method(HttpMethod.POST))
                 .andExpect(header("access_token", "chave"))
                 .andExpect(content().json("""
-                        {"customer":"cus_1","billingType":"PIX","value":60.00,"cycle":"MONTHLY",
+                        {"customer":"cus_1","billingType":"UNDEFINED","value":60.00,"cycle":"MONTHLY",
                          "nextDueDate":"2026-11-12","externalReference":"usuario"}"""))
                 .andRespond(withSuccess("{\"id\":\"sub_1\"}", MediaType.APPLICATION_JSON));
 
-        String id = client.createSubscription("cus_1", new BigDecimal("60.00"), "MONTHLY", LocalDate.of(2026, 11, 12), "Plano", "usuario", "PIX");
+        String id = client.createSubscription("cus_1", new BigDecimal("60.00"), "MONTHLY", LocalDate.of(2026, 11, 12), "Plano", "usuario");
 
         assertThat(id).isEqualTo("sub_1");
         server.verify();
     }
 
     @Test
-    void createsRecurringCheckoutOnlyWithCreditCard() {
-        server.expect(requestTo(BASE + "/checkouts")).andExpect(method(HttpMethod.POST))
-                .andExpect(content().json("""
-                        {"billingTypes":["CREDIT_CARD"],"chargeTypes":["RECURRENT"],"externalReference":"usuario",
-                         "callback":{"successUrl":"https://techlayoof.tech/settings?tab=plan","cancelUrl":"https://techlayoof.tech/plans"},
-                         "items":[{"name":"Sentinela Médio","quantity":1,"value":60.00}],
-                         "subscription":{"cycle":"MONTHLY","nextDueDate":"2026-11-12"}}"""))
-                .andRespond(withSuccess("{\"id\":\"chk_1\",\"link\":\"https://checkout\"}", MediaType.APPLICATION_JSON));
+    void returnsOnlyDueDatesOfPaidCharges() {
+        server.expect(requestTo(BASE + "/subscriptions/sub_1/payments")).andRespond(withSuccess("""
+                {"data":[{"status":"PENDING","dueDate":"2026-12-12"},{"status":"RECEIVED","dueDate":"2026-11-12"},
+                         {"status":"CONFIRMED","dueDate":"2026-10-12"},{"status":"OVERDUE","dueDate":"2026-09-12"}]}""", MediaType.APPLICATION_JSON));
 
-        var checkout = client.createCheckout("Médio", new BigDecimal("60.00"), "MONTHLY", LocalDate.of(2026, 11, 12), "usuario");
-
-        assertThat(checkout.link()).isEqualTo("https://checkout");
-        server.verify();
+        assertThat(client.paidDueDates("sub_1")).containsExactly(LocalDate.of(2026, 11, 12), LocalDate.of(2026, 10, 12));
     }
 
     @Test
@@ -116,7 +109,7 @@ class AsaasClientTest {
 
     @Test
     void missingKeyFailsWithoutCallingTheProvider() {
-        AsaasClient unconfigured = new AsaasClient(builder.build(), JsonMapper.builder().build(), "", "https://techlayoof.tech");
+        AsaasClient unconfigured = new AsaasClient(builder.build(), JsonMapper.builder().build(), "");
 
         assertThatThrownBy(() -> unconfigured.findCustomerId("u")).isInstanceOfSatisfying(ResponseStatusException.class,
                 exception -> assertThat(exception.getReason()).isEqualTo("Pagamentos ainda não configurados"));

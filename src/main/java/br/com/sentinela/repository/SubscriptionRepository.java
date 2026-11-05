@@ -29,10 +29,6 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
     @Query("select subscription from Subscription subscription where subscription.asaasSubscriptionId = :asaasId")
     Optional<Subscription> lockByAsaasSubscriptionId(@Param("asaasId") String asaasId);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select subscription from Subscription subscription where subscription.checkoutId = :checkoutId")
-    Optional<Subscription> lockByCheckoutId(@Param("checkoutId") String checkoutId);
-
     @Modifying
     @Query(value = "insert into tb_asaas_event (event_id, event_type, received_at) values (:id, :type, :now) "
             + "on conflict (event_id) do nothing", nativeQuery = true)

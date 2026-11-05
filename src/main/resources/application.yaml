@@ -117,8 +117,6 @@ asaas:
   base-url: ${ASAAS_BASE_URL:https://api-sandbox.asaas.com/v3}
   api-key: ${ASAAS_API_KEY:${WALLET_API_KEY:}}
   webhook-token: ${ASAAS_WEBHOOK_TOKEN:}
-  # O Asaas recusa localhost nas URLs de retorno do Checkout.
-  callback-url: ${ASAAS_CALLBACK_URL:https://techlayoof.tech}
 
 public-data:
   inmet-warnings-url: https://apiprevmet3.inmet.gov.br/avisos/ativos

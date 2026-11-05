@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { BarChartSquare02, CreditCard01, FileDownload01, Home03, LogOut01, Map01, Settings01 } from "@untitledui/icons";
+import { BarChartSquare02, FileDownload01, Home03, LogOut01, Map01, Settings01 } from "@untitledui/icons";
 import { motion } from "motion/react";
 import { Button as AriaButton } from "react-aria-components";
 import { useTranslation } from "react-i18next";
@@ -8,6 +8,7 @@ import { PlanBanner } from "@/components/app/plan-gate";
 import { Avatar } from "@/components/base/avatar/avatar";
 import { AvatarLabelGroup } from "@/components/base/avatar/avatar-label-group";
 import { Dropdown } from "@/components/base/dropdown/dropdown";
+import { useBreakpoint } from "@/hooks/use-breakpoint";
 import { useAuth } from "@/providers/auth-provider";
 import { cx } from "@/utils/cx";
 
@@ -26,6 +27,7 @@ const UserMenu = () => {
     const { t } = useTranslation();
     const { user, signOut } = useAuth();
     const navigate = useNavigate();
+    const wide = useBreakpoint("lg");
     if (!user) return null;
 
     return (
@@ -39,7 +41,9 @@ const UserMenu = () => {
                     )
                 }
             >
-                <Avatar size="sm" src={user.picture || undefined} alt={user.name} initials={initialsOf(user.name)} />
+                <span className="inline-flex rounded-full ring-2 ring-brand">
+                    <Avatar size="sm" src={user.picture || undefined} alt={user.name} initials={initialsOf(user.name)} />
+                </span>
             </AriaButton>
             <Dropdown.Popover className="w-64">
                 <div className="flex gap-3 border-b border-secondary p-3">
@@ -52,21 +56,23 @@ const UserMenu = () => {
                         else navigate(String(key));
                     }}
                 >
-                    <Dropdown.Item id="/home" icon={Home03}>
-                        {t("nav.home")}
-                    </Dropdown.Item>
-                    <Dropdown.Item id="/properties" icon={Map01}>
-                        {t("nav.properties")}
-                    </Dropdown.Item>
-                    <Dropdown.Item id="/dashboard" icon={BarChartSquare02}>
-                        {t("nav.dashboard")}
-                    </Dropdown.Item>
-                    <Dropdown.Item id="/reports" icon={FileDownload01}>
-                        {t("nav.reports")}
-                    </Dropdown.Item>
-                    <Dropdown.Item id="/plans" icon={CreditCard01}>
-                        {t("nav.plans")}
-                    </Dropdown.Item>
+                    {/* No celular o menu superior some, então a navegação continua aqui. */}
+                    {!wide ? (
+                        <>
+                            <Dropdown.Item id="/home" icon={Home03}>
+                                {t("nav.home")}
+                            </Dropdown.Item>
+                            <Dropdown.Item id="/properties" icon={Map01}>
+                                {t("nav.properties")}
+                            </Dropdown.Item>
+                            <Dropdown.Item id="/dashboard" icon={BarChartSquare02}>
+                                {t("nav.dashboard")}
+                            </Dropdown.Item>
+                            <Dropdown.Item id="/reports" icon={FileDownload01}>
+                                {t("nav.reports")}
+                            </Dropdown.Item>
+                        </>
+                    ) : null}
                     <Dropdown.Item id="/settings" icon={Settings01}>
                         {t("nav.settings")}
                     </Dropdown.Item>
@@ -144,12 +150,6 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
                             </NavLink>
                             <NavLink to="/reports" className={navLink}>
                                 {navLabel(t("nav.reports"))}
-                            </NavLink>
-                            <NavLink to="/plans" className={navLink}>
-                                {navLabel(t("nav.plans"))}
-                            </NavLink>
-                            <NavLink to="/settings" className={navLink}>
-                                {navLabel(t("nav.settings"))}
                             </NavLink>
                         </nav>
                     )}

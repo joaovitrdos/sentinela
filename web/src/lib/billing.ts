@@ -2,7 +2,6 @@ import { api } from "./api";
 
 export type Feature = "BASE" | "REPORTS" | "SPRAY_WINDOW" | "NDVI" | "ALERTS" | "TEAM" | "IRRIGATION" | "EARLY_ACCESS";
 export type BillingCycle = "MONTHLY" | "YEARLY";
-export type PaymentMethod = "CARD" | "PIX" | "BOLETO";
 export type SubscriptionStatus = "TRIAL" | "PENDING" | "ACTIVE" | "OVERDUE" | "CANCELED";
 
 export interface Plan {
@@ -42,7 +41,7 @@ export const FEATURE_ORDER: Feature[] = ["BASE", "REPORTS", "SPRAY_WINDOW", "NDV
 export const billingApi = {
     plans: (signal?: AbortSignal) => api<Plan[]>("/api/plans", { signal }),
     status: (signal?: AbortSignal) => api<BillingStatus>("/api/billing/me", { signal }),
-    subscribe: (body: { planCode: string; cycle: BillingCycle; paymentMethod: PaymentMethod; cpfCnpj?: string }) =>
+    subscribe: (body: { planCode: string; cycle: BillingCycle; cpfCnpj?: string }) =>
         api<SubscribeResult>("/api/billing/subscribe", { method: "POST", body }),
     cancel: () => api("/api/billing/cancel", { method: "POST" }),
 };

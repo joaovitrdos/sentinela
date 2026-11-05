@@ -65,7 +65,7 @@ class PlanAccessControllerTest extends WebLayerTestSupport {
         mockMvc.perform(get("/api/billing/me").header(HttpHeaders.AUTHORIZATION, token)).andExpect(status().isOk());
         mockMvc.perform(post("/api/billing/subscribe").header(HttpHeaders.AUTHORIZATION, token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"planCode\":\"NORMAL\",\"cycle\":\"MONTHLY\",\"cpfCnpj\":\"12345678909\",\"paymentMethod\":\"PIX\"}"))
+                        .content("{\"planCode\":\"NORMAL\",\"cycle\":\"MONTHLY\",\"cpfCnpj\":\"12345678909\"}"))
                 .andExpect(status().isOk());
         mockMvc.perform(delete("/api/properties/{id}/team/me", PROPERTY_ID).header(HttpHeaders.AUTHORIZATION, token))
                 .andExpect(status().isOk());

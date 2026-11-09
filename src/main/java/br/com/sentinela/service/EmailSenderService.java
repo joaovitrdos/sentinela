@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.entity.Email;
 import br.com.sentinela.entity.User;
 import br.com.sentinela.enums.StatusEmail;
@@ -40,7 +42,7 @@ public class EmailSenderService {
 
         this.mailSender = mailSender;
         this.emailRepository = emailRepository;
-        this.from = from == null ? "" : from.trim();
+        this.from = Util.isNull(from) ? "" : from.trim();
         this.enabled = enabled;
     }
 
@@ -49,7 +51,7 @@ public class EmailSenderService {
         Objects.requireNonNull(user, "user não pode ser nulo");
 
         String recipient = emailMessage.getRecipient();
-        if (recipient == null || recipient.isBlank()) {
+        if (Util.isNullOrBlank(recipient)) {
             throw new IllegalArgumentException("O destinatário do e-mail não pode ser vazio");
         }
 
@@ -96,7 +98,7 @@ public class EmailSenderService {
             MimeMessageHelper helper =
                     new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
 
-            if (!from.isEmpty()) {
+            if (!Util.isNullOrEmpty(from)) {
 
                 helper.setFrom(from);
             }

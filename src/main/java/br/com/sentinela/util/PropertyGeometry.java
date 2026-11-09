@@ -30,18 +30,18 @@ public final class PropertyGeometry {
     }
 
     public static Validated validate(PropertyGeometryResponseDto geometry) {
-        if (geometry == null || !"Polygon".equals(geometry.type())
-                || geometry.coordinates() == null || geometry.coordinates().size() != 1) {
+        if (Util.isNull(geometry) || !"Polygon".equals(geometry.type())
+                || Util.isNull(geometry.coordinates()) || geometry.coordinates().size() != 1) {
             throw invalid("A área deve ser um polígono GeoJSON com um único contorno, sem áreas internas vazias");
         }
         List<List<Double>> ring = geometry.coordinates().getFirst();
-        if (ring == null || ring.size() < 4 || ring.size() > MAX_VERTICES + 1) {
+        if (Util.isNull(ring) || ring.size() < 4 || ring.size() > MAX_VERTICES + 1) {
             throw invalid("Desenhe entre 3 e 200 pontos e feche o contorno da propriedade");
         }
 
         List<List<Double>> points = new ArrayList<>(ring.size());
         for (List<Double> point : ring) {
-            if (point == null || point.size() != 2 || point.get(0) == null || point.get(1) == null) {
+            if (Util.isNull(point) || point.size() != 2 || Util.isNull(point.get(0)) || Util.isNull(point.get(1))) {
                 throw invalid("Cada ponto deve conter apenas longitude e latitude, nessa ordem");
             }
             double longitude = point.get(0);

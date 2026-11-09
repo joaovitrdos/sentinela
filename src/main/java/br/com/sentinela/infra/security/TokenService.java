@@ -1,5 +1,9 @@
 package br.com.sentinela.infra.security;
 
+import br.com.sentinela.util.Util;
+
+import br.com.sentinela.util.LogUtil;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
@@ -29,7 +33,7 @@ public class TokenService {
 
     @PostConstruct
     void requireStrongSecret() {
-        if (secret == null || secret.strip().length() < MIN_SECRET_LENGTH) {
+        if (Util.isNull(secret) || secret.strip().length() < MIN_SECRET_LENGTH) {
             throw new IllegalStateException(
                     "SENTINELA_JWT_SECRET precisa de ao menos " + MIN_SECRET_LENGTH
                             + " caracteres. Gere um com: openssl rand -base64 48");
@@ -52,13 +56,13 @@ public class TokenService {
     public Credentials credentialsFrom(String authorizationHeader) {
         DecodedJWT decoded = decode(authorizationHeader);
 
-        if (decoded == null) {
+        if (Util.isNull(decoded)) {
             return null;
         }
 
         Claim version = decoded.getClaim(VERSION_CLAIM);
         UUID userId = parseUserId(decoded.getSubject());
-        if (userId == null) {
+        if (Util.isNull(userId)) {
             return null;
         }
         return new Credentials(userId, version.isMissing() || version.isNull()
@@ -69,23 +73,24 @@ public class TokenService {
     /** Chave estavel do usuario (o userId), usada para o rate limit por usuario. */
     public String subjectFrom(String authorizationHeader) {
         Credentials credentials = credentialsFrom(authorizationHeader);
-        return credentials == null ? null : credentials.userId().toString();
+        return Util.isNull(credentials) ? null : credentials.userId().toString();
     }
 
     // O subject e o userId (imutavel). Tokens antigos, emitidos com o e-mail no subject, deixam de valer.
     private static UUID parseUserId(String subject) {
-        if (subject == null) {
+        if (Util.isNull(subject)) {
             return null;
         }
         try {
             return UUID.fromString(subject);
         } catch (IllegalArgumentException exception) {
+            LogUtil.debug("Token com identificador de usuário inválido");
             return null;
         }
     }
 
     private DecodedJWT decode(String authorizationHeader) {
-        if (authorizationHeader == null) {
+        if (Util.isNull(authorizationHeader)) {
             return null;
         }
         try {
@@ -94,6 +99,7 @@ public class TokenService {
                     .build()
                     .verify(authorizationHeader.replace(BEARER_PREFIX, ""));
         } catch (JWTVerificationException exception) {
+            LogUtil.debug("Token rejeitado: {0}", exception.getMessage());
             return null;
         }
     }
@@ -104,7 +110,7 @@ public class TokenService {
 
     public record Credentials(UUID userId, Integer tokenVersion) {
         public boolean matches(User user) {
-            return tokenVersion != null && tokenVersion == user.getTokenVersion()
+            return Util.nonNull(tokenVersion) && tokenVersion == user.getTokenVersion()
                     && userId.equals(user.getUserId());
         }
     }

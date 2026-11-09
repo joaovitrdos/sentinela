@@ -1,5 +1,7 @@
 package br.com.sentinela.entity;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.enums.CodePurpose;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -61,6 +63,6 @@ public class VerificationCode implements Serializable {
     }
 
     public boolean isExpired(LocalDateTime moment) {
-        return expiresAt == null || expiresAt.isBefore(moment);
+        return Util.isNull(expiresAt) || expiresAt.isBefore(moment);
     }
 }

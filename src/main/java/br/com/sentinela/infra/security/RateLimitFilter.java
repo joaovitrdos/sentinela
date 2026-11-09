@@ -1,5 +1,7 @@
 package br.com.sentinela.infra.security;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.infra.config.SentinelaSecurityProperties;
 import com.github.benmanes.caffeine.cache.Cache;
 import io.github.bucket4j.Bucket;
@@ -74,7 +76,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
         }
 
         String subject = tokenService.subjectFrom(request.getHeader(HttpHeaders.AUTHORIZATION));
-        if (subject == null) {
+        if (Util.isNull(subject)) {
             return new Target("ip:" + ip, rateLimit.anonymous());
         }
         return new Target("user:" + subject, rateLimit.user());

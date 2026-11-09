@@ -1,5 +1,7 @@
 package br.com.sentinela.infra.security;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.exception.TooManyCodeAttemptsException;
 import br.com.sentinela.exception.TooManyCodeRequestsException;
 import br.com.sentinela.exception.TooManyLoginAttemptsException;
@@ -77,7 +79,7 @@ public class AttemptGuard {
 
     private int current(Cache<String, AtomicInteger> counters, String email) {
         AtomicInteger counter = counters.getIfPresent(email);
-        return counter == null ? 0 : counter.get();
+        return Util.isNull(counter) ? 0 : counter.get();
     }
 
     private int increment(Cache<String, AtomicInteger> counters, String email) {
@@ -85,6 +87,6 @@ public class AttemptGuard {
     }
 
     private String clientKey(String email, String clientAddress) {
-        return email + "@" + (clientAddress == null || clientAddress.isBlank() ? "unknown" : clientAddress);
+        return email + "@" + (Util.isNullOrBlank(clientAddress) ? "unknown" : clientAddress);
     }
 }

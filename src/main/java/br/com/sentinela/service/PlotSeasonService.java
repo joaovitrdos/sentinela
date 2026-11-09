@@ -1,5 +1,6 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
 import br.com.sentinela.dto.request.PlotSeasonRequestDto;
 import br.com.sentinela.dto.response.PlotSeasonResponseDto;
 import br.com.sentinela.entity.PlotSeason;
@@ -41,10 +42,10 @@ public class PlotSeasonService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Encerre a safra ativa antes de iniciar outra");
         }
         if (seasons.findAllByPlot_PlotIdOrderByPlantingDateDesc(plotId).stream().anyMatch(previous ->
-                previous.getHarvestDate() == null || !request.plantingDate().isAfter(previous.getHarvestDate())))
+                Util.isNull(previous.getHarvestDate()) || !request.plantingDate().isAfter(previous.getHarvestDate())))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "O plantio deve ocorrer depois da última colheita");
         var season = PlotSeason.builder().plot(plot).cropName(request.cropName().trim())
-                .variety(request.variety() == null || request.variety().isBlank() ? null : request.variety().trim())
+                .variety(Util.trimToNull(request.variety()))
                 .plantingDate(request.plantingDate()).status("ACTIVE").build();
         plot.setCropName(season.getCropName());
         plot.setPlantingDate(season.getPlantingDate());
@@ -56,7 +57,7 @@ public class PlotSeasonService {
         properties.requireEdit(propertyId, userId);
         var season = requireSeason(userId, propertyId, plotId, seasonId);
         if (!"ACTIVE".equals(season.getStatus())) throw new ResponseStatusException(HttpStatus.CONFLICT, "Safra já encerrada");
-        if (harvestDate == null || harvestDate.isBefore(season.getPlantingDate()) || harvestDate.isAfter(LocalDate.now()))
+        if (Util.isNull(harvestDate) || harvestDate.isBefore(season.getPlantingDate()) || harvestDate.isAfter(LocalDate.now()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data de colheita inválida");
         if (activities.existsBySeason_SeasonIdAndDateAfter(seasonId, harvestDate))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Há operações posteriores à data de encerramento");

@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.dto.response.RiverLevelResponseDto;
 import br.com.sentinela.infra.cache.SingleValueCache;
 import br.com.sentinela.infra.client.snirh.SnirhLayerClient;
@@ -46,7 +48,7 @@ public class ReferenceLevelService {
                 level.stationCode(), level.stationName(), level.city(), level.state(), level.watershed(), level.subWatershed(),
                 level.responsible(), level.operator(), level.project(), level.stationSituation(), level.levelCm(),
                 level.status(), level.statusDescription(), level.lastReadingAt(),
-                level.lastReadingAt() == null ? null : ageHours(level.lastReadingAt().toInstant(), now),
+                Util.isNull(level.lastReadingAt()) ? null : ageHours(level.lastReadingAt().toInstant(), now),
                 level.latitude(), level.longitude(), level.requiresAttention())).toList();
     }
 
@@ -54,10 +56,10 @@ public class ReferenceLevelService {
         Instant now = Instant.now();
         List<RiverLevelResponseDto> levels = client.fetchAll(properties.levelsUrl(), FIELDS, "estcodigo", true).stream()
                 .map(feature -> toRiverLevel(feature, now))
-                .filter(Objects::nonNull)
+                .filter(Util::nonNull)
                 .toList();
         List<RiverLevelResponseDto> latest = latestPerStation(levels, now);
-        if (latest.isEmpty()) {
+        if (Util.isNullOrEmpty(latest)) {
             throw new SnirhUnavailableException("SNIRH returned no valid reference levels");
         }
         return latest;
@@ -66,12 +68,12 @@ public class ReferenceLevelService {
     RiverLevelResponseDto toRiverLevel(LayerFeatureDto feature, Instant now) {
         Long stationCode = feature.integer("Codigo");
         LayerGeometryDto geometry = feature.geometry();
-        if (stationCode == null || geometry == null || geometry.latitude() == null || geometry.longitude() == null) {
+        if (Util.isNull(stationCode) || Util.isNull(geometry) || Util.isNull(geometry.latitude()) || Util.isNull(geometry.longitude())) {
             return null;
         }
 
         Long epochMillis = feature.integer("Data_ult_dado");
-        Instant lastReadingAt = epochMillis != null ? Instant.ofEpochMilli(epochMillis) : null;
+        Instant lastReadingAt = Util.nonNull(epochMillis) ? Instant.ofEpochMilli(epochMillis) : null;
         String description = feature.text("Status_Dado");
         String status = levelStatus(description);
 
@@ -89,8 +91,8 @@ public class ReferenceLevelService {
                 feature.number("Ult_Dado"),
                 status,
                 description,
-                lastReadingAt != null ? lastReadingAt.atZone(timeZone).toOffsetDateTime() : null,
-                lastReadingAt != null ? ageHours(lastReadingAt, now) : null,
+                Util.nonNull(lastReadingAt) ? lastReadingAt.atZone(timeZone).toOffsetDateTime() : null,
+                Util.nonNull(lastReadingAt) ? ageHours(lastReadingAt, now) : null,
                 geometry.latitude(),
                 geometry.longitude(),
                 "ATENCAO".equals(status) || "ALERTA".equals(status) || "INUNDACAO".equals(status));
@@ -98,12 +100,12 @@ public class ReferenceLevelService {
 
     static List<RiverLevelResponseDto> latestPerStation(List<RiverLevelResponseDto> levels, Instant now) {
         Comparator<RiverLevelResponseDto> byDate = Comparator.comparing(
-                (RiverLevelResponseDto level) -> level.lastReadingAt() == null ? null : level.lastReadingAt().toInstant(),
+                (RiverLevelResponseDto level) -> Util.isNull(level.lastReadingAt()) ? null : level.lastReadingAt().toInstant(),
                 Comparator.nullsFirst(Comparator.naturalOrder()));
 
         Map<Long, RiverLevelResponseDto> latest = new LinkedHashMap<>();
         for (RiverLevelResponseDto level : levels) {
-            if (level.lastReadingAt() != null && level.lastReadingAt().toInstant().isAfter(now)) {
+            if (Util.nonNull(level.lastReadingAt()) && level.lastReadingAt().toInstant().isAfter(now)) {
                 continue;
             }
             latest.merge(level.stationCode(), level, (current, candidate) ->

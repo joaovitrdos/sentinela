@@ -1,5 +1,6 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
 import br.com.sentinela.dto.request.TeamInviteRequestDto;
 import br.com.sentinela.dto.response.TeamOverviewDto;
 import br.com.sentinela.entity.Property;
@@ -50,7 +51,7 @@ public class TeamService {
     @Transactional(readOnly = true)
     public Property requireView(UUID propertyId, UUID userId) {
         Property property = properties.findById(propertyId).orElseThrow(PropertyNotFoundException::new);
-        if (role(property, userId) == null) throw new PropertyNotFoundException();
+        if (Util.isNull(role(property, userId))) throw new PropertyNotFoundException();
         return property;
     }
 
@@ -77,7 +78,7 @@ public class TeamService {
 
     @Transactional(readOnly = true)
     public TeamRole role(Property property, UUID userId) {
-        if (userId == null || property == null) return null;
+        if (Util.isNull(userId) || Util.isNull(property)) return null;
         if (property.getUser().getUserId().equals(userId)) return TeamRole.ADMIN;
         if (!Boolean.TRUE.equals(property.getTeamEnabled()) || !plans.ownerHasTeam(property.getUser().getUserId())) return null;
         return members.findByProperty_PropertyIdAndUser_UserId(property.getPropertyId(), userId)
@@ -130,7 +131,7 @@ public class TeamService {
     }
 
     private String titleOf(Property property) {
-        return property.getTeamTitle() == null || property.getTeamTitle().isBlank()
+        return Util.isNullOrBlank(property.getTeamTitle())
                 ? property.getName() : property.getTeamTitle();
     }
 
@@ -225,7 +226,7 @@ public class TeamService {
 
     @Transactional
     public void accept(UUID userId, String token) {
-        if (token == null || !token.matches("[A-Za-z0-9_-]{43}")) throw invalidInvite();
+        if (Util.isNull(token) || !token.matches("[A-Za-z0-9_-]{43}")) throw invalidInvite();
         var user = users.findById(userId).orElseThrow(PropertyNotFoundException::new);
         PropertyInvitation invitation = invitations.findByTokenHash(hash(token)).orElseThrow(this::invalidInvite);
         if (invitation.getExpiresAt().isBefore(LocalDateTime.now()) ||

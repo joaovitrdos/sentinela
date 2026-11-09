@@ -1,5 +1,6 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
 import br.com.sentinela.dto.response.RiverLevelResponseDto;
 import br.com.sentinela.report.PreparedReport;
 import br.com.sentinela.report.ReportProvider;
@@ -51,20 +52,20 @@ public class SnirhHydroLevelsReportProvider implements ReportProvider {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O relatório recebeu parâmetros não permitidos");
         }
         String state = text(requested.get("state"));
-        if (state != null && !state.matches("[A-Za-z]{2}")) {
+        if (Util.nonNull(state) && !state.matches("[A-Za-z]{2}")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe uma sigla de estado válida");
         }
         boolean onlyAttention = booleanValue(requested.get("onlyAttention"));
         List<Map<String, ?>> rows = new ArrayList<>();
         for (RiverLevelResponseDto level : referenceLevelService.getRiverLevels()) {
-            if (state != null && !state.equalsIgnoreCase(level.state())) continue;
+            if (Util.nonNull(state) && !state.equalsIgnoreCase(level.state())) continue;
             if (onlyAttention && !level.requiresAttention()) continue;
             rows.add(toRow(level));
         }
 
         Map<String, Object> parameters = new LinkedHashMap<>();
         parameters.put("REPORT_TITLE", title());
-        parameters.put("FILTER_LABEL", (state == null ? "Todos os estados" : "UF: " + state.toUpperCase(Locale.ROOT))
+        parameters.put("FILTER_LABEL", (Util.isNull(state) ? "Todos os estados" : "UF: " + state.toUpperCase(Locale.ROOT))
                 + (onlyAttention ? " · Somente estações que exigem atenção" : ""));
         parameters.put("GENERATED_AT", DATE_TIME.format(OffsetDateTime.now()));
         parameters.put("TOTAL_STATIONS", rows.size());
@@ -78,20 +79,20 @@ public class SnirhHydroLevelsReportProvider implements ReportProvider {
         row.put("city", value(level.city()));
         row.put("state", value(level.state()));
         row.put("watershed", value(level.watershed()));
-        row.put("levelCm", level.levelCm() == null ? "Sem leitura" : String.format(Locale.forLanguageTag("pt-BR"), "%.1f cm", level.levelCm()));
+        row.put("levelCm", Util.isNull(level.levelCm()) ? "Sem leitura" : String.format(Locale.forLanguageTag("pt-BR"), "%.1f cm", level.levelCm()));
         row.put("status", value(level.status()));
         row.put("statusDescription", value(level.statusDescription()));
-        row.put("lastReadingAt", level.lastReadingAt() == null ? "Sem data" : DATE_TIME.format(level.lastReadingAt()));
-        row.put("ageHours", level.ageHours() == null ? "" : String.format(Locale.forLanguageTag("pt-BR"), "%.1f h", level.ageHours()));
+        row.put("lastReadingAt", Util.isNull(level.lastReadingAt()) ? "Sem data" : DATE_TIME.format(level.lastReadingAt()));
+        row.put("ageHours", Util.isNull(level.ageHours()) ? "" : String.format(Locale.forLanguageTag("pt-BR"), "%.1f h", level.ageHours()));
         return row;
     }
 
     private String text(Object value) {
-        return value == null || value.toString().isBlank() ? null : value.toString().trim();
+        return Util.trimToNull(value);
     }
 
     private boolean booleanValue(Object value) {
-        if (value == null) return false;
+        if (Util.isNull(value)) return false;
         if (value instanceof Boolean bool) return bool;
         if ("true".equalsIgnoreCase(value.toString()) || "false".equalsIgnoreCase(value.toString())) {
             return Boolean.parseBoolean(value.toString());
@@ -100,6 +101,6 @@ public class SnirhHydroLevelsReportProvider implements ReportProvider {
     }
 
     private String value(String value) {
-        return value == null ? "" : value;
+        return Util.isNull(value) ? "" : value;
     }
 }

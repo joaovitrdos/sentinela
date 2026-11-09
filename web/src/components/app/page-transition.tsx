@@ -35,6 +35,6 @@ export const AnimatedOutlet = () => {
 /** Agrupa rotas que compartilham a mesma moldura (nao refazem a animacao de pagina inteira entre si). */
 export const routeGroup = (pathname: string) => {
     if (pathname === "/login" || pathname === "/register") return "auth";
-    if (/^\/(home|properties|dashboard|reports|settings|plans|privacy|terms)(\/|$)/.test(pathname)) return "shell";
+    if (/^\/(mapa|properties|dashboard|reports|settings|plans|privacy|terms)(\/|$)/.test(pathname)) return "shell";
     return pathname;
 };

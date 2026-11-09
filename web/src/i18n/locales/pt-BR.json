@@ -138,9 +138,9 @@
         "noSubscription": "Você não tem assinatura ativa para cancelar."
     },
     "nav": {
-        "home": "Início",
+        "home": "Mapa regional",
         "properties": "Propriedades",
-        "dashboard": "Dashboard",
+        "dashboard": "Painel",
         "reports": "Relatórios",
         "settings": "Configurações",
         "logout": "Sair",
@@ -208,7 +208,7 @@
         "snirhSecurityNote": "Os níveis são dados públicos consultados no SNIRH."
     },
     "dashboard": {
-        "title": "Dashboard ambiental",
+        "title": "Painel ambiental",
         "subtitle": "Resumo de chuva, clima e níveis dos rios com dados recentes das estações monitoradas.",
         "refresh": "Atualizar dados",
         "updatedAt": "Atualizado às {{time}}",
@@ -703,7 +703,8 @@
             "ALERTS": "Alertas automáticos",
             "TEAM": "Equipe",
             "IRRIGATION": "Recomendação de irrigação",
-            "EARLY_ACCESS": "Novidades em primeira mão"
+            "EARLY_ACCESS": "Novidades em primeira mão",
+            "PLANTING_WINDOW": "Janela de plantio do ZARC"
         },
         "status": {
             "TRIAL": "Teste grátis",
@@ -794,6 +795,67 @@
             "hours_other": "({{count}} horas)",
             "legend": "Verde: horário favorável. Passe o mouse para ver os detalhes.",
             "loadError": "Não foi possível consultar a janela de pulverização."
+        },
+        "planting": {
+            "title": "Janela de plantio (ZARC)",
+            "subtitle": "Períodos indicados pelo Zoneamento Agrícola de Risco Climático do MAPA para o município da propriedade.",
+            "crop": "Cultura",
+            "soil": "Solo",
+            "cycle": "Ciclo",
+            "management": "Manejo",
+            "openNow": "Janela aberta: plante até {{to}} com risco a partir de {{risk}}%.",
+            "opensOn": "Próxima janela: de {{from}} a {{to}}, com risco a partir de {{risk}}%.",
+            "noWindow": "O ZARC não indica plantio desta combinação no município.",
+            "riskLegend": "Risco de perda por clima",
+            "outside": "Fora da janela",
+            "today": "Hoje",
+            "notImported": "A tábua do ZARC ainda está sendo importada. Tente de novo mais tarde.",
+            "notFound": "Não encontramos {{city}} ({{uf}}) no ZARC. Confira a cidade e o estado da propriedade.",
+            "ordinance": "Portaria: {{value}}.",
+            "disclaimer": "O risco indica a chance de perda por falta ou excesso de chuva e temperatura no período. Não substitui a orientação do agrônomo.",
+            "source": "Fonte:",
+            "loadError": "Não foi possível consultar a janela de plantio.",
+            "cycles": {
+                "13": "Perene",
+                "19": "Semiperene",
+                "20": "Grupo I (mais curto)",
+                "21": "Grupo II",
+                "22": "Grupo III",
+                "24": "Grupo IV",
+                "25": "Grupo V",
+                "26": "Grupo VI (mais longo)"
+            },
+            "soils": {
+                "1": "Arenoso",
+                "2": "Textura média",
+                "3": "Argiloso",
+                "11": "AD1 (guarda pouca água)",
+                "12": "AD2",
+                "13": "AD3",
+                "14": "AD4",
+                "15": "AD5",
+                "16": "AD6 (guarda muita água)"
+            }
+        },
+        "climate": {
+            "title": "Clima desde {{year}}",
+            "subtitle": "Chuva da propriedade comparada com o mesmo período de cada ano desde {{year}}.",
+            "last30": "Últimos 30 dias",
+            "rain": "{{value}} mm de chuva",
+            "normal": "Média: {{value}} mm",
+            "above": "{{value}}% acima da média",
+            "below": "{{value}}% abaixo da média",
+            "even": "Dentro da média",
+            "driest": "{{rank}}º período mais seco em {{years}} anos",
+            "wettest": "{{rank}}º período mais chuvoso em {{years}} anos",
+            "monthsTitle": "Chuva por mês × média histórica",
+            "seriesRain": "Chuva",
+            "seriesNormal": "Média",
+            "partial": "mês em andamento",
+            "extremes": "Mais seco: {{min}} mm ({{minYear}}) · Mais chuvoso: {{max}} mm ({{maxYear}})",
+            "lastDate": "Dados até {{date}} (a fonte publica com alguns dias de atraso).",
+            "source": "Fonte:",
+            "loadError": "Não foi possível consultar o histórico de clima."
         },
         "irrigation": {
             "title": "Recomendação de irrigação",

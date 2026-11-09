@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.repository.SystemRepository;
 import br.com.sentinela.dto.response.SystemStatusDto;
 import br.com.sentinela.entity.System;
@@ -39,13 +41,13 @@ public class MaintenanceService {
         var active = settings.stream()
                 .filter(System::isMaintenance)
                 .max(Comparator.comparing(System::getMaintenanceStart, Comparator.nullsLast(Comparator.naturalOrder())));
-        System setting = active.orElse(settings.isEmpty() ? null : settings.getFirst());
-        return new SystemStatusDto(active.isPresent(), setting == null ? null : setting.getVersion(),
-                setting == null ? null : offset(setting.getMaintenanceStart()),
-                setting == null ? null : offset(setting.getMaintenanceEnd()), clock.getZone().getId());
+        System setting = active.orElse(Util.isNullOrEmpty(settings) ? null : settings.getFirst());
+        return new SystemStatusDto(active.isPresent(), Util.isNull(setting) ? null : setting.getVersion(),
+                Util.isNull(setting) ? null : offset(setting.getMaintenanceStart()),
+                Util.isNull(setting) ? null : offset(setting.getMaintenanceEnd()), clock.getZone().getId());
     }
 
     private OffsetDateTime offset(LocalDateTime dateTime) {
-        return dateTime == null ? null : dateTime.atZone(clock.getZone()).toOffsetDateTime();
+        return Util.isNull(dateTime) ? null : dateTime.atZone(clock.getZone()).toOffsetDateTime();
     }
 }

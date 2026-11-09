@@ -55,7 +55,7 @@ export const VerifyEmailPage = () => {
         setError(undefined);
         try {
             signIn(await authApi.confirmEmail({ email: email.trim(), code: value }));
-            navigate(state.from?.startsWith("/") && !state.from.startsWith("//") ? state.from : "/home", { replace: true });
+            navigate(state.from?.startsWith("/") && !state.from.startsWith("//") ? state.from : "/mapa", { replace: true });
         } catch (err) {
             setError(t(errorKey(err)));
             setCode("");

@@ -1,5 +1,7 @@
 package br.com.sentinela.infra.security;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.entity.User;
 import br.com.sentinela.repository.UserRepository;
 import jakarta.servlet.FilterChain;
@@ -33,7 +35,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         TokenService.Credentials credentials =
                 tokenService.credentialsFrom(request.getHeader(HttpHeaders.AUTHORIZATION));
 
-        if (credentials != null) {
+        if (Util.nonNull(credentials)) {
             userRepository.findById(credentials.userId())
                     .filter(credentials::matches)
                     .ifPresent(user -> authenticate(user, request));

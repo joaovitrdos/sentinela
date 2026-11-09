@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.dto.response.RiverNetworkResponseDto;
 import br.com.sentinela.dto.response.RiverNetworkResponseDto.RiverFeatureDto;
 import br.com.sentinela.infra.cache.SingleValueCache;
@@ -43,9 +45,9 @@ public class RiverService {
         List<RiverFeatureDto> rivers = client.fetchAll(properties.riversUrl(), "OBJECTID,NORIOCOMP,Shape_Length", "OBJECTID", true,
                         simplification).stream()
                 .map(RiverService::toRiver)
-                .filter(Objects::nonNull)
+                .filter(Util::nonNull)
                 .toList();
-        if (rivers.isEmpty()) {
+        if (Util.isNullOrEmpty(rivers)) {
             throw new SnirhUnavailableException("SNIRH returned no valid rivers");
         }
         return RiverNetworkResponseDto.of(rivers);
@@ -54,12 +56,12 @@ public class RiverService {
     static RiverFeatureDto toRiver(LayerFeatureDto feature) {
         LayerGeometryDto geometry = feature.geometry();
         Long id = feature.integer("OBJECTID");
-        if (id == null || geometry == null || geometry.paths() == null) {
+        if (Util.isNull(id) || Util.isNull(geometry) || Util.isNull(geometry.paths())) {
             return null;
         }
 
         double[][][] paths = Arrays.stream(geometry.paths())
-                .filter(Objects::nonNull)
+                .filter(Util::nonNull)
                 .map(RiverService::round)
                 .filter(path -> path.length >= 2)
                 .toArray(double[][][]::new);
@@ -77,7 +79,7 @@ public class RiverService {
                 simplifiedDegrees += Math.hypot(path[i][0] - path[i - 1][0], path[i][1] - path[i - 1][1]);
             }
         }
-        if (originalLengthDegrees == null || simplifiedDegrees == 0 || originalLengthDegrees <= simplifiedDegrees) {
+        if (Util.isNull(originalLengthDegrees) || simplifiedDegrees == 0 || originalLengthDegrees <= simplifiedDegrees) {
             return 1.0;
         }
         return originalLengthDegrees / simplifiedDegrees;
@@ -87,11 +89,11 @@ public class RiverService {
         List<double[]> points = new ArrayList<>(path.length);
         double[] previous = null;
         for (double[] point : path) {
-            if (point == null || point.length < 2) {
+            if (Util.isNull(point) || point.length < 2) {
                 continue;
             }
             double[] rounded = {Math.round(point[0] * PRECISION) / PRECISION, Math.round(point[1] * PRECISION) / PRECISION};
-            if (previous == null || previous[0] != rounded[0] || previous[1] != rounded[1]) {
+            if (Util.isNull(previous) || previous[0] != rounded[0] || previous[1] != rounded[1]) {
                 points.add(rounded);
                 previous = rounded;
             }

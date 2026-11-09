@@ -76,11 +76,73 @@ export interface CarProperty {
     source: string;
 }
 
+export interface ClimatePeriod {
+    from: string;
+    to: string;
+    rainMm: number;
+    normalRainMm: number;
+    anomalyPercent: number | null;
+    driestRank: number;
+    yearsCompared: number;
+}
+
+export interface ClimateMonth {
+    month: string;
+    complete: boolean;
+    rainMm: number;
+    normalRainMm: number;
+    anomalyPercent: number | null;
+    driestRank: number;
+    yearsCompared: number;
+    meanMaxTemperatureC: number;
+    normalMaxTemperatureC: number;
+}
+
+export interface ClimateHistory {
+    firstDate: string;
+    lastDate: string;
+    years: number;
+    last30Days: ClimatePeriod | null;
+    recentMonths: ClimateMonth[];
+    normals: { month: number; meanRainMm: number; minRainMm: number; minYear: number; maxRainMm: number; maxYear: number }[];
+    sources: { name: string; url: string; license: string }[];
+}
+
+export interface PlantingWindowOption {
+    harvest: string;
+    cycleCode: number;
+    soilCode: number;
+    climateName: string | null;
+    managementCode: number;
+    managementName: string;
+    productivity: string | null;
+    managementLevel: number | null;
+    ordinance: string | null;
+    risks: number[];
+    openNow: boolean;
+    window: { fromDecendio: number; toDecendio: number; from: string; to: string; bestRiskPercent: number } | null;
+}
+
+export interface PlantingWindow {
+    status: "OK" | "MUNICIPALITY_NOT_FOUND" | "NOT_IMPORTED";
+    municipality: string | null;
+    uf: string | null;
+    ibgeCode: number | null;
+    crops: string[];
+    crop: string | null;
+    currentDecendio: number;
+    options: PlantingWindowOption[];
+    sources: { name: string; url: string; license: string }[];
+}
+
 export const advisoryApi = {
     alerts: (id: string, signal?: AbortSignal) => api<PropertyAlert[]>(`${property(id)}/alerts`, { signal }),
     alertSettings: (id: string, signal?: AbortSignal) => api<AlertSettings>(`${property(id)}/alerts/settings`, { signal }),
     saveAlertSettings: (id: string, body: AlertSettings) => api<AlertSettings>(`${property(id)}/alerts/settings`, { method: "PUT", body }),
     sprayWindows: (id: string, signal?: AbortSignal) => api<SprayWindows>(`${property(id)}/spray-windows`, { signal }),
+    climateHistory: (id: string, signal?: AbortSignal) => api<ClimateHistory>(`${property(id)}/climate-history`, { signal }),
+    plantingWindow: (id: string, crop: string | null, signal?: AbortSignal) =>
+        api<PlantingWindow>(`${property(id)}/planting-window${crop ? `?crop=${encodeURIComponent(crop)}` : ""}`, { signal }),
     irrigation: (id: string, plotId: string, signal?: AbortSignal) =>
         api<IrrigationRecommendation>(`${property(id)}/plots/${encodeURIComponent(plotId)}/irrigation-recommendation`, { signal }),
     car: (code: string) => api<CarProperty>(`/api/car/${encodeURIComponent(code)}`),

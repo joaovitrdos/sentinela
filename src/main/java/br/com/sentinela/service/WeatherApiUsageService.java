@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.util.LogUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
@@ -36,7 +38,7 @@ public class WeatherApiUsageService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void record() {
         Long calls = jdbc.queryForObject(INCREMENT, Long.class, month());
-        if (calls != null && calls >= monthlyLimit * WARNING_SHARE && calls % WARNING_STEP == 0) {
+        if (Util.nonNull(calls) && calls >= monthlyLimit * WARNING_SHARE && calls % WARNING_STEP == 0) {
             LogUtil.warn("WeatherAPI: " + calls + " de " + monthlyLimit + " chamadas usadas no mês");
         }
     }
@@ -45,7 +47,7 @@ public class WeatherApiUsageService {
     public boolean automationAllowed() {
         try {
             List<Long> calls = jdbc.queryForList("SELECT calls FROM tb_weather_api_usage WHERE usage_month = ?", Long.class, month());
-            return calls.isEmpty() || calls.getFirst() < monthlyLimit * AUTOMATION_SHARE;
+            return Util.isNullOrEmpty(calls) || calls.getFirst() < monthlyLimit * AUTOMATION_SHARE;
         } catch (DataAccessException exception) {
             LogUtil.warn("Não foi possível ler o consumo da WeatherAPI");
             return true;

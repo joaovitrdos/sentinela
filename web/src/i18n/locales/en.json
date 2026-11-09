@@ -138,9 +138,9 @@
         "noSubscription": "You have no active subscription to cancel."
     },
     "nav": {
-        "home": "Home",
+        "home": "Regional map",
         "properties": "Properties",
-        "dashboard": "Dashboard",
+        "dashboard": "Overview",
         "reports": "Reports",
         "settings": "Settings",
         "logout": "Sign out",
@@ -208,7 +208,7 @@
         "snirhSecurityNote": "The levels are public data retrieved from SNIRH."
     },
     "dashboard": {
-        "title": "Environmental dashboard",
+        "title": "Environmental overview",
         "subtitle": "A summary of rainfall, weather and river levels from monitored stations.",
         "refresh": "Refresh data",
         "updatedAt": "Updated at {{time}}",
@@ -703,7 +703,8 @@
             "ALERTS": "Automatic alerts",
             "TEAM": "Team",
             "IRRIGATION": "Irrigation recommendation",
-            "EARLY_ACCESS": "Early access to new features"
+            "EARLY_ACCESS": "Early access to new features",
+            "PLANTING_WINDOW": "ZARC planting window"
         },
         "status": {
             "TRIAL": "Free trial",
@@ -794,6 +795,67 @@
             "hours_other": "({{count}} hours)",
             "legend": "Green: favorable hour. Hover to see details.",
             "loadError": "Could not load the spray window."
+        },
+        "planting": {
+            "title": "Planting window (ZARC)",
+            "subtitle": "Periods recommended by Brazil's Agricultural Climate Risk Zoning (MAPA) for the property's municipality.",
+            "crop": "Crop",
+            "soil": "Soil",
+            "cycle": "Cycle",
+            "management": "Management",
+            "openNow": "Window open: plant until {{to}} with risk from {{risk}}%.",
+            "opensOn": "Next window: from {{from}} to {{to}}, with risk from {{risk}}%.",
+            "noWindow": "ZARC does not recommend planting this combination in the municipality.",
+            "riskLegend": "Climate loss risk",
+            "outside": "Outside the window",
+            "today": "Today",
+            "notImported": "The ZARC table is still being imported. Please try again later.",
+            "notFound": "We could not find {{city}} ({{uf}}) in ZARC. Check the property's city and state.",
+            "ordinance": "Ordinance: {{value}}.",
+            "disclaimer": "Risk is the chance of loss from lack or excess of rain and temperature in the period. It does not replace an agronomist's advice.",
+            "source": "Source:",
+            "loadError": "Could not load the planting window.",
+            "cycles": {
+                "13": "Perennial",
+                "19": "Semi-perennial",
+                "20": "Group I (shortest)",
+                "21": "Group II",
+                "22": "Group III",
+                "24": "Group IV",
+                "25": "Group V",
+                "26": "Group VI (longest)"
+            },
+            "soils": {
+                "1": "Sandy",
+                "2": "Medium texture",
+                "3": "Clay",
+                "11": "AD1 (holds little water)",
+                "12": "AD2",
+                "13": "AD3",
+                "14": "AD4",
+                "15": "AD5",
+                "16": "AD6 (holds a lot of water)"
+            }
+        },
+        "climate": {
+            "title": "Climate since {{year}}",
+            "subtitle": "Rainfall at the property compared with the same period of every year since {{year}}.",
+            "last30": "Last 30 days",
+            "rain": "{{value}} mm of rain",
+            "normal": "Average: {{value}} mm",
+            "above": "{{value}}% above average",
+            "below": "{{value}}% below average",
+            "even": "Close to average",
+            "driest": "#{{rank}} driest period in {{years}} years",
+            "wettest": "#{{rank}} wettest period in {{years}} years",
+            "monthsTitle": "Monthly rainfall × historical average",
+            "seriesRain": "Rain",
+            "seriesNormal": "Average",
+            "partial": "month in progress",
+            "extremes": "Driest: {{min}} mm ({{minYear}}) · Wettest: {{max}} mm ({{maxYear}})",
+            "lastDate": "Data up to {{date}} (the source publishes with a few days of delay).",
+            "source": "Source:",
+            "loadError": "Could not load the climate history."
         },
         "irrigation": {
             "title": "Irrigation recommendation",

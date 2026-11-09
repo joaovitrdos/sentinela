@@ -1,5 +1,6 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
 import br.com.sentinela.dto.request.*;
 import br.com.sentinela.dto.response.FieldActionResponseDto;
 import br.com.sentinela.entity.FieldAction;
@@ -33,15 +34,15 @@ public class FieldActionService {
     @Transactional
     public FieldActionResponseDto create(UUID ownerId, UUID propertyId, FieldActionRequestDto request) {
         var property = propertyService.requireEdit(propertyId, ownerId);
-        var plot = request.plotId() == null ? null : plotService.requirePlot(propertyId, ownerId, request.plotId());
-        if (request.assigneeUserId() == null)
+        var plot = Util.isNull(request.plotId()) ? null : plotService.requirePlot(propertyId, ownerId, request.plotId());
+        if (Util.isNull(request.assigneeUserId()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selecione um membro responsável");
         var assignee = teamService.requireActiveMember(property, request.assigneeUserId());
         FieldAction action = FieldAction.builder().property(property).plot(plot).kind(request.kind())
                 .title(request.title().trim()).assignee(assignee)
                 .responsibleName(assignee.getName())
                 .dueDate(request.dueDate()).status("OPEN")
-                .sourceNote(request.sourceNote() == null || request.sourceNote().isBlank() ? null : request.sourceNote().trim())
+                .sourceNote(Util.trimToNull(request.sourceNote()))
                 .build();
         return response(actionRepository.saveAndFlush(action));
     }
@@ -54,7 +55,7 @@ public class FieldActionService {
         if (!"OPEN".equals(action.getStatus())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Ação já concluída");
         }
-        if (!"IRRIGATION".equals(action.getKind()) && request.amountMm() != null) {
+        if (!"IRRIGATION".equals(action.getKind()) && Util.nonNull(request.amountMm())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lâmina só é permitida em irrigação");
         }
         String note = request.completionNote().trim();
@@ -67,7 +68,7 @@ public class FieldActionService {
         FieldAction saved = actionRepository.saveAndFlush(action);
         activityService.create(ownerId, propertyId, new PropertyActivityRequestDto(action.getKind(),
                 LocalDate.now(), null, note, request.amountMm(),
-                action.getPlot() == null ? null : action.getPlot().getPlotId()));
+                Util.isNull(action.getPlot()) ? null : action.getPlot().getPlotId()));
         return response(saved);
     }
 
@@ -93,11 +94,11 @@ public class FieldActionService {
     }
 
     private FieldActionResponseDto response(FieldAction action) {
-        return new FieldActionResponseDto(action.getActionId(), action.getPlot() == null ? null : action.getPlot().getPlotId(),
+        return new FieldActionResponseDto(action.getActionId(), Util.isNull(action.getPlot()) ? null : action.getPlot().getPlotId(),
                 action.getKind(), action.getTitle(), action.getResponsibleName(), action.getDueDate(), action.getStatus(),
                 action.getSourceNote(), action.getCompletionNote(), action.getCompletedAt(), action.getCreatedAt(),
-                action.getAssignee() == null ? null : action.getAssignee().getUserId(),
-                action.getCompletedBy() == null ? null : action.getCompletedBy().getUserId(),
-                action.getCompletedBy() == null ? null : action.getCompletedBy().getName());
+                Util.isNull(action.getAssignee()) ? null : action.getAssignee().getUserId(),
+                Util.isNull(action.getCompletedBy()) ? null : action.getCompletedBy().getUserId(),
+                Util.isNull(action.getCompletedBy()) ? null : action.getCompletedBy().getName());
     }
 }

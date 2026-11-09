@@ -8,5 +8,6 @@ public enum Feature {
     ALERTS,
     TEAM,
     IRRIGATION,
-    EARLY_ACCESS
+    EARLY_ACCESS,
+    PLANTING_WINDOW
 }

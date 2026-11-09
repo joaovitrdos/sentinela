@@ -1,5 +1,7 @@
 package br.com.sentinela.controller;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.enums.Feature;
 import br.com.sentinela.infra.security.RequiresFeature;
 import br.com.sentinela.dto.request.ReportRequestDto;
@@ -44,7 +46,7 @@ public class ReportController {
             @AuthenticationPrincipal User user,
             @PathVariable String reportCode,
             @RequestBody ReportRequestDto request) {
-        if (request == null) {
+        if (Util.isNull(request)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe os parâmetros do relatório");
         }
         GeneratedReportResposneDto report = reportService.generate(

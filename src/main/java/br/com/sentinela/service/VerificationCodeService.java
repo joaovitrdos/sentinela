@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.entity.User;
 import br.com.sentinela.entity.VerificationCode;
 import br.com.sentinela.enums.CodePurpose;
@@ -96,8 +98,8 @@ public class VerificationCodeService {
     }
 
     private boolean matches(String code, VerificationCode candidate) {
-        return code != null
-                && candidate.getCodeHash() != null
+        return Util.nonNull(code)
+                && Util.nonNull(candidate.getCodeHash())
                 && passwordEncoder.matches(code, candidate.getCodeHash());
     }
 
@@ -105,7 +107,7 @@ public class VerificationCodeService {
         List<VerificationCode> pending = verificationCodeRepository
                 .findAllByUserEmailAndPurposeAndUsedFalse(EmailNormalizer.normalize(email), purpose);
 
-        if (pending.isEmpty()) {
+        if (Util.isNullOrEmpty(pending)) {
             return;
         }
         pending.forEach(code -> code.setUsed(true));

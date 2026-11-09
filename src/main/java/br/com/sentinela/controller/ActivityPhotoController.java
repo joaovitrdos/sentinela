@@ -1,5 +1,7 @@
 package br.com.sentinela.controller;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.entity.ActivityPhoto;
 import br.com.sentinela.entity.PropertyActivity;
 import br.com.sentinela.entity.User;
@@ -43,14 +45,14 @@ public class ActivityPhotoController {
                             @RequestPart("file") MultipartFile file) throws IOException {
         properties.requireEdit(propertyId, user.getUserId());
         PropertyActivity activity = activity(propertyId, activityId);
-        if (file.isEmpty() || file.getSize() > 5_000_000 || !TYPES.contains(file.getContentType()))
+        if (Util.isNull(file) || file.isEmpty() || file.getSize() > 5_000_000 || !TYPES.contains(file.getContentType()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Envie JPEG, PNG ou WebP com até 5 MB");
         if (photos.countByActivity_ActivityId(activityId) >= 5)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Limite de cinco fotos por registro");
         byte[] bytes = file.getBytes();
         if (!matchesImageSignature(file.getContentType(), bytes))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O conteúdo do arquivo não corresponde ao formato de imagem");
-        String name = file.getOriginalFilename() == null ? "foto" : file.getOriginalFilename().replaceAll("[\\r\\n\\/\\\\]", "_");
+        String name = Util.isNull(file.getOriginalFilename()) ? "foto" : file.getOriginalFilename().replaceAll("[\\r\\n\\/\\\\]", "_");
         ActivityPhoto photo = photos.save(ActivityPhoto.builder().activity(activity).fileName(name)
                 .contentType(file.getContentType()).imageData(bytes).build());
         return new PhotoInfo(photo.getPhotoId(), photo.getFileName());

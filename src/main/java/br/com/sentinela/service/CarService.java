@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.dto.response.CarPropertyResponseDto;
 import br.com.sentinela.dto.response.PropertyGeometryResponseDto;
 import br.com.sentinela.util.LogUtil;
@@ -37,14 +39,14 @@ public class CarService {
     public CarPropertyResponseDto find(String rawCode) {
         String code = normalize(rawCode);
         JsonNode features = request(code).path("features");
-        if (features.isEmpty()) {
+        if (Util.isNull(features) || features.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Imóvel não encontrado no CAR");
         }
         return response(features.get(0));
     }
 
     static String normalize(String rawCode) {
-        String code = rawCode == null ? "" : rawCode.trim().toUpperCase(Locale.ROOT).replace(".", "");
+        String code = Util.isNull(rawCode) ? "" : rawCode.trim().toUpperCase(Locale.ROOT).replace(".", "");
         if (!CODE.matcher(code).matches() || !STATES.contains(code.substring(0, 2))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Código do CAR inválido");
         }
@@ -65,7 +67,7 @@ public class CarService {
                             .build("cod_imovel='" + code + "'"))
                     .retrieve()
                     .body(JsonNode.class);
-            if (response == null) throw new RestClientException("Resposta vazia do SICAR");
+            if (Util.isNull(response)) throw new RestClientException("Resposta vazia do SICAR");
             return response;
         } catch (RestClientException exception) {
             LogUtil.warn("SICAR indisponível");
@@ -96,7 +98,7 @@ public class CarService {
         Set<List<Double>> points = new LinkedHashSet<>();
         for (JsonNode point : coordinates) points.add(List.of(point.path(0).asDouble(), point.path(1).asDouble()));
         List<List<Double>> ring = new ArrayList<>(points);
-        if (!ring.isEmpty()) ring.add(ring.getFirst());
+        if (!Util.isNullOrEmpty(ring)) ring.add(ring.getFirst());
         return ring;
     }
 

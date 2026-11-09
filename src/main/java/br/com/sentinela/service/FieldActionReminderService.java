@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.entity.FieldAction;
 import br.com.sentinela.notification.EmailFactory;
 import br.com.sentinela.repository.FieldActionRepository;
@@ -32,7 +34,7 @@ public class FieldActionReminderService {
                 var property = action.getProperty();
                 if (!Boolean.TRUE.equals(property.getActionReminderEnabled()) ||
                         action.getDueDate().isAfter(today.plusDays(property.getActionReminderDays()))) continue;
-                if (teams.role(action.getProperty(), action.getAssignee().getUserId()) == null) continue;
+                if (Util.isNull(teams.role(action.getProperty(), action.getAssignee().getUserId()))) continue;
                 var user = teams.requireActiveMember(action.getProperty(), action.getAssignee().getUserId());
                 sender.send(emails.createFieldActionReminder(user.getEmail(), action.getProperty().getName(), action.getTitle(),
                         action.getDueDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))), user);

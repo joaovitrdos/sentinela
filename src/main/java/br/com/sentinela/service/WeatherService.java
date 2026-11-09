@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.dto.response.CurrentWeatherDto;
 import br.com.sentinela.dto.response.ForecastWeatherDto;
 import br.com.sentinela.dto.response.WeatherTimeZoneDto;
@@ -50,7 +52,7 @@ public class WeatherService {
                 .retrieve()
                 .body(JsonNode.class));
 
-        if (response == null) {
+        if (Util.isNull(response)) {
             throw new IllegalStateException(
                     "Resposta vazia da WeatherAPI");
         }
@@ -97,7 +99,7 @@ public class WeatherService {
                 .retrieve()
                 .body(JsonNode.class));
 
-        if (response == null) {
+        if (Util.isNull(response)) {
             throw new IllegalStateException(
                     "Resposta vazia da WeatherAPI");
         }
@@ -119,7 +121,7 @@ public class WeatherService {
                 .retrieve()
                 .body(JsonNode.class));
 
-        if (response == null) {
+        if (Util.isNull(response)) {
             throw new IllegalStateException("Resposta vazia da WeatherAPI time-zone");
         }
 

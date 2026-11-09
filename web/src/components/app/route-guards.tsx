@@ -52,7 +52,7 @@ export const GuestOnly = ({ children }: { children: ReactNode }) => {
         const from = (location.state as { from?: unknown } | null)?.from;
         const returnTo = typeof from === "string" && from.startsWith("/") && !from.startsWith("//")
             ? from
-            : "/home";
+            : "/mapa";
         return <Redirect to={returnTo} />;
     }
     return children;

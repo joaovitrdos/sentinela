@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.exception.GoogleAuthUnavailableException;
 import br.com.sentinela.exception.InvalidGoogleTokenException;
 import br.com.sentinela.util.LogUtil;
@@ -42,7 +44,7 @@ public class GoogleTokenVerifier {
 
         try {
             GoogleIdToken token = verifier.verify(idToken);
-            if (token == null) {
+            if (Util.isNull(token)) {
                 throw new InvalidGoogleTokenException();
             }
             return token.getPayload();

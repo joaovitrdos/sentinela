@@ -1,5 +1,7 @@
 package br.com.sentinela.dto.response;
 
+import br.com.sentinela.util.Util;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -33,21 +35,21 @@ public record ArcGisLayerResponseDto(
             @JsonProperty("geometry") LayerGeometryDto geometry) {
 
         public String text(String field) {
-            Object value = attributes == null ? null : attributes.get(field);
-            if (value == null) {
+            Object value = Util.isNull(attributes) ? null : attributes.get(field);
+            if (Util.isNull(value)) {
                 return null;
             }
             String text = value.toString().trim();
-            return text.isEmpty() ? null : text;
+            return Util.isNullOrEmpty(text) ? null : text;
         }
 
         public Double number(String field) {
-            Object value = attributes == null ? null : attributes.get(field);
+            Object value = Util.isNull(attributes) ? null : attributes.get(field);
             return value instanceof Number number ? number.doubleValue() : null;
         }
 
         public Long integer(String field) {
-            Object value = attributes == null ? null : attributes.get(field);
+            Object value = Util.isNull(attributes) ? null : attributes.get(field);
             return value instanceof Number number ? number.longValue() : null;
         }
     }

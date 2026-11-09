@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.dto.request.PropertyAlertSettingsDto;
 import br.com.sentinela.dto.response.PropertyAlertResponseDto;
 import br.com.sentinela.dto.response.PropertyMonitoringDto;
@@ -92,7 +94,7 @@ public class PropertyAlertService {
     @Scheduled(initialDelayString = "${sentinela.alerts.initial-delay:PT5M}", fixedDelayString = "${sentinela.alerts.scan-delay:PT6H}")
     public void scanWeatherAndRivers() {
         List<Property> monitored = monitored(Feature.ALERTS);
-        if (monitored.isEmpty()) return;
+        if (Util.isNullOrEmpty(monitored)) return;
         List<InmetWarning> warnings = attempt("INMET", inmet::activeWarnings);
         List<RiverLevelResponseDto> levels = attempt("níveis de rio", riverLevels::getRiverLevels);
         boolean forecastAllowed = weatherUsage.automationAllowed();
@@ -166,8 +168,8 @@ public class PropertyAlertService {
     static List<Candidate> riverAlerts(Property property, List<RiverLevelResponseDto> levels) {
         List<Candidate> candidates = new ArrayList<>();
         for (RiverLevelResponseDto level : levels) {
-            if (!level.requiresAttention() || level.latitude() == null || level.longitude() == null || level.lastReadingAt() == null) continue;
-            if (level.ageHours() != null && level.ageHours() > MAX_RIVER_READING_AGE_HOURS) continue;
+            if (!level.requiresAttention() || Util.isNull(level.latitude()) || Util.isNull(level.longitude()) || Util.isNull(level.lastReadingAt())) continue;
+            if (Util.nonNull(level.ageHours()) && level.ageHours() > MAX_RIVER_READING_AGE_HOURS) continue;
             double distance = distanceKm(property.getLatitude(), property.getLongitude(), level.latitude(), level.longitude());
             if (distance > property.getAlertRiverRadiusKm()) continue;
             candidates.add(new Candidate("RIVER", "RIVER:" + level.stationCode() + ":" + level.status() + ":" + level.lastReadingAt().toLocalDate(),
@@ -179,7 +181,7 @@ public class PropertyAlertService {
     }
 
     static List<Candidate> ndviAlerts(Property property, PropertyMonitoringDto monitoring) {
-        if (monitoring.changeNdvi() == null || monitoring.latestDate() == null
+        if (Util.isNull(monitoring.changeNdvi()) || Util.isNull(monitoring.latestDate())
                 || monitoring.changeNdvi() > -property.getAlertNdviDrop()) {
             return List.of();
         }
@@ -210,6 +212,7 @@ public class PropertyAlertService {
             alerts.saveAndFlush(PropertyAlert.builder().property(property).alertKey(candidate.key()).type(candidate.type())
                     .severity(candidate.severity()).title(candidate.title()).message(candidate.message()).build());
         } catch (DataIntegrityViolationException duplicated) {
+            LogUtil.debug("Alerta {0} já registrado por outra execução", candidate.key());
             return;
         }
         if (!mailEnabled) return;

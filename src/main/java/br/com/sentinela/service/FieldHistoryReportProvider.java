@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.report.PreparedReport;
 import br.com.sentinela.report.ReportProvider;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +22,7 @@ public class FieldHistoryReportProvider implements ReportProvider {
     public PreparedReport prepare(UUID userId, Map<String, Object> requestedParameters) {
         var filter = filters.validate(userId, requestedParameters);
         var parameters = filters.jasperParameters(filter, title());
-        if (filter.fromTime() != null)
+        if (Util.nonNull(filter.fromTime()))
             parameters.put("TIME_LABEL", parameters.get("TIME_LABEL") + " (registros sem horário incluídos)");
         return PreparedReport.jdbc(parameters);
     }

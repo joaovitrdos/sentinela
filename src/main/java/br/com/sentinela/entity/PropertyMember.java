@@ -1,5 +1,7 @@
 package br.com.sentinela.entity;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.enums.TeamRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,5 +25,5 @@ public class PropertyMember {
     private TeamRole role;
     @Column(name = "joined_at", nullable = false)
     private LocalDateTime joinedAt;
-    @PrePersist void onCreate() { if (joinedAt == null) joinedAt = LocalDateTime.now(); }
+    @PrePersist void onCreate() { if (Util.isNull(joinedAt)) joinedAt = LocalDateTime.now(); }
 }

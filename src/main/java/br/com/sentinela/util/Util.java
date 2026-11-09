@@ -3,11 +3,31 @@ package br.com.sentinela.util;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class Util implements Serializable {
 
     public static boolean isNullOrEmpty(String str) {
         return str == null || str.isEmpty();
+    }
+
+    /** Nulo, vazio ou só espaços. */
+    public static boolean isNullOrBlank(String str) {
+        return str == null || str.isBlank();
+    }
+
+    /** Para valores vindos de JSON/filtros, em que o texto pode chegar como qualquer tipo. */
+    public static boolean isNullOrBlank(Object obj) {
+        return obj == null || obj.toString().isBlank();
+    }
+
+    /** Texto sem espaços nas pontas, ou {@code null} quando não sobra nada. */
+    public static String trimToNull(String str) {
+        return isNullOrBlank(str) ? null : str.trim();
+    }
+
+    public static String trimToNull(Object obj) {
+        return isNullOrBlank(obj) ? null : obj.toString().trim();
     }
 
     public static boolean isNullOrZero(Long vlr) {
@@ -26,12 +46,33 @@ public class Util implements Serializable {
         return collection == null || collection.isEmpty();
     }
 
+    public static boolean isNullOrEmpty(Map<?, ?> map) {
+        return map == null || map.isEmpty();
+    }
+
     public static boolean isEmpty(List list) {
         return list == null || list.isEmpty();
     }
 
     public static String emptyIfNull(Object obj) {
         return obj == null ? "" : obj.toString();
+    }
+
+    public static boolean anyNull(Object... objs) {
+        for (Object obj : objs) {
+            if (obj == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isNull(Object obj) {
+        return obj == null;
+    }
+
+    public static boolean nonNull(Object obj) {
+        return obj != null;
     }
 
     public static String capitalizeWords(String text) {

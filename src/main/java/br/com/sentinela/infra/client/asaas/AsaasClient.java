@@ -1,5 +1,7 @@
 package br.com.sentinela.infra.client.asaas;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.util.LogUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +35,7 @@ public class AsaasClient {
     public AsaasClient(@Qualifier("asaasRestClient") RestClient client, ObjectMapper mapper, @Value("${asaas.api-key:}") String apiKey) {
         this.client = client;
         this.mapper = mapper;
-        this.configured = !apiKey.isBlank();
+        this.configured = !Util.isNullOrBlank(apiKey);
     }
 
     /** A API aceita clientes duplicados, por isso a busca pelo identificador do Sentinela vem antes da criação. */
@@ -118,7 +120,7 @@ public class AsaasClient {
         }
         try {
             JsonNode response = request.get();
-            return response == null ? mapper.createObjectNode() : response;
+            return Util.isNull(response) ? mapper.createObjectNode() : response;
         } catch (RestClientResponseException exception) {
             int status = exception.getStatusCode().value();
             if (status == 400 || status == 404 || status == 422) {
@@ -137,6 +139,7 @@ public class AsaasClient {
             return mapper.readTree(exception.getResponseBodyAsString()).path("errors").path(0).path("description")
                     .asText("Não foi possível processar o pagamento");
         } catch (RuntimeException invalidBody) {
+            LogUtil.warn("Resposta de erro do Asaas fora do formato esperado", invalidBody);
             return "Não foi possível processar o pagamento";
         }
     }

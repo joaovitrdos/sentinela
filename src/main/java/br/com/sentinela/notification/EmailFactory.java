@@ -1,5 +1,6 @@
 package br.com.sentinela.notification;
 
+import br.com.sentinela.util.Util;
 import br.com.sentinela.enums.TypeEmail;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -39,7 +40,7 @@ public class EmailFactory {
         String content = paragraph("Novo alerta para a propriedade <strong>" + escape(propertyName) + "</strong>.")
                 + paragraph("<strong>" + escape(title) + "</strong><br>" + escape(description))
                 + button("Ver propriedade", link) + fallbackLink(link)
-                + (disclaimer == null ? "" : note(disclaimer));
+                + (Util.isNull(disclaimer) ? "" : note(disclaimer));
         return message(recipient, title + " - " + APP_NAME, TypeEmail.PROPERTY_ALERT,
                 layout("Novo alerta na sua propriedade.", "Alerta da propriedade", content));
     }
@@ -60,7 +61,7 @@ public class EmailFactory {
     }
 
     public EmailMessage createWelcomeEmail(String recipient, String name) {
-        String greeting = name == null || name.isBlank() ? "Olá!" : "Olá, " + escape(name.trim()) + "!";
+        String greeting = Util.isNullOrBlank(name) ? "Olá!" : "Olá, " + escape(name.trim()) + "!";
         String content = paragraph(greeting)
                 + paragraph("Sua conta está pronta. Acompanhe suas propriedades, atividades e informações em um só lugar.")
                 + button("Acessar o Sentinela", webBaseUrl) + fallbackLink(webBaseUrl);

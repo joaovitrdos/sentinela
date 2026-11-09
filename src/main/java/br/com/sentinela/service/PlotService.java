@@ -1,5 +1,6 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
 import br.com.sentinela.dto.request.PlotRequestDto;
 import br.com.sentinela.dto.response.PlotResponseDto;
 import br.com.sentinela.entity.Plot;
@@ -45,7 +46,7 @@ public class PlotService {
         Plot plot = Plot.builder().property(property).build();
         apply(plot, request);
         plotRepository.saveAndFlush(plot);
-        if (plot.getCropName() != null && plot.getPlantingDate() != null) {
+        if (Util.nonNull(plot.getCropName()) && Util.nonNull(plot.getPlantingDate())) {
             seasonRepository.saveAndFlush(br.com.sentinela.entity.PlotSeason.builder().plot(plot)
                     .cropName(plot.getCropName()).plantingDate(plot.getPlantingDate()).status("ACTIVE").build());
         }
@@ -65,9 +66,9 @@ public class PlotService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um talhão com esse nome");
         }
         apply(plot, request);
-        if (!seasonRepository.existsByPlot_PlotIdAndStatus(plotId, "ACTIVE") && plot.getCropName() != null && plot.getPlantingDate() != null) {
+        if (!seasonRepository.existsByPlot_PlotIdAndStatus(plotId, "ACTIVE") && Util.nonNull(plot.getCropName()) && Util.nonNull(plot.getPlantingDate())) {
             if (seasonRepository.findAllByPlot_PlotIdOrderByPlantingDateDesc(plotId).stream().anyMatch(previous ->
-                    previous.getHarvestDate() == null || !plot.getPlantingDate().isAfter(previous.getHarvestDate())))
+                    Util.isNull(previous.getHarvestDate()) || !plot.getPlantingDate().isAfter(previous.getHarvestDate())))
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "O novo plantio deve ocorrer depois da última colheita");
             seasonRepository.save(br.com.sentinela.entity.PlotSeason.builder().plot(plot).cropName(plot.getCropName())
                     .plantingDate(plot.getPlantingDate()).status("ACTIVE").build());
@@ -93,7 +94,7 @@ public class PlotService {
         plot.setAreaHectares(request.areaHectares());
     }
 
-    private String clean(String value) { return value == null || value.isBlank() ? null : value.trim(); }
+    private String clean(String value) { return Util.trimToNull(value); }
     private PlotResponseDto response(Plot plot) {
         return new PlotResponseDto(plot.getPlotId(), plot.getName(), plot.getCropName(),
                 plot.getPlantingDate(), plot.getCropStage(), plot.getAreaHectares());

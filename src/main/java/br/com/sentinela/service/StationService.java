@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.dto.response.HydroStationResponseDto;
 import br.com.sentinela.infra.cache.SingleValueCache;
 import br.com.sentinela.infra.client.snirh.SnirhLayerClient;
@@ -36,9 +38,9 @@ public class StationService {
     private List<HydroStationResponseDto> load() {
         List<HydroStationResponseDto> stations = client.fetchAll(properties.stationsUrl(), FIELDS, "Codigo", false).stream()
                 .map(this::toStation)
-                .filter(Objects::nonNull)
+                .filter(Util::nonNull)
                 .toList();
-        if (stations.isEmpty()) {
+        if (Util.isNullOrEmpty(stations)) {
             throw new SnirhUnavailableException("SNIRH returned no valid stations");
         }
         return stations;
@@ -48,7 +50,7 @@ public class StationService {
         Long stationCode = feature.integer("Codigo");
         Double latitude = feature.number("Latitude");
         Double longitude = feature.number("Longitude");
-        if (stationCode == null || latitude == null || longitude == null) {
+        if (Util.isNull(stationCode) || Util.isNull(latitude) || Util.isNull(longitude)) {
             return null;
         }
 

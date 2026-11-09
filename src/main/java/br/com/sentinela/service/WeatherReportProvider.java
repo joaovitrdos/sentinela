@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.dto.response.CurrentWeatherDto;
 import br.com.sentinela.dto.response.ForecastWeatherDto;
 import br.com.sentinela.dto.response.WeatherTimeZoneDto;
@@ -104,12 +106,12 @@ public class WeatherReportProvider implements ReportProvider {
     }
 
     private String decimal(Number value, String unit) {
-        return value == null ? "—" : String.format(PT_BR, "%.1f", value.doubleValue()) + unit;
+        return Util.isNull(value) ? "—" : String.format(PT_BR, "%.1f", value.doubleValue()) + unit;
     }
 
     private Map<String, Object> row(String... values) {
         Map<String, Object> row = new LinkedHashMap<>();
-        for (int i = 0; i < values.length; i++) row.put("c" + (i + 1), values[i] == null ? "" : values[i]);
+        for (int i = 0; i < values.length; i++) row.put("c" + (i + 1), Util.isNull(values[i]) ? "" : values[i]);
         return row;
     }
 

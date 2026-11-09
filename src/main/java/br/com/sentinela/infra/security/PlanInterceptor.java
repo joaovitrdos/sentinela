@@ -1,5 +1,9 @@
 package br.com.sentinela.infra.security;
 
+import br.com.sentinela.util.Util;
+
+import br.com.sentinela.util.LogUtil;
+
 import br.com.sentinela.entity.User;
 import br.com.sentinela.enums.Feature;
 import br.com.sentinela.service.PlanService;
@@ -36,12 +40,12 @@ public class PlanInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (!(handler instanceof HandlerMethod method)) return true;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof User user)) return true;
+        if (Util.isNull(authentication) || !(authentication.getPrincipal() instanceof User user)) return true;
         String path = request.getRequestURI().substring(request.getContextPath().length());
         if (isFree(path, request.getMethod())) return true;
 
         Feature feature = requiredFeature(method, request.getMethod());
-        if (feature != null && !plans.allows(user.getUserId(), propertyId(request), feature)) {
+        if (Util.nonNull(feature) && !plans.allows(user.getUserId(), propertyId(request), feature)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Seu plano não inclui este recurso");
         }
         return true;
@@ -57,19 +61,20 @@ public class PlanInterceptor implements HandlerInterceptor {
 
     private Feature requiredFeature(HandlerMethod method, String httpMethod) {
         RequiresFeature required = AnnotatedElementUtils.findMergedAnnotation(method.getMethod(), RequiresFeature.class);
-        if (required == null) required = AnnotatedElementUtils.findMergedAnnotation(method.getBeanType(), RequiresFeature.class);
-        if (required != null) return required.value();
+        if (Util.isNull(required)) required = AnnotatedElementUtils.findMergedAnnotation(method.getBeanType(), RequiresFeature.class);
+        if (Util.nonNull(required)) return required.value();
         return HttpMethod.GET.matches(httpMethod) || HttpMethod.HEAD.matches(httpMethod) ? null : Feature.BASE;
     }
 
     @SuppressWarnings("unchecked")
     private UUID propertyId(HttpServletRequest request) {
         var variables = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-        String value = variables == null ? null : variables.get("propertyId");
-        if (value == null) return null;
+        String value = Util.isNull(variables) ? null : variables.get("propertyId");
+        if (Util.isNull(value)) return null;
         try {
             return UUID.fromString(value);
         } catch (IllegalArgumentException invalid) {
+            LogUtil.debug("propertyId inválido na rota: {0}", value);
             return null;
         }
     }

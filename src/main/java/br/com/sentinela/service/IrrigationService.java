@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.dto.response.IrrigationRecommendationResponseDto;
 import br.com.sentinela.dto.response.IrrigationRecommendationResponseDto.Day;
 import br.com.sentinela.entity.Plot;
@@ -62,8 +64,8 @@ public class IrrigationService {
         Plot plot = plots.requirePlot(propertyId, userId, plotId);
         PlotSeason season = seasons.findAllByPlot_PlotIdOrderByPlantingDateDesc(plotId).stream()
                 .filter(item -> "ACTIVE".equals(item.getStatus())).findFirst().orElse(null);
-        String cropName = season == null ? plot.getCropName() : season.getCropName();
-        LocalDate plantingDate = season == null ? plot.getPlantingDate() : season.getPlantingDate();
+        String cropName = Util.isNull(season) ? plot.getCropName() : season.getCropName();
+        LocalDate plantingDate = Util.isNull(season) ? plot.getPlantingDate() : season.getPlantingDate();
 
         List<String> warnings = new ArrayList<>();
         List<ClimateDay> forecastDays = forecastDays(forecasts.forecast(property).forecast());
@@ -75,16 +77,16 @@ public class IrrigationService {
         Map<LocalDate, Double> irrigation = new HashMap<>();
         Map<LocalDate, Double> recordedRain = new HashMap<>();
         for (PropertyActivity activity : activities.findAllByProperty_PropertyIdAndDateBetween(propertyId, from, today)) {
-            if (activity.getAmountMm() == null) continue;
-            boolean samePlot = activity.getPlot() != null && plotId.equals(activity.getPlot().getPlotId());
+            if (Util.isNull(activity.getAmountMm())) continue;
+            boolean samePlot = Util.nonNull(activity.getPlot()) && plotId.equals(activity.getPlot().getPlotId());
             if ("IRRIGATION".equals(activity.getType()) && samePlot) irrigation.merge(activity.getDate(), activity.getAmountMm(), Double::sum);
-            if ("RAINFALL".equals(activity.getType()) && (samePlot || activity.getPlot() == null)) {
+            if ("RAINFALL".equals(activity.getType()) && (samePlot || Util.isNull(activity.getPlot()))) {
                 recordedRain.merge(activity.getDate(), activity.getAmountMm(), Double::sum);
             }
         }
 
         Crop crop = crop(cropName);
-        boolean cropKnown = crop != null && plantingDate != null;
+        boolean cropKnown = Util.nonNull(crop) && Util.nonNull(plantingDate);
         if (!cropKnown) {
             crop = REFERENCE;
             plantingDate = null;
@@ -96,7 +98,7 @@ public class IrrigationService {
         if (missing > 0) {
             warnings.add(missing + " dia(s) recente(s) ainda sem dados, fora do cálculo: o déficit real pode ser maior.");
         }
-        double recommended = days.isEmpty() ? 0 : days.getLast().deficitMm();
+        double recommended = Util.isNullOrEmpty(days) ? 0 : days.getLast().deficitMm();
         return new IrrigationRecommendationResponseDto(plotId, plot.getName(), cropName, cropKnown,
                 round(coefficient(crop, plantingDate, today)), recommended, missing, days, warnings, METHOD, SOURCE, DISCLAIMER);
     }
@@ -108,7 +110,7 @@ public class IrrigationService {
             days.add(new ClimateDay(LocalDate.parse(node.path("date").asText()), day.path("maxtemp_c").asDouble(),
                     day.path("mintemp_c").asDouble(), day.path("totalprecip_mm").asDouble(), true));
         }
-        if (days.isEmpty()) throw new WeatherApiUnavailableException();
+        if (Util.isNullOrEmpty(days)) throw new WeatherApiUnavailableException();
         return days;
     }
 
@@ -140,13 +142,13 @@ public class IrrigationService {
     }
 
     static Crop crop(String name) {
-        if (name == null) return null;
+        if (Util.isNull(name)) return null;
         String normalized = Normalizer.normalize(name, Normalizer.Form.NFD).replaceAll("\\p{M}", "").toLowerCase(Locale.ROOT);
         return CROPS.stream().filter(crop -> normalized.contains(crop.key())).findFirst().orElse(null);
     }
 
     static double coefficient(Crop crop, LocalDate plantingDate, LocalDate date) {
-        if (plantingDate == null) return crop.middle();
+        if (Util.isNull(plantingDate)) return crop.middle();
         long age = ChronoUnit.DAYS.between(plantingDate, date);
         if (age < 0) return 0;
         double progress = (double) age / crop.cycleDays();

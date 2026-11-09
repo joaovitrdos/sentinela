@@ -40,7 +40,7 @@ export const AuthPage = () => {
     const [googleError, setGoogleError] = useState<string>();
     const [googleBusy, setGoogleBusy] = useState(false);
 
-    const afterSignIn = () => navigate(state.from && state.from !== "/login" ? state.from : "/home", { replace: true });
+    const afterSignIn = () => navigate(state.from && state.from !== "/login" ? state.from : "/mapa", { replace: true });
 
     const handleGoogle = async (idToken: string) => {
         setGoogleError(undefined);

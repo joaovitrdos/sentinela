@@ -7,6 +7,9 @@ import br.com.sentinela.infra.security.SecurityConfig;
 import br.com.sentinela.infra.security.TokenService;
 import br.com.sentinela.repository.UserRepository;
 import br.com.sentinela.service.AuthService;
+import br.com.sentinela.service.ClimateHistoryService;
+import br.com.sentinela.service.PlantingWindowService;
+import br.com.sentinela.service.ZarcImportService;
 import br.com.sentinela.service.CopernicusService;
 import br.com.sentinela.service.FieldActionService;
 import br.com.sentinela.service.PlotService;
@@ -76,6 +79,15 @@ abstract class WebLayerTestSupport {
 
     @MockitoBean
     protected CopernicusService copernicusService;
+
+    @MockitoBean
+    protected ClimateHistoryService climateHistoryService;
+
+    @MockitoBean
+    protected PlantingWindowService plantingWindowService;
+
+    @MockitoBean
+    protected ZarcImportService zarcImportService;
 
     @MockitoBean
     protected RainService rainService;

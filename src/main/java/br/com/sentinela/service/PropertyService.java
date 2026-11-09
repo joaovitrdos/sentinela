@@ -1,5 +1,6 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
 import br.com.sentinela.dto.response.PropertyGeometryResponseDto;
 import br.com.sentinela.dto.request.PropertyRequestDto;
 import br.com.sentinela.dto.response.PropertyResponseDto;
@@ -94,7 +95,7 @@ public class PropertyService {
     public Property requireOwner(UUID propertyId, UUID userId) { return teamService.requireOwner(propertyId, userId); }
 
     public PropertyGeometryResponseDto geometryOf(Property property) {
-        if (property.getPolygonJson() == null || property.getPolygonJson().isBlank()) {
+        if (Util.isNullOrBlank(property.getPolygonJson())) {
             return null;
         }
         try {
@@ -122,7 +123,7 @@ public class PropertyService {
     }
 
     private String clean(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
+        return Util.trimToNull(value);
     }
 
     private boolean isOwner(Property property, UUID userId) {

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { BarChartSquare02, FileDownload01, Home03, LogOut01, Map01, Settings01 } from "@untitledui/icons";
+import { BarChartSquare02, FileDownload01, Globe02, LogOut01, Map01, Settings01 } from "@untitledui/icons";
 import { motion } from "motion/react";
 import { Button as AriaButton } from "react-aria-components";
 import { useTranslation } from "react-i18next";
@@ -59,7 +59,7 @@ const UserMenu = () => {
                     {/* No celular o menu superior some, então a navegação continua aqui. */}
                     {!wide ? (
                         <>
-                            <Dropdown.Item id="/home" icon={Home03}>
+                            <Dropdown.Item id="/mapa" icon={Globe02}>
                                 {t("nav.home")}
                             </Dropdown.Item>
                             <Dropdown.Item id="/properties" icon={Map01}>
@@ -139,7 +139,7 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
                 <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center gap-4 px-4 sm:px-6 lg:px-8">
                     {isAuthenticated && (
                         <nav className="hidden items-center gap-1 lg:flex">
-                            <NavLink to="/home" className={navLink}>
+                            <NavLink to="/mapa" className={navLink}>
                                 {navLabel(t("nav.home"))}
                             </NavLink>
                             <NavLink to="/properties" className={navLink}>

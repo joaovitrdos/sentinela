@@ -1,5 +1,6 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
 import br.com.sentinela.dto.response.RainReadingResponseDto;
 import br.com.sentinela.report.PreparedReport;
 import br.com.sentinela.report.ReportProvider;
@@ -52,7 +53,7 @@ public class SnirhRainfallReportProvider implements ReportProvider {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O relatório recebeu parâmetros não permitidos");
         }
         String state = text(requested.get("state"));
-        if (state != null && !state.matches("[A-Za-z]{2}")) {
+        if (Util.nonNull(state) && !state.matches("[A-Za-z]{2}")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe uma sigla de estado válida");
         }
         boolean onlyAttention = booleanValue(requested.get("onlyAttention"));
@@ -60,14 +61,14 @@ public class SnirhRainfallReportProvider implements ReportProvider {
         List<RainReadingResponseDto> readings = new ArrayList<>(rainService.getRain24h());
         readings.sort(Comparator.comparingDouble(RainReadingResponseDto::rainfallMm24h).reversed());
         for (RainReadingResponseDto reading : readings) {
-            if (state != null && !state.equalsIgnoreCase(reading.state())) continue;
+            if (Util.nonNull(state) && !state.equalsIgnoreCase(reading.state())) continue;
             if (onlyAttention && !reading.requiresAttention()) continue;
             rows.add(toRow(reading));
         }
 
         Map<String, Object> parameters = new LinkedHashMap<>();
         parameters.put("REPORT_TITLE", title());
-        parameters.put("FILTER_LABEL", (state == null ? "Todos os estados" : "UF: " + state.toUpperCase(Locale.ROOT))
+        parameters.put("FILTER_LABEL", (Util.isNull(state) ? "Todos os estados" : "UF: " + state.toUpperCase(Locale.ROOT))
                 + (onlyAttention ? " · Somente estações que exigem atenção" : ""));
         parameters.put("GENERATED_AT", DATE_TIME.format(OffsetDateTime.now()));
         parameters.put("TOTAL_STATIONS", rows.size());
@@ -83,17 +84,17 @@ public class SnirhRainfallReportProvider implements ReportProvider {
         row.put("watershed", value(reading.watershed()));
         row.put("rainfallMm24h", String.format(Locale.forLanguageTag("pt-BR"), "%.1f mm", reading.rainfallMm24h()));
         row.put("readingClass", value(reading.readingClass()));
-        row.put("lastReadingAt", reading.lastReadingAt() == null ? "Sem data" : DATE_TIME.format(reading.lastReadingAt()));
+        row.put("lastReadingAt", Util.isNull(reading.lastReadingAt()) ? "Sem data" : DATE_TIME.format(reading.lastReadingAt()));
         row.put("ageHours", String.format(Locale.forLanguageTag("pt-BR"), "%.1f h", reading.ageHours()));
         return row;
     }
 
     private String text(Object value) {
-        return value == null || value.toString().isBlank() ? null : value.toString().trim();
+        return Util.trimToNull(value);
     }
 
     private boolean booleanValue(Object value) {
-        if (value == null) return false;
+        if (Util.isNull(value)) return false;
         if (value instanceof Boolean bool) return bool;
         if ("true".equalsIgnoreCase(value.toString()) || "false".equalsIgnoreCase(value.toString())) {
             return Boolean.parseBoolean(value.toString());
@@ -102,6 +103,6 @@ public class SnirhRainfallReportProvider implements ReportProvider {
     }
 
     private String value(String value) {
-        return value == null ? "" : value;
+        return Util.isNull(value) ? "" : value;
     }
 }

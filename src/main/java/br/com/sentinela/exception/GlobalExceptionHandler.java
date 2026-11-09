@@ -1,5 +1,7 @@
 package br.com.sentinela.exception;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.util.LogUtil;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -156,6 +158,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(exception.getMessage());
     }
 
+    @ExceptionHandler(ClimateHistoryUnavailableException.class)
+    public ResponseEntity<String> climateHistoryUnavailableHandler(ClimateHistoryUnavailableException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(exception.getMessage());
+    }
+
     // 500 Internal Server Error
 
     @ExceptionHandler(UserSaveException.class)
@@ -197,7 +204,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<String> responseStatusHandler(ResponseStatusException exception) {
         return ResponseEntity.status(exception.getStatusCode()).headers(exception.getHeaders())
-                .body(exception.getReason() == null ? "Não foi possível processar a requisição" : exception.getReason());
+                .body(Util.isNull(exception.getReason()) ? "Não foi possível processar a requisição" : exception.getReason());
     }
 
     @ExceptionHandler(Exception.class)

@@ -1,5 +1,7 @@
 package br.com.sentinela.infra.client.snirh;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.exception.SnirhApiException;
 import br.com.sentinela.exception.SnirhUnavailableException;
 import br.com.sentinela.dto.response.ArcGisLayerResponseDto;
@@ -90,7 +92,7 @@ public class SnirhLayerClient {
                 .build(true)
                 .toUri();
         ArcGisLayerResponseDto response = call(uri, "count");
-        if (response.total() == null || response.total() < 0) {
+        if (Util.isNull(response.total()) || response.total() < 0) {
             throw new SnirhApiException("SNIRH returned an invalid record count");
         }
         return response.total();
@@ -110,17 +112,17 @@ public class SnirhLayerClient {
         extraParams.forEach(builder::queryParam);
         URI uri = builder.build(true).toUri();
         ArcGisLayerResponseDto response = call(uri, "offset " + offset);
-        return response.features() != null ? response.features() : List.of();
+        return Util.nonNull(response.features()) ? response.features() : List.of();
     }
 
     private ArcGisLayerResponseDto call(URI uri, String context) {
         for (int attempt = 1; attempt <= properties.maxRetries(); attempt++) {
             try {
                 ArcGisLayerResponseDto response = snirhRestClient.get().uri(uri).retrieve().body(ArcGisLayerResponseDto.class);
-                if (response == null) {
+                if (Util.isNull(response)) {
                     throw new SnirhApiException("SNIRH returned an empty response");
                 }
-                if (response.error() != null) {
+                if (Util.nonNull(response.error())) {
                     throw new SnirhApiException("ArcGIS error " + response.error().code() + ": " + response.error().message());
                 }
                 return response;

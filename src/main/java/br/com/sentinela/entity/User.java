@@ -1,5 +1,7 @@
 package br.com.sentinela.entity;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.enums.AuthProvider;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -80,7 +82,7 @@ public class User implements Serializable {
     }
 
     public boolean hasLocalPassword() {
-        return password != null && !password.isBlank();
+        return !Util.isNullOrBlank(password);
     }
 
     public void revokeIssuedTokens() {

@@ -122,6 +122,14 @@ public-data:
   inmet-warnings-url: https://apiprevmet3.inmet.gov.br/avisos/ativos
   nasa-power-url: https://power.larc.nasa.gov/api/temporal/daily/point
   car-wfs-url: https://geoserver.car.gov.br/geoserver/sicar/wfs
+  zarc:
+    enabled: ${ZARC_IMPORT_ENABLED:true}
+    user-agent: "Sentinela-Importador/1.0 (+https://techlayoof.tech)"
+    files:
+      - harvest: "2026/2027"
+        url: https://dados.agricultura.gov.br/dataset/6d3d141c-885e-41a4-ab7f-dc8ff323b96f/resource/139e5a60-1f43-4cc8-aeab-a35dbbf816c0/download/dados-abertos-tabua-de-risco-safra-2026-2027.csv
+      - harvest: PERENE
+        url: https://dados.agricultura.gov.br/dataset/6d3d141c-885e-41a4-ab7f-dc8ff323b96f/resource/dae65d31-683f-4ac4-ab90-3abd0c1583ba/download/dados-abertos-tabua-de-risco-safra-perene-olericola-sem-safra.csv
 
 weather:
   api:

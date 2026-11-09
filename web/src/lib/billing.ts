@@ -1,6 +1,6 @@
 import { api } from "./api";
 
-export type Feature = "BASE" | "REPORTS" | "SPRAY_WINDOW" | "NDVI" | "ALERTS" | "TEAM" | "IRRIGATION" | "EARLY_ACCESS";
+export type Feature = "BASE" | "REPORTS" | "SPRAY_WINDOW" | "NDVI" | "ALERTS" | "TEAM" | "IRRIGATION" | "EARLY_ACCESS" | "PLANTING_WINDOW";
 export type BillingCycle = "MONTHLY" | "YEARLY";
 export type SubscriptionStatus = "TRIAL" | "PENDING" | "ACTIVE" | "OVERDUE" | "CANCELED";
 

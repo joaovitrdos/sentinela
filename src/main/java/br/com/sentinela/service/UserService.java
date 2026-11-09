@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.dto.request.ChangeEmailRequestDto;
 import br.com.sentinela.dto.request.ConfirmEmailChangeRequestDto;
 import br.com.sentinela.dto.request.DeleteAccountRequestDto;
@@ -72,7 +74,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public PublicUserResponseDto findPublicById(UUID requesterId, UUID userId) {
-        if (requesterId == null || !requesterId.equals(userId)) {
+        if (Util.isNull(requesterId) || !requesterId.equals(userId)) {
             throw new UserNotFoundException();
         }
         return userMapper.toPublicResponse(findEntityById(userId));
@@ -173,13 +175,13 @@ public class UserService {
     }
 
     private void verifyDeleteReauthentication(User user, DeleteAccountRequestDto request) {
-        if (request == null) {
+        if (Util.isNull(request)) {
             throw new IncorrectPasswordException();
         }
         if (user.getAuthProvider() == AuthProvider.LOCAL) {
             String email = EmailNormalizer.normalize(user.getEmail());
             attemptGuard.checkLogin(email);
-            if (request.currentPassword() == null
+            if (Util.isNull(request.currentPassword())
                     || !passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
                 attemptGuard.recordLoginFailure(email);
                 throw new IncorrectPasswordException();
@@ -188,7 +190,7 @@ public class UserService {
             return;
         }
 
-        if (request.googleIdToken() == null || user.getGoogleId() == null) {
+        if (Util.isNull(request.googleIdToken()) || Util.isNull(user.getGoogleId())) {
             throw new IncorrectPasswordException();
         }
         var payload = googleTokenVerifier.verify(request.googleIdToken());

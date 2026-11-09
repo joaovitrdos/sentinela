@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.dto.response.RainReadingResponseDto;
 import br.com.sentinela.infra.cache.SingleValueCache;
 import br.com.sentinela.infra.client.snirh.SnirhRainClient;
@@ -45,14 +47,14 @@ public class RainService {
     private List<RainReadingResponseDto> load() {
         Instant now = Instant.now();
         List<FeatureDto> features = client.fetchAllFeatures();
-        if (features.isEmpty()) {
+        if (Util.isNullOrEmpty(features)) {
             throw new SnirhUnavailableException("SNIRH returned no rainfall stations");
         }
         List<RainReadingResponseDto> readings = features.stream()
                 .map(feature -> toReading(feature, now))
-                .filter(Objects::nonNull)
+                .filter(Util::nonNull)
                 .toList();
-        if (readings.isEmpty()) {
+        if (Util.isNullOrEmpty(readings)) {
             throw new SnirhUnavailableException("SNIRH returned no valid rainfall readings");
         }
         return readings;
@@ -60,8 +62,8 @@ public class RainService {
 
     RainReadingResponseDto toReading(FeatureDto feature, Instant now) {
         AttributesDto attributes = feature.attributes();
-        if (attributes == null || attributes.stationCode() == null || attributes.rainfallMm24h() == null
-                || attributes.lastReadingAt() == null) {
+        if (Util.isNull(attributes) || Util.isNull(attributes.stationCode()) || Util.isNull(attributes.rainfallMm24h())
+                || Util.isNull(attributes.lastReadingAt())) {
             return null;
         }
         double rainfall = attributes.rainfallMm24h();
@@ -85,8 +87,8 @@ public class RainService {
                 attributes.readingStatus(),
                 lastReadingAt.atZone(timeZone).toOffsetDateTime(),
                 ReferenceLevelService.ageHours(lastReadingAt, now),
-                geometry != null ? geometry.latitude() : null,
-                geometry != null ? geometry.longitude() : null,
+                Util.nonNull(geometry) ? geometry.latitude() : null,
+                Util.nonNull(geometry) ? geometry.longitude() : null,
                 requiresAttention);
     }
 }

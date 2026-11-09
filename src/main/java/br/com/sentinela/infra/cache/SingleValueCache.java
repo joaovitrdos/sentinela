@@ -1,5 +1,9 @@
 package br.com.sentinela.infra.cache;
 
+import br.com.sentinela.util.Util;
+
+import br.com.sentinela.util.LogUtil;
+
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -26,11 +30,11 @@ public class SingleValueCache<T> {
     private CompletableFuture<T> inFlight;
 
     public SingleValueCache(Duration ttl, Supplier<T> loader) {
-        this(ttl, ttl.multipliedBy(2), loader, value -> value != null, Clock.systemUTC());
+        this(ttl, ttl.multipliedBy(2), loader, value -> Util.nonNull(value), Clock.systemUTC());
     }
 
     public SingleValueCache(Duration ttl, Supplier<T> loader, Clock clock) {
-        this(ttl, ttl.multipliedBy(2), loader, value -> value != null, clock);
+        this(ttl, ttl.multipliedBy(2), loader, value -> Util.nonNull(value), clock);
     }
 
     public SingleValueCache(Duration ttl, Duration maxStale, Supplier<T> loader, Predicate<T> cacheable, Clock clock) {
@@ -46,25 +50,25 @@ public class SingleValueCache<T> {
         T stale = null;
         synchronized (this) {
             Instant now = clock.instant();
-            if (value != null && now.isBefore(expiresAt)) {
+            if (Util.nonNull(value) && now.isBefore(expiresAt)) {
                 return value;
             }
 
-            if (value != null && now.isBefore(staleUntil)) {
+            if (Util.nonNull(value) && now.isBefore(staleUntil)) {
                 stale = value;
                 if (now.isBefore(retryAt)) {
                     return stale;
                 }
-                if (inFlight == null) {
+                if (Util.isNull(inFlight)) {
                     startLoad();
                 }
                 return stale;
             }
 
-            if (lastFailure != null && now.isBefore(retryAt) && inFlight == null) {
+            if (Util.nonNull(lastFailure) && now.isBefore(retryAt) && Util.isNull(inFlight)) {
                 throw lastFailure;
             }
-            if (inFlight == null) {
+            if (Util.isNull(inFlight)) {
                 waitFor = startLoad();
             } else {
                 waitFor = inFlight;
@@ -101,11 +105,12 @@ public class SingleValueCache<T> {
                 }
                 future.complete(loaded);
             } catch (RuntimeException exception) {
+                LogUtil.warn("Falha ao atualizar valor em cache", exception);
                 synchronized (SingleValueCache.this) {
                     lastFailure = exception;
                     retryAt = clock.instant().plus(RETRY_AFTER_FAILURE);
                     inFlight = null;
-                    if (value == null || !clock.instant().isBefore(staleUntil)) {
+                    if (Util.isNull(value) || !clock.instant().isBefore(staleUntil)) {
                         value = null;
                     }
                 }

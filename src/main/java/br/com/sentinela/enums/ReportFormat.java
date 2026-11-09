@@ -33,7 +33,7 @@ public enum ReportFormat {
     }
 
     public static ReportFormat from(String value) {
-        if (Util.isNullOrEmpty(value) || value.isBlank()) {
+        if (Util.isNullOrEmpty(value) || Util.isNullOrBlank(value)) {
             return PDF;
         }
         return switch (value.trim().toLowerCase(Locale.ROOT)) {

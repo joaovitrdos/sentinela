@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.dto.request.SubscribeRequestDto;
 import br.com.sentinela.dto.response.BillingStatusResponseDto;
 import br.com.sentinela.dto.response.SubscribeResponseDto;
@@ -61,7 +63,7 @@ public class BillingService {
         try {
             for (String asaasId : asaas.activeSubscriptionIds(reference)) {
                 List<LocalDate> paid = asaas.paidDueDates(asaasId);
-                if (paid.isEmpty()) continue;
+                if (Util.isNullOrEmpty(paid)) continue;
                 subscription.setAsaasSubscriptionId(asaasId);
                 paid.forEach(dueDate -> applyPayment(subscription, dueDate));
                 subscriptions.save(subscription);
@@ -85,7 +87,7 @@ public class BillingService {
         Subscription subscription = subscriptions.lockByUserId(user.getUserId()).orElseThrow();
         String reference = user.getUserId().toString();
 
-        if (subscription.getAsaasCustomerId() == null) {
+        if (Util.isNull(subscription.getAsaasCustomerId())) {
             subscription.setAsaasCustomerId(customer(user, request.cpfCnpj(), reference));
         }
         removeRecurrence(subscription, reference);
@@ -126,12 +128,12 @@ public class BillingService {
     }
 
     private boolean inPaidPeriod(Subscription subscription, LocalDate today) {
-        return subscription.getPlan() != null && subscription.getPaidUntil() != null && !subscription.getPaidUntil().isBefore(today);
+        return Util.nonNull(subscription.getPlan()) && Util.nonNull(subscription.getPaidUntil()) && !subscription.getPaidUntil().isBefore(today);
     }
 
     private void removeRecurrence(Subscription subscription, String reference) {
         String current = subscription.getAsaasSubscriptionId();
-        if (current != null) {
+        if (Util.nonNull(current)) {
             try {
                 asaas.deleteSubscription(current);
             } catch (ResponseStatusException alreadyRemoved) {
@@ -143,8 +145,8 @@ public class BillingService {
 
     private String customer(User user, String rawDocument, String reference) {
         String existing = asaas.findCustomerId(reference);
-        if (existing != null) return existing;
-        String document = rawDocument == null ? "" : rawDocument.replaceAll("\\D", "");
+        if (Util.nonNull(existing)) return existing;
+        String document = Util.isNull(rawDocument) ? "" : rawDocument.replaceAll("\\D", "");
         if (document.length() != 11 && document.length() != 14) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe um CPF ou CNPJ válido");
         }
@@ -153,8 +155,8 @@ public class BillingService {
 
     static LocalDate nextDueDate(LocalDate today, LocalDate trialEnd, LocalDate paidUntil) {
         LocalDate date = today;
-        if (trialEnd != null && trialEnd.isAfter(date)) date = trialEnd;
-        if (paidUntil != null && paidUntil.isAfter(date)) date = paidUntil;
+        if (Util.nonNull(trialEnd) && trialEnd.isAfter(date)) date = trialEnd;
+        if (Util.nonNull(paidUntil) && paidUntil.isAfter(date)) date = paidUntil;
         return date;
     }
 
@@ -163,13 +165,13 @@ public class BillingService {
     public void cancel(UUID userId) {
         planService.subscriptionOf(userId);
         Subscription subscription = subscriptions.lockByUserId(userId).orElseThrow();
-        if (subscription.getAsaasSubscriptionId() == null || "CANCELED".equals(subscription.getStatus())) {
+        if (Util.isNull(subscription.getAsaasSubscriptionId()) || "CANCELED".equals(subscription.getStatus())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Nenhuma assinatura ativa para cancelar");
         }
         removeRecurrence(subscription, userId.toString());
         subscription.setPendingPlan(null);
         subscription.setPendingCycle(null);
-        if (subscription.getPaidUntil() == null) {
+        if (Util.isNull(subscription.getPaidUntil())) {
             subscription.setPlan(null);
             subscription.setCycle(null);
             subscription.setAsaasSubscriptionId(null);
@@ -186,7 +188,7 @@ public class BillingService {
         if (!validToken(token)) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token inválido");
         String id = event.path("id").asText("");
         String type = event.path("event").asText("");
-        if (id.isBlank() || type.isBlank()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Evento inválido");
+        if (Util.isNullOrBlank(id) || Util.isNullOrBlank(type)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Evento inválido");
         if (subscriptions.registerEvent(id, type, LocalDateTime.now()) == 0) return;
 
         JsonNode payment = event.path("payment");
@@ -208,7 +210,7 @@ public class BillingService {
     }
 
     private boolean validToken(String token) {
-        return !webhookToken.isBlank() && token != null && MessageDigest.isEqual(
+        return !Util.isNullOrBlank(webhookToken) && Util.nonNull(token) && MessageDigest.isEqual(
                 token.getBytes(StandardCharsets.UTF_8), webhookToken.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -221,14 +223,14 @@ public class BillingService {
     }
 
     static void applyPayment(Subscription subscription, LocalDate dueDate) {
-        if (subscription.getPendingPlan() != null) {
+        if (Util.nonNull(subscription.getPendingPlan())) {
             subscription.setPlan(subscription.getPendingPlan());
             subscription.setCycle(subscription.getPendingCycle());
             subscription.setPendingPlan(null);
             subscription.setPendingCycle(null);
         }
         LocalDate end = "YEARLY".equals(subscription.getCycle()) ? dueDate.plusYears(1) : dueDate.plusMonths(1);
-        if (subscription.getPaidUntil() == null || end.isAfter(subscription.getPaidUntil())) subscription.setPaidUntil(end);
+        if (Util.isNull(subscription.getPaidUntil()) || end.isAfter(subscription.getPaidUntil())) subscription.setPaidUntil(end);
         if (!"CANCELED".equals(subscription.getStatus())) subscription.setStatus("ACTIVE");
     }
 }

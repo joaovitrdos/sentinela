@@ -1,5 +1,7 @@
 package br.com.sentinela.controller;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.enums.Feature;
 import br.com.sentinela.infra.security.RequiresFeature;
 import br.com.sentinela.dto.response.CurrentWeatherDto;
@@ -28,7 +30,7 @@ public class WeatherController {
             @RequestParam Double latitude,
             @RequestParam Double longitude) {
 
-        if (latitude == null || longitude == null
+        if (Util.isNull(latitude) || Util.isNull(longitude)
                 || !Double.isFinite(latitude)
                 || !Double.isFinite(longitude)
                 || latitude < -90 || latitude > 90
@@ -71,7 +73,7 @@ public class WeatherController {
     }
 
     private boolean isValidCoordinates(Double latitude, Double longitude) {
-        return latitude != null && longitude != null
+        return Util.nonNull(latitude) && Util.nonNull(longitude)
                 && Double.isFinite(latitude)
                 && Double.isFinite(longitude)
                 && latitude >= -90 && latitude <= 90

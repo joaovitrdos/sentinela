@@ -1,5 +1,6 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
 import br.com.sentinela.report.PreparedReport;
 import br.com.sentinela.report.ReportProvider;
 import br.com.sentinela.repository.PropertyRepository;
@@ -55,10 +56,10 @@ public class PropertyActivitiesReportProvider implements ReportProvider {
 
         boolean allProperties = booleanValue(requested.get("allProperties"), "allProperties");
         List<UUID> propertyIds = propertyIds(requested.get("propertyIds"));
-        if (!allProperties && propertyIds.isEmpty()) {
+        if (!allProperties && Util.isNullOrEmpty(propertyIds)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selecione ao menos uma propriedade ou escolha todas");
         }
-        if (allProperties && !propertyIds.isEmpty()) {
+        if (allProperties && !Util.isNullOrEmpty(propertyIds)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Envie propriedades selecionadas ou escolha todas, não ambos");
         }
         validateAccessibleProperties(userId, propertyIds);
@@ -75,35 +76,35 @@ public class PropertyActivitiesReportProvider implements ReportProvider {
         parameters.put("PROPERTY_IDS", propertyIds);
         parameters.put("FROM_DATE", Date.valueOf(fromDate));
         parameters.put("TO_DATE", Date.valueOf(toDate));
-        parameters.put("FROM_TIME", fromTime == null ? null : Time.valueOf(fromTime));
-        parameters.put("TO_TIME", toTime == null ? null : Time.valueOf(toTime));
+        parameters.put("FROM_TIME", Util.isNull(fromTime) ? null : Time.valueOf(fromTime));
+        parameters.put("TO_TIME", Util.isNull(toTime) ? null : Time.valueOf(toTime));
         parameters.put("REPORT_TITLE", title());
         parameters.put("PERIOD_LABEL", fromDate + " - " + toDate);
-        parameters.put("TIME_LABEL", fromTime == null ? "Todos os horários" : fromTime + " - " + toTime);
+        parameters.put("TIME_LABEL", Util.isNull(fromTime) ? "Todos os horários" : fromTime + " - " + toTime);
         return PreparedReport.jdbc(parameters);
     }
 
     private void validate(LocalDate fromDate, LocalDate toDate, LocalTime fromTime, LocalTime toTime) {
-        if (fromDate == null || toDate == null) {
+        if (Util.isNull(fromDate) || Util.isNull(toDate)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe a data inicial e a data final");
         }
         if (fromDate.isAfter(toDate)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A data inicial deve ser anterior ou igual à data final");
         }
-        if ((fromTime == null) != (toTime == null)) {
+        if ((Util.isNull(fromTime)) != (Util.isNull(toTime))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe o horário inicial e final");
         }
-        if (fromTime != null && fromTime.isAfter(toTime)) {
+        if (Util.nonNull(fromTime) && fromTime.isAfter(toTime)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O horário inicial deve ser anterior ou igual ao final");
         }
     }
 
     private List<UUID> propertyIds(Object value) {
-        if (value == null) return List.of();
+        if (Util.isNull(value)) return List.of();
         if (!(value instanceof Collection<?> values)) throw invalid("propertyIds");
         List<UUID> propertyIds = new ArrayList<>();
         for (Object item : values) {
-            if (item == null || item.toString().isBlank()) throw invalid("propertyIds");
+            if (Util.isNullOrBlank(item)) throw invalid("propertyIds");
             try {
                 UUID id = UUID.fromString(item.toString());
                 if (propertyIds.contains(id)) throw invalid("propertyIds");
@@ -116,7 +117,7 @@ public class PropertyActivitiesReportProvider implements ReportProvider {
     }
 
     private void validateAccessibleProperties(UUID userId, List<UUID> propertyIds) {
-        if (propertyIds.isEmpty()) return;
+        if (Util.isNullOrEmpty(propertyIds)) return;
         Set<UUID> accessibleIds = new HashSet<>();
         propertyRepository.findAllAccessibleByIds(propertyIds, userId)
                 .forEach(property -> accessibleIds.add(property.getPropertyId()));
@@ -127,7 +128,7 @@ public class PropertyActivitiesReportProvider implements ReportProvider {
 
     private boolean booleanValue(Object value, String name) {
         if (value instanceof Boolean bool) return bool;
-        if (value == null) return false;
+        if (Util.isNull(value)) return false;
         if ("true".equalsIgnoreCase(value.toString()) || "false".equalsIgnoreCase(value.toString())) {
             return Boolean.parseBoolean(value.toString());
         }
@@ -135,7 +136,7 @@ public class PropertyActivitiesReportProvider implements ReportProvider {
     }
 
     private LocalDate date(Object value, String name) {
-        if (value == null || value.toString().isBlank()) return null;
+        if (Util.isNullOrBlank(value)) return null;
         try {
             return LocalDate.parse(value.toString());
         } catch (RuntimeException exception) {
@@ -144,7 +145,7 @@ public class PropertyActivitiesReportProvider implements ReportProvider {
     }
 
     private LocalTime time(Object value, String name) {
-        if (value == null || value.toString().isBlank()) return null;
+        if (Util.isNullOrBlank(value)) return null;
         try {
             return LocalTime.parse(value.toString());
         } catch (RuntimeException exception) {

@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.dto.response.BillingStatusResponseDto;
 import br.com.sentinela.dto.response.PlanResponseDto;
 import br.com.sentinela.entity.Plan;
@@ -56,8 +58,8 @@ public class PlanService {
      */
     @Transactional
     public boolean allows(UUID userId, UUID propertyId, Feature feature) {
-        Property property = propertyId == null ? null : properties.findById(propertyId).orElse(null);
-        if (property == null) return allows(userId, feature);
+        Property property = Util.isNull(propertyId) ? null : properties.findById(propertyId).orElse(null);
+        if (Util.isNull(property)) return allows(userId, feature);
         UUID ownerId = property.getUser().getUserId();
         boolean owner = ownerId.equals(userId);
         boolean member = !owner && Boolean.TRUE.equals(property.getTeamEnabled())
@@ -65,7 +67,7 @@ public class PlanService {
         if (!owner && !member) return allows(userId, feature);
 
         Plan plan = effectivePlan(ownerId);
-        if (plan == null || !plan.getFeatures().contains(feature)) return false;
+        if (Util.isNull(plan) || !plan.getFeatures().contains(feature)) return false;
         if (member && !plan.getFeatures().contains(Feature.TEAM)) return false;
         return withinLimit(plan, ownerId, propertyId);
     }
@@ -73,21 +75,21 @@ public class PlanService {
     @Transactional
     public boolean allows(UUID userId, Feature feature) {
         Plan plan = effectivePlan(userId);
-        return plan != null && plan.getFeatures().contains(feature);
+        return Util.nonNull(plan) && plan.getFeatures().contains(feature);
     }
 
     /** Somente leitura: é chamado de dentro de transações read-only e por isso não cria o registro de teste. */
     @Transactional(readOnly = true)
     public boolean ownerHasTeam(UUID ownerId) {
         Plan plan = subscriptions.findByUserId(ownerId).map(this::resolve).orElseGet(() -> plans.findById(TRIAL_PLAN).orElse(null));
-        return plan != null && plan.getFeatures().contains(Feature.TEAM);
+        return Util.nonNull(plan) && plan.getFeatures().contains(Feature.TEAM);
     }
 
     @Transactional
     public void requirePropertySlot(UUID ownerId) {
         Plan plan = effectivePlan(ownerId);
-        if (plan == null) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Seu plano não inclui este recurso");
-        if (plan.getMaxProperties() != null && properties.countByUser_UserId(ownerId) >= plan.getMaxProperties()) {
+        if (Util.isNull(plan)) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Seu plano não inclui este recurso");
+        if (Util.nonNull(plan.getMaxProperties()) && properties.countByUser_UserId(ownerId) >= plan.getMaxProperties()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Seu plano permite até " + plan.getMaxProperties() + " propriedade(s)");
         }
     }
@@ -96,16 +98,16 @@ public class PlanService {
     public BillingStatusResponseDto status(UUID userId) {
         Subscription subscription = subscriptionOf(userId);
         Plan effective = effectivePlan(userId);
-        return new BillingStatusResponseDto(subscription.getStatus(), effective == null ? null : effective.getCode(),
-                subscription.getPlan() == null ? null : subscription.getPlan().getCode(),
-                subscription.getPendingPlan() == null ? null : subscription.getPendingPlan().getCode(),
+        return new BillingStatusResponseDto(subscription.getStatus(), Util.isNull(effective) ? null : effective.getCode(),
+                Util.isNull(subscription.getPlan()) ? null : subscription.getPlan().getCode(),
+                Util.isNull(subscription.getPendingPlan()) ? null : subscription.getPendingPlan().getCode(),
                 subscription.getCycle(), subscription.getTrialEndsAt(), subscription.getPaidUntil(),
-                effective == null ? null : effective.getMaxProperties(), effective == null ? Set.of() : effective.getFeatures(),
-                subscription.getAsaasCustomerId() != null);
+                Util.isNull(effective) ? null : effective.getMaxProperties(), Util.isNull(effective) ? Set.of() : effective.getFeatures(),
+                Util.nonNull(subscription.getAsaasCustomerId()));
     }
 
     private boolean withinLimit(Plan plan, UUID ownerId, UUID propertyId) {
-        if (plan.getMaxProperties() == null) return true;
+        if (Util.isNull(plan.getMaxProperties())) return true;
         int position = properties.findOwnedIdsOldestFirst(ownerId).indexOf(propertyId);
         return position >= 0 && position < plan.getMaxProperties();
     }
@@ -123,9 +125,9 @@ public class PlanService {
      * para que um webhook perdido não deixe o plano liberado para sempre.
      */
     static Plan resolve(Subscription subscription, Plan trialPlan, LocalDateTime now) {
-        if (subscription.getPlan() == null) return now.isBefore(subscription.getTrialEndsAt()) ? trialPlan : null;
+        if (Util.isNull(subscription.getPlan())) return now.isBefore(subscription.getTrialEndsAt()) ? trialPlan : null;
         LocalDate paidUntil = subscription.getPaidUntil();
-        if (paidUntil == null) {
+        if (Util.isNull(paidUntil)) {
             // Ainda sem pagamento: a fatura vence no fim do teste, com a mesma tolerância de qualquer cobrança.
             boolean awaitingFirstPayment = "PENDING".equals(subscription.getStatus())
                     && !now.toLocalDate().isAfter(subscription.getTrialEndsAt().toLocalDate().plusDays(GRACE_DAYS));

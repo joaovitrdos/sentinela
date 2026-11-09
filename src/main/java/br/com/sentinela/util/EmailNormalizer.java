@@ -8,6 +8,6 @@ public final class EmailNormalizer {
     }
 
     public static String normalize(String email) {
-        return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
+        return Util.isNull(email) ? null : email.trim().toLowerCase(Locale.ROOT);
     }
 }

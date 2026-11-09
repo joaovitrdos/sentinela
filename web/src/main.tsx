@@ -48,9 +48,11 @@ const AppRoutes = () => {
         <AnimatePresence mode="wait" initial={false} onExitComplete={() => window.scrollTo({ top: 0, behavior: "instant" })}>
             <PageFade key={routeGroup(location.pathname)}>
                 <Routes location={location}>
-                    <Route path="/" element={<Redirect to="/home" />} />
+                    <Route path="/" element={<Redirect to="/mapa" />} />
                     <Route path="/404" element={<NotFound />} />
-                    <Route path="/maintenance" element={<Redirect to="/home" />} />
+                    <Route path="/maintenance" element={<Redirect to="/mapa" />} />
+                    {/* Endereço antigo do mapa: mantém favoritos funcionando. */}
+                    <Route path="/home" element={<Redirect to="/mapa" />} />
 
                     {/* AuthController. Rota-pai unica: trocar entre /login e /register nao desmonta a tela (nem o mapa) */}
                     <Route
@@ -97,7 +99,7 @@ const AppRoutes = () => {
                         }
                     >
                         <Route
-                            path="/home"
+                            path="/mapa"
                             element={
                                 <RequireAuth>
                                     <HomePage />

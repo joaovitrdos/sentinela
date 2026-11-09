@@ -149,7 +149,7 @@ public class AuthService {
 
         User user = userRepository.findByEmail(email).orElse(null);
 
-        if (user == null || !user.hasLocalPassword()
+        if (Util.isNull(user) || !user.hasLocalPassword()
                 || !passwordEncoder.matches(request.password(), user.getPassword())) {
             burnPasswordComparison(request.password());
             throw failedLogin(email);
@@ -253,7 +253,7 @@ public class AuthService {
 
     private User createFromGoogle(String googleId, String email, String name, String picture) {
         User user = User.builder()
-                .name(name != null ? name : email)
+                .name(Util.nonNull(name) ? name : email)
                 .email(email)
                 .picture(picture)
                 .googleId(googleId)
@@ -268,7 +268,7 @@ public class AuthService {
     private User linkGoogleAccount(User user, String googleId, String picture) {
         user.setGoogleId(googleId);
         user.setEmailVerified(true);
-        if (picture != null) {
+        if (Util.nonNull(picture)) {
             user.setPicture(picture);
         }
         User linked = saveUser(user);
@@ -282,10 +282,10 @@ public class AuthService {
     }
 
     private User refreshGoogleProfile(User user, String name, String picture) {
-        if (name != null) {
+        if (Util.nonNull(name)) {
             user.setName(name);
         }
-        if (picture != null) {
+        if (Util.nonNull(picture)) {
             user.setPicture(picture);
         }
         return saveUser(user);
@@ -301,7 +301,7 @@ public class AuthService {
     }
 
     private String requiredClaim(String value) {
-        if (value == null || value.isBlank()) {
+        if (Util.isNullOrBlank(value)) {
             throw new InvalidGoogleTokenException();
         }
         return value;
@@ -309,7 +309,7 @@ public class AuthService {
 
     private String optionalClaim(GoogleIdToken.Payload payload, String claim) {
         Object value = payload.get(claim);
-        return value instanceof String text && !text.isBlank() ? text : null;
+        return value instanceof String text && !Util.isNullOrBlank(text) ? text : null;
     }
 
     private String normalizeEmail(String email) {

@@ -1,5 +1,7 @@
 package br.com.sentinela.infra.client.snirh;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.exception.SnirhApiException;
 import br.com.sentinela.exception.SnirhUnavailableException;
 import br.com.sentinela.dto.response.ArcGisQueryResponseDto;
@@ -61,15 +63,15 @@ public class SnirhRainClient {
                         .retrieve()
                         .body(ArcGisQueryResponseDto.class);
 
-                if (response == null) {
+                if (Util.isNull(response)) {
                     throw new SnirhApiException("SNIRH returned an empty response");
                 }
-                if (response.error() != null) {
+                if (Util.nonNull(response.error())) {
                     throw new SnirhApiException(
                             "ArcGIS error " + response.error().code()
                                     + ": " + response.error().message());
                 }
-                return response.features() != null ? response.features() : List.of();
+                return Util.nonNull(response.features()) ? response.features() : List.of();
 
             } catch (HttpClientErrorException exception) {
                 throw new SnirhApiException("SNIRH rejected offset " + offset + " with HTTP " + exception.getStatusCode());

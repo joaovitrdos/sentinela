@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.dto.response.SprayWindowResponseDto;
 import br.com.sentinela.dto.response.SprayWindowResponseDto.Hour;
 import br.com.sentinela.dto.response.SprayWindowResponseDto.Window;
@@ -54,7 +56,7 @@ public class SprayWindowService {
         if (temperature > MAX_TEMPERATURE_C) reasons.add("Temperatura acima de 30 °C");
         if (humidity < MIN_HUMIDITY) reasons.add("Umidade abaixo de 55%");
         if (rainChance >= MAX_RAIN_CHANCE || precipitation > 0) reasons.add("Risco de chuva");
-        return new Hour(hour.path("time").asText(), reasons.isEmpty(), temperature, humidity, wind, rainChance,
+        return new Hour(hour.path("time").asText(), Util.isNullOrEmpty(reasons), temperature, humidity, wind, rainChance,
                 precipitation, reasons);
     }
 
@@ -65,16 +67,16 @@ public class SprayWindowService {
         int count = 0;
         for (Hour hour : hours) {
             if (hour.suitable()) {
-                if (first == null) first = hour;
+                if (Util.isNull(first)) first = hour;
                 last = hour;
                 count++;
-            } else if (first != null) {
+            } else if (Util.nonNull(first)) {
                 windows.add(new Window(first.time(), last.time(), count));
                 first = null;
                 count = 0;
             }
         }
-        if (first != null) windows.add(new Window(first.time(), last.time(), count));
+        if (Util.nonNull(first)) windows.add(new Window(first.time(), last.time(), count));
         return windows;
     }
 }

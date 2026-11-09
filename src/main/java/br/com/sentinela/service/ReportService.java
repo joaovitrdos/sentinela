@@ -1,5 +1,7 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
+
 import br.com.sentinela.dto.response.GeneratedReportResposneDto;
 import br.com.sentinela.enums.ReportFormat;
 import br.com.sentinela.exception.ReportGenerationException;
@@ -72,17 +74,17 @@ public class ReportService {
     public GeneratedReportResposneDto generate(String reportCode, String formatValue,
             UUID userId, Map<String, Object> requestedParameters) {
         ReportProvider provider = providersByCode.get(reportCode);
-        if (provider == null) {
+        if (Util.isNull(provider)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Relatório não encontrado");
         }
 
         ReportFormat format = ReportFormat.from(formatValue);
         PreparedReport prepared = provider.prepare(userId,
-                requestedParameters == null ? Map.of() : requestedParameters);
+                Util.isNull(requestedParameters) ? Map.of() : requestedParameters);
         try {
             JasperReport template = compiledReports.computeIfAbsent(provider.code(), ignored -> compile(provider));
             JasperPrint filledReport;
-            if (prepared.rows() != null) {
+            if (Util.nonNull(prepared.rows())) {
                 JRDataSource reportDataSource = new JRMapCollectionDataSource(prepared.rows());
                 filledReport = JasperFillManager.fillReport(template, prepared.parameters(), reportDataSource);
             } else {

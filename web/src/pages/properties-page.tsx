@@ -10,6 +10,8 @@ import { PropertyMonitoring } from "@/components/app/properties/property-monitor
 import { PropertyAlerts } from "@/components/app/properties/property-alerts";
 import { PropertyCarImport } from "@/components/app/properties/property-car-import";
 import { PropertyFarmPanel } from "@/components/app/properties/property-farm-panel";
+import { PropertyClimateHistory } from "@/components/app/properties/property-climate-history";
+import { PropertyPlantingWindow } from "@/components/app/properties/property-planting-window";
 import { PropertyIrrigation } from "@/components/app/properties/property-irrigation";
 import { PropertySprayWindows } from "@/components/app/properties/property-spray-windows";
 import { Button } from "@/components/base/buttons/button";
@@ -543,6 +545,8 @@ export const PropertiesPage = () => {
             </section>
             <PropertyMonitoring property={editing ? null : selected} onOverlay={setOverlay} onPlanInspection={(note) => { if (selected) setInspectionSuggestion({ propertyId: selected.propertyId, note, key: Date.now() }); }} />
             {selected && !editing ? <PropertyAlerts property={selected} /> : null}
+            {selected && !editing ? <PropertyClimateHistory property={selected} /> : null}
+            {selected && !editing ? <PropertyPlantingWindow property={selected} /> : null}
             {selected && !editing ? (
                 <div className="grid min-w-0 gap-3 xl:grid-cols-2">
                     <PropertySprayWindows property={selected} />

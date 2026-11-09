@@ -1,5 +1,6 @@
 package br.com.sentinela.service;
 
+import br.com.sentinela.util.Util;
 import br.com.sentinela.dto.request.PropertyActivityRequestDto;
 import br.com.sentinela.dto.response.PropertyActivityResponseDto;
 import br.com.sentinela.entity.PropertyActivity;
@@ -31,34 +32,34 @@ public class PropertyActivityService {
 
     @Transactional
     public PropertyActivityResponseDto create(UUID ownerId, UUID propertyId, PropertyActivityRequestDto request) {
-        if ("RAINFALL".equals(request.type()) && request.amountMm() == null) {
+        if ("RAINFALL".equals(request.type()) && Util.isNull(request.amountMm())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe a chuva medida em milímetros");
         }
         var property = propertyService.requireEdit(propertyId, ownerId);
         if (Boolean.TRUE.equals(property.getRequireSeasonForFieldRecords()) &&
                 java.util.Set.of("PLANTING", "FERTILIZATION", "SPRAYING", "HARVEST").contains(request.type()) &&
-                request.seasonId() == null)
+                Util.isNull(request.seasonId()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selecione uma safra para esta operação");
-        var plot = request.plotId() == null ? null : plotService.requirePlot(propertyId, ownerId, request.plotId());
-        if (request.seasonId() != null && plot == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe o talhão da safra");
-        var season = request.seasonId() == null ? null : seasonService.requireSeason(ownerId, propertyId, request.plotId(), request.seasonId());
-        if (season != null && (request.date().isBefore(season.getPlantingDate()) ||
-                season.getHarvestDate() != null && request.date().isAfter(season.getHarvestDate())))
+        var plot = Util.isNull(request.plotId()) ? null : plotService.requirePlot(propertyId, ownerId, request.plotId());
+        if (Util.nonNull(request.seasonId()) && Util.isNull(plot)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe o talhão da safra");
+        var season = Util.isNull(request.seasonId()) ? null : seasonService.requireSeason(ownerId, propertyId, request.plotId(), request.seasonId());
+        if (Util.nonNull(season) && (request.date().isBefore(season.getPlantingDate()) ||
+                Util.nonNull(season.getHarvestDate()) && request.date().isAfter(season.getHarvestDate())))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data fora do período da safra");
-        if ((request.inputName() == null) != (request.inputQuantity() == null) ||
-                (request.inputName() != null && (request.inputName().isBlank() || request.inputUnit() == null || request.inputUnit().isBlank())))
+        if ((Util.isNull(request.inputName())) != (Util.isNull(request.inputQuantity())) ||
+                (Util.nonNull(request.inputName()) && (Util.isNullOrBlank(request.inputName()) || Util.isNullOrBlank(request.inputUnit()))))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe insumo, quantidade e unidade juntos");
-        if ((request.harvestQuantity() == null) != (request.harvestUnit() == null) ||
-                (request.harvestQuantity() != null && (!"HARVEST".equals(request.type()) || request.harvestUnit().isBlank())))
+        if ((Util.isNull(request.harvestQuantity())) != (Util.isNull(request.harvestUnit())) ||
+                (Util.nonNull(request.harvestQuantity()) && (!"HARVEST".equals(request.type()) || Util.isNullOrBlank(request.harvestUnit()))))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantidade colhida requer operação de colheita e unidade");
-        var responsible = request.responsibleUserId() == null ? null : teamService.requireActiveMember(property, request.responsibleUserId());
+        var responsible = Util.isNull(request.responsibleUserId()) ? null : teamService.requireActiveMember(property, request.responsibleUserId());
         var activity = PropertyActivity.builder()
                 .property(property)
                 .plot(plot).season(season).responsibleUser(responsible)
-                .responsibleName(responsible == null ? null : responsible.getName())
-                .inputName(request.inputName() == null ? null : request.inputName().trim())
-                .inputQuantity(request.inputQuantity()).inputUnit(request.inputUnit() == null ? null : request.inputUnit().trim())
-                .harvestQuantity(request.harvestQuantity()).harvestUnit(request.harvestUnit() == null ? null : request.harvestUnit().trim())
+                .responsibleName(Util.isNull(responsible) ? null : responsible.getName())
+                .inputName(Util.isNull(request.inputName()) ? null : request.inputName().trim())
+                .inputQuantity(request.inputQuantity()).inputUnit(Util.isNull(request.inputUnit()) ? null : request.inputUnit().trim())
+                .harvestQuantity(request.harvestQuantity()).harvestUnit(Util.isNull(request.harvestUnit()) ? null : request.harvestUnit().trim())
                 .type(request.type())
                 .date(request.date())
                 .time(request.time())
@@ -80,9 +81,9 @@ public class PropertyActivityService {
     private PropertyActivityResponseDto toResponse(PropertyActivity activity) {
         return new PropertyActivityResponseDto(activity.getActivityId(), activity.getType(), activity.getDate(), activity.getTime(),
                 activity.getNotes(), activity.getAmountMm(), activity.getCreatedAt(),
-                activity.getPlot() == null ? null : activity.getPlot().getPlotId(),
-                activity.getSeason() == null ? null : activity.getSeason().getSeasonId(),
-                activity.getResponsibleUser() == null ? null : activity.getResponsibleUser().getUserId(),
+                Util.isNull(activity.getPlot()) ? null : activity.getPlot().getPlotId(),
+                Util.isNull(activity.getSeason()) ? null : activity.getSeason().getSeasonId(),
+                Util.isNull(activity.getResponsibleUser()) ? null : activity.getResponsibleUser().getUserId(),
                 activity.getResponsibleName(), activity.getInputName(), activity.getInputQuantity(), activity.getInputUnit(),
                 activity.getHarvestQuantity(), activity.getHarvestUnit());
     }
